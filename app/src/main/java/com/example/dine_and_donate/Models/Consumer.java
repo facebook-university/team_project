@@ -5,10 +5,9 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 
-public class Consumer extends ParseUser {
+public class Consumer {
 
     private String email;
-    private String password;
     private ArrayList<Event> upcomingEvents;
     private ArrayList<Event> pastEvents;
     private ArrayList<Organization> followingOrgs;

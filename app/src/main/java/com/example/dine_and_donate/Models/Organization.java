@@ -5,8 +5,9 @@ import com.parse.ParseUser;
 import java.io.File;
 import java.util.ArrayList;
 
-public class Organization extends ParseUser {
+public class Organization {
 
+    private String email;
     private String name;
     private File profileImage;
     private String bio;
