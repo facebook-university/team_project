@@ -44,7 +44,7 @@ dependencies {
     implementation "com.github.hotchemi:permissionsdispatcher:$permissionDispatcherVersion"
     annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:$permissionDispatcherVersion"
     implementation 'com.google.maps.android:android-maps-utils:0.5+'
-
+    implementation 'com.google.firebase:firebase-auth:18.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
