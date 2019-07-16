@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Dine and Donate</string>
+    <string-array name="user_types">
+        <item> </item>
+        <item>Consumer</item>
+        <item>Organization</item>
+    </string-array>
 </resources>
