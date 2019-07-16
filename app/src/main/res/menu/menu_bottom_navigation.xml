@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_home"
+        android:id="@+id/action_notify"
         android:enabled="true"
         android:icon="@drawable/icons8_notification_50"
         android:title="Notifications"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_newPost"
+        android:id="@+id/action_map"
         android:enabled="true"
         android:icon="@drawable/icons8_map_50"
         android:title="Map"

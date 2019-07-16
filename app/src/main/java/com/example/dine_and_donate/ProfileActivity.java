@@ -15,7 +15,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
 
 public class ProfileActivity extends AppCompatActivity {
-    Button logOutBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,34 +22,29 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.profile_activity);
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
+        //Change bottom navigation profile icon to filled
         bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
 
-//        logOutBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                ParseUser.logOut();
-//                ParseUser currentUser = ParseUser.getCurrentUser();
-//                navigationHelper(LoginActivity.class);
-//            }
-//        });
-
-//        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-//            @Override
-//            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//                switch (item.getItemId()) {
-//                    case R.id.action_home:
-//                        navigationHelper(FeedActivity.class);
-//                        break;
-//                    case R.id.action_newPost:
-//                        navigationHelper(HomeActivity.class);
-//                        break;
-//                    case R.id.action_profile:
-//                        break;
-//                    default: return true;
-//                }
-//                return true;
-//            }
-//        });
+        //Add click listener to bottom navigation bar for navigating between views
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_notify:
+                        //Go to Notifications
+                        navigationHelper(NotificationsActivity.class);
+                        break;
+                    case R.id.action_map:
+                        //Go to Map
+                        navigationHelper(MapActivity.class);
+                        break;
+                    case R.id.action_profile:
+                        break;
+                    default: break;
+                }
+                return true;
+            }
+        });
     }
 
     private void navigationHelper(Class activity) {
