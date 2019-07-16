@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.dine_and_donate.LoginActivity;
 import com.example.dine_and_donate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.parse.ParseUser;
 
 public class ProfileActivity extends AppCompatActivity {
     MenuItem createEvent;
