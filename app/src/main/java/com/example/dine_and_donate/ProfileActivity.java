@@ -2,6 +2,7 @@ package com.example.dine_and_donate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseUser;
 
 public class ProfileActivity extends AppCompatActivity {
+    MenuItem createEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,5 +52,34 @@ public class ProfileActivity extends AppCompatActivity {
     private void navigationHelper(Class activity) {
         final Intent loginToTimeline = new Intent(this, activity);
         startActivity(loginToTimeline);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Store instance of the menu item containing progress
+        createEvent = menu.findItem(R.id.createEvent);
+        createEvent.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                createEvent();
+                return false;
+            }
+        });
+
+
+        // Return to finish
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Associate searchable configuration with the SearchView
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        return true;
+    }
+
+    private void createEvent() {
+        System.out.println("Clicked on Create Event!");
+        //TO DO
     }
 }
