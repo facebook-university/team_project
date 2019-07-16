@@ -1,8 +1,5 @@
 package com.example.dine_and_donate.Models;
 
-import com.parse.Parse;
-import com.parse.ParseUser;
-
 import java.util.ArrayList;
 
 public class Consumer {

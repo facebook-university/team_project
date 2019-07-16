@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "572197996842",
+    "firebase_url": "https://dine-and-donate.firebaseio.com",
+    "project_id": "dine-and-donate",
+    "storage_bucket": "dine-and-donate.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572197996842:android:05487209f6aa5c02",
+        "android_client_info": {
+          "package_name": "com.example.dine_and_donate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "572197996842-qkve8jbl1plafdgrph0c76f42u91eb6e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsCK2_Eq7mcUrgP8X4R3hBgDQZMFm3pCc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "572197996842-qkve8jbl1plafdgrph0c76f42u91eb6e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
