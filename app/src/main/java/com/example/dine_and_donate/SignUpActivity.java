@@ -72,4 +72,16 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
     }
+
+//    //method to check that the fields are not empty
+//    private boolean checkIfEmpty(String userInput) {
+//        String userEmail = userInput.getText().toString().trim();
+//        if(userEmail.isEmpty()) {
+//            emailInput.setError("Field can not be empty");
+//            return false;
+//        } else {
+//            emailInput.setError(null);
+//            return true;
+//        }
+//    }
 }
