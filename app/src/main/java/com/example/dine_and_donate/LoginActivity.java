@@ -2,10 +2,11 @@ package com.example.dine_and_donate;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -23,7 +24,6 @@ public class LoginActivity extends AppCompatActivity {
         password = findViewById(R.id.et_password);
         login = findViewById(R.id.login_btn);
         signup = findViewById(R.id.signup_btn);
-
 
         //action for login button
         login.setOnClickListener(new View.OnClickListener() {
@@ -47,7 +47,5 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-
     }
 }

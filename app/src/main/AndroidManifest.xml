@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".NotificationsActivity" android:theme="@style/noAnimTheme" />
+        <activity android:name=".MapActivity" android:theme="@style/noAnimTheme" />
+        <activity android:name=".ProfileActivity" android:theme="@style/noAnimTheme" >
+        </activity>
         <activity android:name=".SignUpActivity"/>
 
     </application>
