@@ -63,7 +63,7 @@ import permissions.dispatcher.RuntimePermissions;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 @RuntimePermissions
-public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLongClickListener {
+public class MapActivity extends AppCompatActivity {
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
@@ -281,14 +281,12 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        getRestaurants(Double.toString(location.getLongitude()), Double.toString(location.getLatitude()));
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putParcelable(KEY_LOCATION, mCurrentLocation);
         super.onSaveInstanceState(savedInstanceState);
     }
-
 
 
     // Define a DialogFragment that displays the error dialog
