@@ -109,6 +109,9 @@ public class MapActivity extends AppCompatActivity {
             Toast.makeText(this, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
 
+
+
+
         // Initialize Places.
         Places.initialize(getApplicationContext(), API_KEY);
 
@@ -149,7 +152,7 @@ public class MapActivity extends AppCompatActivity {
             Toast.makeText(this, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapDemoActivityPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
             MapDemoActivityPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
-            map.setOnMapLongClickListener(this);
+            //map.setOnMapLongClickListener(this);
             map.setInfoWindowAdapter(new CustomWindowAdapter(getLayoutInflater()));
             map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         } else {
@@ -277,6 +280,9 @@ public class MapActivity extends AppCompatActivity {
         // Report to the UI that the location was updated
 
         mCurrentLocation = location;
+        String longitude = Double.toString(mCurrentLocation.getLongitude());
+        String latitude = Double.toString(mCurrentLocation.getLatitude());
+        getRestaurants(longitude, latitude);
         String msg = "Updated Location: " +
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
@@ -320,6 +326,7 @@ public class MapActivity extends AppCompatActivity {
 
     private void getRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
+
         yelpService.findRestaurants(latitude, longitude, new Callback() {
 
             @Override
@@ -331,7 +338,7 @@ public class MapActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 try {
                     String jsonData = response.body().string();
-                    Log.v(TAG, jsonData);
+                    Log.v("responseData", jsonData);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
