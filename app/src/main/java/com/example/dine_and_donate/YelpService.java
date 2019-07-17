@@ -21,14 +21,16 @@ public class YelpService {
                 .build();
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse(YELP_BASE_URL).newBuilder();
-        urlBuilder.addQueryParameter(YELP_LONGITUDE_QUERY_PARAMETER, longitude);
         urlBuilder.addQueryParameter(YELP_LATITUDE_QUERY_PARAMETER, latitude);
+        urlBuilder.addQueryParameter(YELP_LONGITUDE_QUERY_PARAMETER, longitude);
 
         String url = urlBuilder.build().toString();
+        System.out.println("URL: " + url);
 
         Request request= new Request.Builder()
                 .url(url)
-                .header("Authorization", YELP_API)
+                .get()
+                .header("Authorization", "Bearer " + YELP_API)
                 .build();
 
         Call call = client.newCall(request);
