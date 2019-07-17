@@ -4,23 +4,38 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.example.dine_and_donate.LoginActivity;
-import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.Models.StaggeredRecyclerViewAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.ArrayList;
 
 public class ProfileActivity extends AppCompatActivity {
     MenuItem createEvent;
+
+    private static final String TAG = "ProfileActivity";
+    private static final int NUM_COLUMNS = 2;
+
+    private ArrayList<String> mImageUrls = new ArrayList<>();
+    private ArrayList<String> mNames = new ArrayList<>();
+    private ArrayList<String> mDescription = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_activity);
+
+        initImageBitmaps();
+        initRecyclerView();
+
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         //Change bottom navigation profile icon to filled
@@ -46,6 +61,31 @@ public class ProfileActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+
+
+    }
+
+    private void initImageBitmaps() {
+        for(int i = 0; i < 20; i++) {
+            mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
+
+        }
+        for(int i = 0; i < 10; i++) {
+            mNames.add("Tree");
+            mNames.add("fjcutcnerdfdluvhbuegnecgvlkclbidjvnlvfubjrbeugtfdrtnikledvtbhguvuhrtjcvcfguekrfrihjfehbjllfdutbg");
+        }
+
+    }
+
+    private void initRecyclerView() {
+        RecyclerView recyclerView = findViewById(R.id.rv_vouchers);
+        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter =
+                new StaggeredRecyclerViewAdapter(this, mNames, mImageUrls);
+        StaggeredGridLayoutManager staggeredGridLayoutManager =
+                new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
+        recyclerView.setAdapter(staggeredRecyclerViewAdapter);
     }
 
     private void navigationHelper(Class activity) {
