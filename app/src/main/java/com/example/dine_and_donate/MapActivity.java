@@ -75,6 +75,9 @@ public class MapActivity extends AppCompatActivity {
     private final static String KEY_LOCATION = "location";
     public static final String TAG = MapActivity.class.getSimpleName();
 
+
+    boolean tempBool = false;
+
     /*
      * Define a request code to send to Google Play services This code is
      * returned in Activity.onActivityResult
@@ -149,8 +152,6 @@ public class MapActivity extends AppCompatActivity {
             Toast.makeText(this, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapDemoActivityPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
             MapDemoActivityPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
-            map.setOnMapLongClickListener(this);
-            map.setInfoWindowAdapter(new CustomWindowAdapter(getLayoutInflater()));
             map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         } else {
             Toast.makeText(this, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
@@ -281,6 +282,12 @@ public class MapActivity extends AppCompatActivity {
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        getRestaurants(Double.toString(location.getLongitude()), Double.toString(location.getLatitude()));
+
+        if (tempBool = false) {
+            tempBool = true;
+            getRestaurants(Double.toString(location.getLongitude()), Double.toString(location.getLatitude()));
+        }
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -319,7 +326,7 @@ public class MapActivity extends AppCompatActivity {
 
     private void getRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
-        yelpService.findRestaurants(latitude, longitude, new Callback() {
+        yelpService.findRestaurants(longitude, latitude, new Callback() {
 
             @Override
             public void onFailure(Call call, IOException e) {
