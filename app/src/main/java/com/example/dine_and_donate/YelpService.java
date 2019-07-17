@@ -12,15 +12,18 @@ public class YelpService {
 
     public static final String YELP_API = "UwrFPMfLEi9SPqorMdsGrNcezJDJ7FwB5sZkbovnv3c3lcqCsXXWcxvGIT6j9b37bn-9Rw_C_XJJV2QCK3yl0Si_vwE1r_s4oiXOY_XQQsnI87sG-v3EdbOo1nsvXXYx";
     public static final String YELP_BASE_URL = "https://api.yelp.com/v3/businesses/search?term=restaurants";
-    public static final String YELP_LOCATION_QUERY_PARAMETER = "location";
+    public static final String YELP_LATITUDE_QUERY_PARAMETER = "latitude";
+    public static final String YELP_LONGITUDE_QUERY_PARAMETER = "longitude";
 
-    public static void findRestaurants(String location, Callback callback) {
+    public static void findRestaurants(String longitude, String latitude, Callback callback) {
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse(YELP_BASE_URL).newBuilder();
-        urlBuilder.addQueryParameter(YELP_LOCATION_QUERY_PARAMETER, location);
+        urlBuilder.addQueryParameter(YELP_LONGITUDE_QUERY_PARAMETER, longitude);
+        urlBuilder.addQueryParameter(YELP_LATITUDE_QUERY_PARAMETER, latitude);
+
         String url = urlBuilder.build().toString();
 
         Request request= new Request.Builder()

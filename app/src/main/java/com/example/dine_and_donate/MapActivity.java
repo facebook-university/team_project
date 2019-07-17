@@ -281,7 +281,7 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        getRestaurants(location);
+        getRestaurants(Double.toString(location.getLongitude()), Double.toString(location.getLatitude()));
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -423,9 +423,9 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
         startActivity(loginToTimeline);
     }
 
-    private void getRestaurants(String location) {
+    private void getRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
-        yelpService.findRestaurants(location, new Callback() {
+        yelpService.findRestaurants(latitude, longitude, new Callback() {
 
             @Override
             public void onFailure(Call call, IOException e) {
@@ -443,6 +443,4 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
             }
         });
     }
-}
-
 }
