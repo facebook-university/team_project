@@ -24,6 +24,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private ArrayList<String> mImageUrls = new ArrayList<>();
     private ArrayList<String> mNames = new ArrayList<>();
+    private ArrayList<String> mDescription = new ArrayList<>();
 
 
     @Override
@@ -68,9 +69,12 @@ public class ProfileActivity extends AppCompatActivity {
     private void initImageBitmaps() {
         for(int i = 0; i < 20; i++) {
             mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
-            mNames.add("Tree");
-        }
 
+        }
+        for(int i = 0; i < 10; i++) {
+            mNames.add("Tree");
+            mNames.add("fjcutcnerdfdluvhbuegnecgvlkclbidjvnlvfubjrbeugtfdrtnikledvtbhguvuhrtjcvcfguekrfrihjfehbjllfdutbg");
+        }
 
     }
 
