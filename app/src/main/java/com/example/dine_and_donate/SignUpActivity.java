@@ -2,14 +2,23 @@ package com.example.dine_and_donate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SignUpActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -21,10 +30,16 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private Button signUpBtn;
     private Button backToLogin;
 
+    private FirebaseAuth mAuth;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup_activity);
+
+        mAuth = FirebaseAuth.getInstance();
 
         spinner = findViewById(R.id.user_options);
         name = findViewById(R.id.et_name);
@@ -88,6 +103,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     if(password.getText().toString().length() < 5) {
                         password.setError("You must have at least 5 characters");
                     } else {
+                        createAccount(email.getText().toString(), password.getText().toString());
                         Intent intent = new Intent(SignUpActivity.this, MapActivity.class);
                         startActivity(intent);
                         finish();
@@ -123,5 +139,27 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
             text.setError(null);
             return false;
         }
+    }
+
+    private void createAccount(String email, String password) {
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("create", "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
+                            // TODO: go to next screen
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("create", "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(SignUpActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
+                        }
+
+                        // ...
+                    }
+                });
     }
 }
