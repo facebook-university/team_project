@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -44,12 +45,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.maps.android.ui.IconGenerator;
 
-import java.util.Map;
+import okhttp3.Call;
+import okhttp3.Callback;
+
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Response;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
@@ -64,8 +71,9 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
     Location mCurrentLocation;
     private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(60);  /* 60 secs */
     private long FASTEST_INTERVAL = 5000; /* 5 secs */
-
+    private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
     private final static String KEY_LOCATION = "location";
+    public static final String TAG = MapActivity.class.getSimpleName();
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -100,6 +108,12 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
         } else {
             Toast.makeText(this, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
+
+        // Initialize Places.
+        Places.initialize(getApplicationContext(), API_KEY);
+
+        // Create a new Places client instance.
+        PlacesClient placesClient = Places.createClient(this);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -267,6 +281,7 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        getRestaurants(location);
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -407,4 +422,27 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
         final Intent loginToTimeline = new Intent(this, activity);
         startActivity(loginToTimeline);
     }
+
+    private void getRestaurants(String location) {
+        final YelpService yelpService = new YelpService();
+        yelpService.findRestaurants(location, new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    String jsonData = response.body().string();
+                    Log.v(TAG, jsonData);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+}
+
 }
