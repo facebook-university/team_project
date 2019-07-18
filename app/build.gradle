@@ -60,7 +60,6 @@ dependencies {
 
     //post request for yelp api
     implementation 'com.squareup.okhttp3:okhttp:4.0.1'
-
     implementation 'com.google.firebase:firebase-database:18.0.0'
 }
 

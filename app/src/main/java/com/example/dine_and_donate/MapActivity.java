@@ -87,6 +87,7 @@ public class MapActivity extends AppCompatActivity {
     private final static String KEY_LOCATION = "location";
     public static final String TAG = MapActivity.class.getSimpleName();
     public JSONArray restaurantsNearbyJSON;
+    private boolean loaded;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -99,6 +100,8 @@ public class MapActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_activity);
+
+        loaded = false;
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -121,6 +124,9 @@ public class MapActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
+
+
+
 
         // Initialize Places.
         Places.initialize(getApplicationContext(), API_KEY);
@@ -163,6 +169,10 @@ public class MapActivity extends AppCompatActivity {
             Toast.makeText(this, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapDemoActivityPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
             MapDemoActivityPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
+
+            //map.setOnMapLongClickListener(this);
+            map.setInfoWindowAdapter(new CustomWindowAdapter(getLayoutInflater()));
+
             map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         } else {
             Toast.makeText(this, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
@@ -276,6 +286,17 @@ public class MapActivity extends AppCompatActivity {
         // Report to the UI that the location was updated
 
         mCurrentLocation = location;
+        String longitude = Double.toString(mCurrentLocation.getLongitude());
+        String latitude = Double.toString(mCurrentLocation.getLatitude());
+
+        if(!loaded) {
+            LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
+            map.animateCamera(CameraUpdateFactory.zoomTo(15));
+            loaded = true;
+        }
+
+        getRestaurants(longitude, latitude);
         String msg = "Updated Location: " +
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
@@ -297,7 +318,10 @@ public class MapActivity extends AppCompatActivity {
 
     private void getRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
+
+
         yelpService.findRestaurants(longitude, latitude, new Callback() {
+
 
             @Override
             public void onFailure(Call call, IOException e) {
