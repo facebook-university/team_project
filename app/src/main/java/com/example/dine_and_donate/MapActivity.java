@@ -22,8 +22,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -94,6 +96,7 @@ public class MapActivity extends AppCompatActivity {
     public static final String TAG = MapActivity.class.getSimpleName();
     public JSONArray restaurantsNearbyJSON;
     private boolean loaded;
+    private View slideView;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -134,6 +137,7 @@ public class MapActivity extends AppCompatActivity {
 
 
 
+
         // Initialize Places.
         Places.initialize(getApplicationContext(), API_KEY);
 
@@ -166,6 +170,11 @@ public class MapActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        slideView = findViewById(R.id.slide_menu);
+        slideView.setVisibility(View.INVISIBLE);
+        //float height = bottomNavigationView.getBottom();
+        slideView.setY(1500);
     }
 
     protected void loadMap(GoogleMap googleMap) {
@@ -347,7 +356,9 @@ public class MapActivity extends AppCompatActivity {
                                             @Override
                                             public boolean onMarkerClick(Marker marker) {
                                                 try {
-                                                    seeRestaurantPopup(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                    //seeRestaurantPopup(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                    //TODO: slide menu comes up here
+                                                    slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
@@ -398,4 +409,17 @@ public class MapActivity extends AppCompatActivity {
 
         dialog.show();
     }
+
+    private void slideUpMenu(final JSONObject restaurant) {
+        slideView.setVisibility(View.VISIBLE);
+        TranslateAnimation animate = new TranslateAnimation(
+                0,
+                0,
+                slideView.getY(),
+                slideView.getY()-500);
+        animate.setDuration(500);
+        animate.setFillAfter(true);
+        slideView.startAnimation(animate);
+    }
+
 }
