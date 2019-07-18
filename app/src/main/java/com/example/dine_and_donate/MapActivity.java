@@ -22,8 +22,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +35,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -101,6 +104,9 @@ public class MapActivity extends AppCompatActivity {
     Double cameraLatitude;
     Double cameraLongitude;
 
+    private View slideView;
+    private boolean slideViewIsUp;
+
     /*
      * Define a request code to send to Google Play services This code is
      * returned in Activity.onActivityResult
@@ -140,6 +146,7 @@ public class MapActivity extends AppCompatActivity {
 
 
 
+
         // Initialize Places.
         Places.initialize(getApplicationContext(), API_KEY);
 
@@ -170,6 +177,21 @@ public class MapActivity extends AppCompatActivity {
                         break;
                 }
                 return true;
+            }
+        });
+
+        slideView = findViewById(R.id.slide_menu);
+        slideView.setVisibility(View.INVISIBLE);
+        slideView.setY(1200);
+        slideViewIsUp = false;
+
+        slideView.setOnTouchListener(new OnSwipeTouchListener(MapActivity.this) {
+            @Override
+            public void onSwipeBottom() {
+                super.onSwipeBottom();
+                if(slideViewIsUp) {
+                    slideDownMenu();
+                }
             }
         });
     }
@@ -418,11 +440,36 @@ public class MapActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse(uri));
-            startActivity(intent);
+                intent.setData(Uri.parse(uri));
+                startActivity(intent);
             }
         });
-
-        dialog.show();
     }
+
+    private void slideUpMenu(final JSONObject restaurant) throws JSONException {
+        TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
+        restName.setText(restaurant.getString("name"));
+        slideView.setVisibility(View.VISIBLE);
+        TranslateAnimation animate = new TranslateAnimation(
+                0,
+                0,
+                slideView.getY(),
+                0);
+        animate.setDuration(500);
+        animate.setFillAfter(true);
+        slideView.startAnimation(animate);
+    }
+
+    private void slideDownMenu() {
+        slideView.setVisibility(View.VISIBLE);
+        TranslateAnimation animate = new TranslateAnimation(
+                0,
+                0,
+                0,
+                slideView.getY());
+        animate.setDuration(500);
+        animate.setFillAfter(true);
+        slideView.startAnimation(animate);
+    }
+
 }
