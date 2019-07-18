@@ -14,4 +14,12 @@ public class Organization {
     private ArrayList<Event> upcomingEvents;
     private ArrayList<Event> pastEvents;
 
+    public Organization(String email, String name) {
+        this.email = email;
+        this.name = name;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 }
