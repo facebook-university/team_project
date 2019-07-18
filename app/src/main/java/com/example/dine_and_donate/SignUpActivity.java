@@ -42,7 +42,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private EditText orgPhone;
     private Button signUpBtn;
     private Button backToLogin;
-
     private FirebaseAuth mAuth;
     FirebaseUser user;
 
