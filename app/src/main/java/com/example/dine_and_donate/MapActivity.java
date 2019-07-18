@@ -9,9 +9,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
@@ -20,7 +22,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -60,11 +64,13 @@ import com.google.maps.android.ui.IconGenerator;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Response;
@@ -296,13 +302,8 @@ public class MapActivity extends AppCompatActivity {
             loaded = true;
         }
 
-        getRestaurants(longitude, latitude);
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         if (restaurantsNearbyJSON == null) {
-            getRestaurants(Double.toString(location.getLongitude()), Double.toString(location.getLatitude()));
+            getRestaurants(longitude, latitude);
         }
     }
 
@@ -318,11 +319,7 @@ public class MapActivity extends AppCompatActivity {
 
     private void getRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
-
-
         yelpService.findRestaurants(longitude, latitude, new Callback() {
-
-
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -337,13 +334,26 @@ public class MapActivity extends AppCompatActivity {
                         //add marker to each restaurant nearby
                         for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
                             try {
-                                JSONObject restLocation = restaurantsNearbyJSON.getJSONObject(i).getJSONObject("coordinates");
+                                final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
+                                JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                                 final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
                                 final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
+                                final int finalI = i;
                                 MapActivity.this.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName));
+                                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
+                                        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                            @Override
+                                            public boolean onMarkerClick(Marker marker) {
+                                                try {
+                                                    seeRestaurantPopup(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                return false;
+                                            }
+                                        });
                                     }
                                 });
                             } catch (JSONException e) {
@@ -358,5 +368,34 @@ public class MapActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void seeRestaurantPopup(final JSONObject restaurant) throws JSONException {
+        final AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.restaurant_fragment, null);
+        final Button callRestaurant = mView.findViewById(R.id.callRestaurant);
+        callRestaurant.setText(restaurant.getString("display_phone"));
+        TextView restaurantName = mView.findViewById(R.id.name);
+        restaurantName.setText(restaurant.getString("name"));
+
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+
+        callRestaurant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String uri = null;
+                try {
+                    uri = "tel:" + restaurant.getString("phone");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse(uri));
+            startActivity(intent);
+            }
+        });
+
+        dialog.show();
     }
 }
