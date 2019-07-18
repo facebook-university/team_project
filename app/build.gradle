@@ -56,11 +56,15 @@ dependencies {
     annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:$permissionDispatcherVersion"
     implementation 'com.google.maps.android:android-maps-utils:0.5+'
     implementation 'com.google.firebase:firebase-auth:18.1.0'
+<<<<<<< HEAD
     implementation 'com.google.android.libraries.places:places:1.1.0'
 
     //post request for yelp api
     implementation 'com.squareup.okhttp3:okhttp:4.0.1'
 
+=======
+    implementation 'com.google.firebase:firebase-database:18.0.0'
+>>>>>>> 8b152f42fd097b9a2548b61ca2e20604e36f2f50
 }
 
 apply plugin: 'com.google.gms.google-services'
