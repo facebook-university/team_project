@@ -287,6 +287,11 @@ public class MapActivity extends AppCompatActivity {
         mCurrentLocation = location;
         String longitude = Double.toString(mCurrentLocation.getLongitude());
         String latitude = Double.toString(mCurrentLocation.getLatitude());
+
+        LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+        map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
+        map.animateCamera(CameraUpdateFactory.zoomTo(15));
+
         getRestaurants(longitude, latitude);
         String msg = "Updated Location: " +
                 Double.toString(location.getLatitude()) + "," +
@@ -338,7 +343,6 @@ public class MapActivity extends AppCompatActivity {
     private void getRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
 
-        yelpService.findRestaurants(latitude, longitude, new Callback() {
 
         yelpService.findRestaurants(longitude, latitude, new Callback() {
 
