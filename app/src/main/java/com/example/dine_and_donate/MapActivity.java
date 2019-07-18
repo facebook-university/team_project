@@ -35,6 +35,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -96,7 +97,9 @@ public class MapActivity extends AppCompatActivity {
     public static final String TAG = MapActivity.class.getSimpleName();
     public JSONArray restaurantsNearbyJSON;
     private boolean loaded;
+
     private View slideView;
+    private boolean slideViewIsUp;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -173,8 +176,18 @@ public class MapActivity extends AppCompatActivity {
 
         slideView = findViewById(R.id.slide_menu);
         slideView.setVisibility(View.INVISIBLE);
-        //float height = bottomNavigationView.getBottom();
-        slideView.setY(1500);
+        slideView.setY(1200);
+        slideViewIsUp = false;
+
+        slideView.setOnTouchListener(new OnSwipeTouchListener(MapActivity.this) {
+            @Override
+            public void onSwipeBottom() {
+                super.onSwipeBottom();
+                if(slideViewIsUp) {
+                    slideDownMenu();
+                }
+            }
+        });
     }
 
     protected void loadMap(GoogleMap googleMap) {
@@ -356,9 +369,9 @@ public class MapActivity extends AppCompatActivity {
                                             @Override
                                             public boolean onMarkerClick(Marker marker) {
                                                 try {
-                                                    //seeRestaurantPopup(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
                                                     //TODO: slide menu comes up here
                                                     slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                    slideViewIsUp = true;
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
@@ -381,42 +394,27 @@ public class MapActivity extends AppCompatActivity {
         });
     }
 
-    private void seeRestaurantPopup(final JSONObject restaurant) throws JSONException {
-        final AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapActivity.this);
-        View mView = getLayoutInflater().inflate(R.layout.restaurant_fragment, null);
-        final Button callRestaurant = mView.findViewById(R.id.callRestaurant);
-        callRestaurant.setText(restaurant.getString("display_phone"));
-        TextView restaurantName = mView.findViewById(R.id.name);
-        restaurantName.setText(restaurant.getString("name"));
-
-        mBuilder.setView(mView);
-        final AlertDialog dialog = mBuilder.create();
-
-        callRestaurant.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String uri = null;
-                try {
-                    uri = "tel:" + restaurant.getString("phone");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse(uri));
-            startActivity(intent);
-            }
-        });
-
-        dialog.show();
-    }
-
-    private void slideUpMenu(final JSONObject restaurant) {
+    private void slideUpMenu(final JSONObject restaurant) throws JSONException {
+        TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
+        restName.setText(restaurant.getString("name"));
         slideView.setVisibility(View.VISIBLE);
         TranslateAnimation animate = new TranslateAnimation(
                 0,
                 0,
                 slideView.getY(),
-                slideView.getY()-500);
+                0);
+        animate.setDuration(500);
+        animate.setFillAfter(true);
+        slideView.startAnimation(animate);
+    }
+
+    private void slideDownMenu() {
+        slideView.setVisibility(View.VISIBLE);
+        TranslateAnimation animate = new TranslateAnimation(
+                0,
+                0,
+                0,
+                slideView.getY());
         animate.setDuration(500);
         animate.setFillAfter(true);
         slideView.startAnimation(animate);
