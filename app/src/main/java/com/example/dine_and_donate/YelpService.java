@@ -25,7 +25,6 @@ public class YelpService {
         urlBuilder.addQueryParameter(YELP_LONGITUDE_QUERY_PARAMETER, longitude);
 
         String url = urlBuilder.build().toString();
-        System.out.println("URL: " + url);
 
         Request request= new Request.Builder()
                 .url(url)

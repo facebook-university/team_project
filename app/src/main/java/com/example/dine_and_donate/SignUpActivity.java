@@ -45,11 +45,8 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private FirebaseAuth mAuth;
     FirebaseUser user;
 
-<<<<<<< HEAD
-=======
     private DatabaseReference mDatabase;
 
->>>>>>> 8b152f42fd097b9a2548b61ca2e20604e36f2f50
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
