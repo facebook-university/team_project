@@ -1,27 +1,24 @@
-package com.example.dine_and_donate.Models;
+package com.example.dine_and_donate;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.dine_and_donate.R;
 
 import java.util.ArrayList;
 
 public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<StaggeredRecyclerViewAdapter.ViewHolder> {
 
 
-    public StaggeredRecyclerViewAdapter(Context mContext, ArrayList<String> mNames, ArrayList<String> mImageUrls) {
+    public StaggeredRecyclerViewAdapter(Tab1Fragment mContext, ArrayList<String> mNames, ArrayList<String> mImageUrls) {
         this.mNames = mNames;
         this.mImageUrls = mImageUrls;
         this.mContext = mContext;
@@ -29,7 +26,16 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
 
     private ArrayList<String> mNames = new ArrayList<>();
     private ArrayList<String> mImageUrls = new ArrayList<>();
-    private Context mContext;
+    private ArrayList<String> mNamesTwo = new ArrayList<>();
+    private ArrayList<String> mImageUrlsTwo = new ArrayList<>();
+    private Tab1Fragment mContext;
+    private Tab2Fragment mContextTwo;
+
+    public StaggeredRecyclerViewAdapter(Tab2Fragment tab2Fragment, ArrayList<String> mNames, ArrayList<String> mImageUrls) {
+        this.mNamesTwo = mNames;
+        this.mImageUrlsTwo = mImageUrls;
+        this.mContextTwo = tab2Fragment;
+    }
 
     @NonNull
     @Override
@@ -56,10 +62,9 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
             @Override
             public void onClick(View v) {
                 Log.d("TAG", "onClick: clicked on: " + mNames.get(position));
-                Toast.makeText(mContext, mNames.get(position), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(mContext, mNames.get(position), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     @Override

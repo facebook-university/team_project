@@ -100,8 +100,8 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                 //if none of the fields are empty, then sign up information is valid
                 if(validInfo) {
                     //if password length is less than 5, then user can not successfully sign up
-                    if(password.getText().toString().length() < 5) {
-                        password.setError("You must have at least 5 characters");
+                    if(password.getText().toString().length() < 6) {
+                        password.setError("You must have at least 6 characters");
                     } else {
                         createAccount(email.getText().toString(), password.getText().toString());
                         Intent intent = new Intent(SignUpActivity.this, MapActivity.class);
@@ -157,8 +157,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                             Log.w("create", "createUserWithEmail:failure", task.getException());
                             Toast.makeText(SignUpActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
                         }
-
-                        // ...
                     }
                 });
     }
