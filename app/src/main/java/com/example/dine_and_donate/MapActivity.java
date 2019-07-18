@@ -74,11 +74,12 @@ public class MapActivity extends AppCompatActivity {
     private GoogleMap map;
     private LocationRequest mLocationRequest;
     Location mCurrentLocation;
-    private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(600);  /* 60 secs */
-    private long FASTEST_INTERVAL = 5000; /* 5 secs */
+    private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(6000);  /* 60 secs */
+    private long FASTEST_INTERVAL = 50000; /* 5 secs */
     private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
     private final static String KEY_LOCATION = "location";
     public static final String TAG = MapActivity.class.getSimpleName();
+    private boolean loaded;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -91,6 +92,8 @@ public class MapActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_activity);
+
+        loaded = false;
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -278,9 +281,12 @@ public class MapActivity extends AppCompatActivity {
         String longitude = Double.toString(mCurrentLocation.getLongitude());
         String latitude = Double.toString(mCurrentLocation.getLatitude());
 
-        LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-        map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
-        map.animateCamera(CameraUpdateFactory.zoomTo(15));
+        if(!loaded) {
+            LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
+            map.animateCamera(CameraUpdateFactory.zoomTo(15));
+            loaded = true;
+        }
 
         getRestaurants(longitude, latitude);
         String msg = "Updated Location: " +
