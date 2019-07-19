@@ -73,7 +73,11 @@ import okhttp3.Call;
 import okhttp3.Callback;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Response;
@@ -95,8 +99,10 @@ public class MapActivity extends AppCompatActivity {
     private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
     private final static String KEY_LOCATION = "location";
     public static final String TAG = MapActivity.class.getSimpleName();
-    public JSONArray restaurantsNearbyJSON;
+    public JSONArray restaurantsNearbyJSON = new JSONArray();
     private boolean loaded;
+    private Double cameraLatitude;
+    private Double cameraLongitude;
 
     private View slideView;
     private boolean slideViewIsUp;
@@ -192,6 +198,27 @@ public class MapActivity extends AppCompatActivity {
 
     protected void loadMap(GoogleMap googleMap) {
         map = googleMap;
+        map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                Double newLongitude = map.getCameraPosition().target.longitude;
+                Double newLatitude = map.getCameraPosition().target.latitude;
+                if (cameraLatitude == null || cameraLongitude == null) {
+                    cameraLatitude = newLatitude;
+                    cameraLongitude = newLongitude;
+                    getRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                }
+
+                if (((Math.abs(newLongitude - cameraLongitude) > 0.03)
+                    || (Math.abs(newLatitude - cameraLatitude) > 0.03))
+                    && (map.getCameraPosition().zoom > 10)) {
+                    cameraLongitude = newLongitude;
+                    cameraLatitude = newLatitude;
+                    getRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                }
+            }
+        });
+
         if (map != null) {
             // Map is ready
             Toast.makeText(this, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
@@ -323,10 +350,6 @@ public class MapActivity extends AppCompatActivity {
             map.animateCamera(CameraUpdateFactory.zoomTo(15));
             loaded = true;
         }
-
-        if (restaurantsNearbyJSON == null) {
-            getRestaurants(longitude, latitude);
-        }
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -353,43 +376,72 @@ public class MapActivity extends AppCompatActivity {
                     String jsonData = response.body().string();
                     try {
                         restaurantsNearbyJSON = new JSONObject(jsonData).getJSONArray("businesses");
-                        //add marker to each restaurant nearby
-                        for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
-                            try {
-                                final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
-                                JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
-                                final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
-                                final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
-                                final int finalI = i;
-                                MapActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
-                                        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                                            @Override
-                                            public boolean onMarkerClick(Marker marker) {
-                                                try {
-                                                    //TODO: slide menu comes up here
-                                                    slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
-                                                    slideViewIsUp = true;
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                return false;
-                                            }
-                                        });
-                                    }
-                                });
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                        addRestaurantMarkers();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+    }
+
+    private void addRestaurantMarkers() {
+        //add marker to each restaurant nearby
+        for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
+            try {
+                final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
+                JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
+                final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
+                final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
+                final int finalI = i;
+                MapActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
+                        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                            @Override
+                            public boolean onMarkerClick(Marker marker) {
+                                try {
+                                    seeRestaurantPopup(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                return false;
+                            }
+                        });
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void seeRestaurantPopup(final JSONObject restaurant) throws JSONException {
+        final AlertDialog.Builder Builder = new AlertDialog.Builder(MapActivity.this);
+        View view = getLayoutInflater().inflate(R.layout.restaurant_fragment, null);
+        final Button callRestaurant = view.findViewById(R.id.callRestaurant);
+        callRestaurant.setText(restaurant.getString("display_phone"));
+        TextView restaurantName = view.findViewById(R.id.name);
+        restaurantName.setText(restaurant.getString("name"));
+
+        Builder.setView(view);
+        final AlertDialog dialog = Builder.create();
+
+        callRestaurant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String uri = null;
+                try {
+                    uri = "tel:" + restaurant.getString("phone");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse(uri));
+                startActivity(intent);
             }
         });
     }
