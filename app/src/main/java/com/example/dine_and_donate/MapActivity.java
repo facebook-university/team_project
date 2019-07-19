@@ -404,7 +404,7 @@ public class MapActivity extends AppCompatActivity {
                             @Override
                             public boolean onMarkerClick(Marker marker) {
                                 try {
-                                    seeRestaurantPopup(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                    slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -417,33 +417,6 @@ public class MapActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-    }
-
-    private void seeRestaurantPopup(final JSONObject restaurant) throws JSONException {
-        final AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapActivity.this);
-        View mView = getLayoutInflater().inflate(R.layout.restaurant_fragment, null);
-        final Button callRestaurant = mView.findViewById(R.id.callRestaurant);
-        callRestaurant.setText(restaurant.getString("display_phone"));
-        TextView restaurantName = mView.findViewById(R.id.name);
-        restaurantName.setText(restaurant.getString("name"));
-
-        mBuilder.setView(mView);
-        final AlertDialog dialog = mBuilder.create();
-
-        callRestaurant.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String uri = null;
-                try {
-                    uri = "tel:" + restaurant.getString("phone");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Intent intent = new Intent(Intent.ACTION_DIAL);
-                intent.setData(Uri.parse(uri));
-                startActivity(intent);
-            }
-        });
     }
 
     private void slideUpMenu(final JSONObject restaurant) throws JSONException {
