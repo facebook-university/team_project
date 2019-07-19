@@ -47,6 +47,7 @@
             android:name=".ProfileActivity"
             android:theme="@style/noAnimTheme"></activity>
         <activity android:name=".SignUpActivity" />
+        <activity android:name=".EventActivity"/>
 
         <uses-library
             android:name="com.google.android.maps"

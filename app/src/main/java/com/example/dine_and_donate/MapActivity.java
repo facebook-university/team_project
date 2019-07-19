@@ -36,6 +36,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
+import com.example.dine_and_donate.Models.Restaurant;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -100,6 +101,7 @@ public class MapActivity extends AppCompatActivity {
 
     private View slideView;
     private boolean slideViewIsUp;
+    Button btnCreate;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -174,11 +176,14 @@ public class MapActivity extends AppCompatActivity {
             }
         });
 
+        // setting uo slide view with restaurant info
         slideView = findViewById(R.id.slide_menu);
         slideView.setVisibility(View.INVISIBLE);
         slideView.setY(1200);
         slideViewIsUp = false;
 
+
+        // slide view can be swiped down to dismiss and swiped up for more info
         slideView.setOnTouchListener(new OnSwipeTouchListener(MapActivity.this) {
             @Override
             public void onSwipeBottom() {
@@ -186,6 +191,22 @@ public class MapActivity extends AppCompatActivity {
                 if(slideViewIsUp) {
                     slideDownMenu();
                 }
+            }
+
+            @Override
+            public void onSwipeTop() {
+                super.onSwipeTop();
+                if(slideViewIsUp) {
+                    //TODO: show more detail in view
+
+                }
+            }
+        });
+
+        slideView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: same as swipe up
             }
         });
     }
@@ -353,6 +374,7 @@ public class MapActivity extends AppCompatActivity {
                     String jsonData = response.body().string();
                     try {
                         restaurantsNearbyJSON = new JSONObject(jsonData).getJSONArray("businesses");
+                        Log.v("response", restaurantsNearbyJSON.toString());
                         //add marker to each restaurant nearby
                         for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
                             try {
@@ -406,10 +428,27 @@ public class MapActivity extends AppCompatActivity {
         animate.setDuration(500);
         animate.setFillAfter(true);
         slideView.startAnimation(animate);
+
+        btnCreate = slideView.findViewById(R.id.btn_create_event);
+        btnCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapActivity.this, EventActivity.class);
+                try {
+                    intent.putExtra("location", Restaurant.format(restaurant));
+                    JSONObject restLocation = restaurant.getJSONObject("coordinates");
+                    intent.putExtra("latitude", restLocation.getDouble("latitude"));
+                    intent.putExtra("longitude", restLocation.getDouble("longitude"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                startActivity(intent);
+            }
+        });
     }
 
     private void slideDownMenu() {
-        slideView.setVisibility(View.VISIBLE);
+        slideView.setVisibility(View.INVISIBLE);
         TranslateAnimation animate = new TranslateAnimation(
                 0,
                 0,
