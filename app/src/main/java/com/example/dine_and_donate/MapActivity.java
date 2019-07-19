@@ -101,8 +101,8 @@ public class MapActivity extends AppCompatActivity {
     public static final String TAG = MapActivity.class.getSimpleName();
     public JSONArray restaurantsNearbyJSON = new JSONArray();
     private boolean loaded;
-    Double cameraLatitude;
-    Double cameraLongitude;
+    private Double cameraLatitude;
+    private Double cameraLongitude;
 
     private View slideView;
     private boolean slideViewIsUp;
@@ -420,15 +420,15 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void seeRestaurantPopup(final JSONObject restaurant) throws JSONException {
-        final AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapActivity.this);
-        View mView = getLayoutInflater().inflate(R.layout.restaurant_fragment, null);
-        final Button callRestaurant = mView.findViewById(R.id.callRestaurant);
+        final AlertDialog.Builder Builder = new AlertDialog.Builder(MapActivity.this);
+        View view = getLayoutInflater().inflate(R.layout.restaurant_fragment, null);
+        final Button callRestaurant = view.findViewById(R.id.callRestaurant);
         callRestaurant.setText(restaurant.getString("display_phone"));
-        TextView restaurantName = mView.findViewById(R.id.name);
+        TextView restaurantName = view.findViewById(R.id.name);
         restaurantName.setText(restaurant.getString("name"));
 
-        mBuilder.setView(mView);
-        final AlertDialog dialog = mBuilder.create();
+        Builder.setView(view);
+        final AlertDialog dialog = Builder.create();
 
         callRestaurant.setOnClickListener(new View.OnClickListener() {
             @Override
