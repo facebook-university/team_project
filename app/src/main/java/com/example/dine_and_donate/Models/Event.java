@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Event {
-    private Boolean isAproved;
+    private String name;
     private String info;
     private Double percentOfMealPriceDonated;
     private ArrayList<Date> eventDates;
-    private File voucher;
+    private String voucherUrl;
     private ArrayList<Consumer> consumers;
     private Organization organization;
     // could create restaurant class and include here

@@ -1,12 +1,19 @@
 package com.example.dine_and_donate;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
@@ -15,14 +22,20 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,32 +53,59 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.gson.Gson;
 import com.google.maps.android.ui.IconGenerator;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 @RuntimePermissions
-public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLongClickListener {
+public class MapActivity extends AppCompatActivity {
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private LocationRequest mLocationRequest;
     Location mCurrentLocation;
-    private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(60);  /* 60 secs */
-    private long FASTEST_INTERVAL = 5000; /* 5 secs */
-
+    private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(6000);  /* 60 secs */
+    private long FASTEST_INTERVAL = 50000; /* 5 secs */
+    private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
     private final static String KEY_LOCATION = "location";
+    public static final String TAG = MapActivity.class.getSimpleName();
+    public JSONArray restaurantsNearbyJSON = new JSONArray();
+    private boolean loaded;
+    private Double cameraLatitude;
+    private Double cameraLongitude;
+
+    private View slideView;
+    private boolean slideViewIsUp;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -78,6 +118,8 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_activity);
+
+        loaded = false;
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -101,6 +143,16 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
             Toast.makeText(this, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
 
+
+
+
+
+        // Initialize Places.
+        Places.initialize(getApplicationContext(), API_KEY);
+
+        // Create a new Places client instance.
+        PlacesClient placesClient = Places.createClient(this);
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         //Change bottom navigation map icon to filled
@@ -121,28 +173,68 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
                         //Go to Profile
                         navigationHelper(ProfileActivity.class);
                         break;
-                    default: break;
+                    default:
+                        break;
                 }
                 return true;
+            }
+        });
+
+        slideView = findViewById(R.id.slide_menu);
+        slideView.setVisibility(View.INVISIBLE);
+        slideView.setY(1200);
+        slideViewIsUp = false;
+
+        slideView.setOnTouchListener(new OnSwipeTouchListener(MapActivity.this) {
+            @Override
+            public void onSwipeBottom() {
+                super.onSwipeBottom();
+                if(slideViewIsUp) {
+                    slideDownMenu();
+                }
             }
         });
     }
 
     protected void loadMap(GoogleMap googleMap) {
         map = googleMap;
+        map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                Double newLongitude = map.getCameraPosition().target.longitude;
+                Double newLatitude = map.getCameraPosition().target.latitude;
+                if (cameraLatitude == null || cameraLongitude == null) {
+                    cameraLatitude = newLatitude;
+                    cameraLongitude = newLongitude;
+                    getRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                }
+
+                if (((Math.abs(newLongitude - cameraLongitude) > 0.03)
+                    || (Math.abs(newLatitude - cameraLatitude) > 0.03))
+                    && (map.getCameraPosition().zoom > 10)) {
+                    cameraLongitude = newLongitude;
+                    cameraLatitude = newLatitude;
+                    getRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                }
+            }
+        });
+
         if (map != null) {
             // Map is ready
             Toast.makeText(this, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapDemoActivityPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
             MapDemoActivityPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
-            map.setOnMapLongClickListener(this);
+
+            //map.setOnMapLongClickListener(this);
             map.setInfoWindowAdapter(new CustomWindowAdapter(getLayoutInflater()));
+
             map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         } else {
             Toast.makeText(this, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
     }
 
+    @SuppressLint("NeedOnRequestPermissionsResult")
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -189,31 +281,6 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
         super.onStop();
     }
 
-    private boolean isGooglePlayServicesAvailable() {
-        // Check that Google Play services is available
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        // If Google Play services is available
-        if (ConnectionResult.SUCCESS == resultCode) {
-            // In debug mode, log the status
-            Log.d("Location Updates", "Google Play services is available.");
-            return true;
-        } else {
-            // Get the error dialog from Google Play services
-            Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-                    CONNECTION_FAILURE_RESOLUTION_REQUEST);
-
-            // If Google Play services can provide an error dialog
-            if (errorDialog != null) {
-                // Create a new DialogFragment for the error dialog
-                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-                errorFragment.setDialog(errorDialog);
-                errorFragment.show(getSupportFragmentManager(), "Location Updates");
-            }
-
-            return false;
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -231,6 +298,7 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
         MapDemoActivityPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     protected void startLocationUpdates() {
         mLocationRequest = new LocationRequest();
@@ -245,6 +313,16 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
         SettingsClient settingsClient = LocationServices.getSettingsClient(this);
         settingsClient.checkLocationSettings(locationSettingsRequest);
         //noinspection MissingPermission
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    Activity#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+            return;
+        }
         getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
@@ -263,10 +341,15 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
         // Report to the UI that the location was updated
 
         mCurrentLocation = location;
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        String longitude = Double.toString(mCurrentLocation.getLongitude());
+        String latitude = Double.toString(mCurrentLocation.getLatitude());
+
+        if(!loaded) {
+            LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
+            map.animateCamera(CameraUpdateFactory.zoomTo(15));
+            loaded = true;
+        }
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -274,137 +357,119 @@ public class MapActivity extends AppCompatActivity implements GoogleMap.OnMapLon
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    @Override
-    public void onMapLongClick(LatLng latLng) {
-        Toast.makeText(this, String.format(
-                "Map clicked at %f and %f", latLng.latitude, latLng.longitude),
-                Toast.LENGTH_SHORT)
-                .show();
-
-        showAlertDialogForPoint(latLng);
-
+    private void navigationHelper(Class activity) {
+        final Intent loginToTimeline = new Intent(this, activity);
+        startActivity(loginToTimeline);
     }
 
-    // Display the alert that adds the marker
-    private void showAlertDialogForPoint(final LatLng point) {
-        // inflate message_item.xml view
-        View messageView = LayoutInflater.from(MapActivity.this).
-                inflate(R.layout.message_item, null);
-        // Create alert dialog builder
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        // set message_item.xml to AlertDialog builder
-        alertDialogBuilder.setView(messageView);
-
-        // Create alert dialog
-        final AlertDialog alertDialog = alertDialogBuilder.create();
-
-        // Configure dialog button (OK)
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Define color of marker icon
-                        BitmapDescriptor defaultMarker =
-                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
-                        // Extract content from alert dialog
-                        String title = ((EditText) alertDialog.findViewById(R.id.etTitle)).
-                                getText().toString();
-                        String snippet = ((EditText) alertDialog.findViewById(R.id.etSnippet)).
-                                getText().toString();
-                        // Creates and adds marker to the map
-                        Marker marker = map.addMarker(new MarkerOptions()
-                                .position(point)
-                                .title(title)
-                                .snippet(snippet)
-                                .icon(getCustomIcon(title)));
-                        dropPinEffect(marker);
-                    }
-                });
-
-        // Configure dialog button (Cancel)
-        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        // Display the dialog
-        alertDialog.show();
-    }
-
-    private void dropPinEffect(final Marker marker) {
-        // Handler allows us to repeat a code block after a specified delay
-        final android.os.Handler handler = new android.os.Handler();
-        final long start = SystemClock.uptimeMillis();
-        final long duration = 1500;
-
-        // Use the bounce interpolator
-        final android.view.animation.Interpolator interpolator =
-                new BounceInterpolator();
-
-        // Animate marker with a bounce updating its position every 15ms
-        handler.post(new Runnable() {
+    private void getRestaurants(String longitude, String latitude) {
+        final YelpService yelpService = new YelpService();
+        yelpService.findRestaurants(longitude, latitude, new Callback() {
             @Override
-            public void run() {
-                long elapsed = SystemClock.uptimeMillis() - start;
-                // Calculate t for bounce based on elapsed time
-                float t = Math.max(
-                        1 - interpolator.getInterpolation((float) elapsed
-                                / duration), 0);
-                // Set the anchor
-                marker.setAnchor(0.5f, 1.0f + 14 * t);
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
 
-                if (t > 0.0) {
-                    // Post this event again 15ms from now.
-                    handler.postDelayed(this, 15);
-                } else { // done elapsing, show window
-                    marker.showInfoWindow();
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    String jsonData = response.body().string();
+                    try {
+                        restaurantsNearbyJSON = new JSONObject(jsonData).getJSONArray("businesses");
+                        addRestaurantMarkers();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
     }
 
-    private BitmapDescriptor getCustomIcon(String title) {
-        IconGenerator iconGenerator = new IconGenerator(MapActivity.this);
-
-        // Possible color options:
-        // STYLE_WHITE, STYLE_RED, STYLE_BLUE, STYLE_GREEN, STYLE_PURPLE, STYLE_ORANGE
-        iconGenerator.setStyle(IconGenerator.STYLE_GREEN);
-        // Swap text here to live inside speech bubble
-        Bitmap bitmap = iconGenerator.makeIcon(title);
-        // Use BitmapDescriptorFactory to create the marker
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmap);
-        return icon;
-    }
-
-
-    // Define a DialogFragment that displays the error dialog
-    public static class ErrorDialogFragment extends androidx.fragment.app.DialogFragment {
-
-        // Global field to contain the error dialog
-        private Dialog mDialog;
-
-        // Default constructor. Sets the dialog field to null
-        public ErrorDialogFragment() {
-            super();
-            mDialog = null;
-        }
-
-        // Set the dialog to display
-        public void setDialog(Dialog dialog) {
-            mDialog = dialog;
-        }
-
-        // Return a Dialog to the DialogFragment.
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return mDialog;
+    private void addRestaurantMarkers() {
+        //add marker to each restaurant nearby
+        for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
+            try {
+                final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
+                JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
+                final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
+                final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
+                final int finalI = i;
+                MapActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
+                        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                            @Override
+                            public boolean onMarkerClick(Marker marker) {
+                                try {
+                                    seeRestaurantPopup(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                return false;
+                            }
+                        });
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    private void navigationHelper(Class activity) {
-        final Intent loginToTimeline = new Intent(this, activity);
-        startActivity(loginToTimeline);
+    private void seeRestaurantPopup(final JSONObject restaurant) throws JSONException {
+        final AlertDialog.Builder Builder = new AlertDialog.Builder(MapActivity.this);
+        View view = getLayoutInflater().inflate(R.layout.restaurant_fragment, null);
+        final Button callRestaurant = view.findViewById(R.id.callRestaurant);
+        callRestaurant.setText(restaurant.getString("display_phone"));
+        TextView restaurantName = view.findViewById(R.id.name);
+        restaurantName.setText(restaurant.getString("name"));
+
+        Builder.setView(view);
+        final AlertDialog dialog = Builder.create();
+
+        callRestaurant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String uri = null;
+                try {
+                    uri = "tel:" + restaurant.getString("phone");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse(uri));
+                startActivity(intent);
+            }
+        });
     }
+
+    private void slideUpMenu(final JSONObject restaurant) throws JSONException {
+        TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
+        restName.setText(restaurant.getString("name"));
+        slideView.setVisibility(View.VISIBLE);
+        TranslateAnimation animate = new TranslateAnimation(
+                0,
+                0,
+                slideView.getY(),
+                0);
+        animate.setDuration(500);
+        animate.setFillAfter(true);
+        slideView.startAnimation(animate);
+    }
+
+    private void slideDownMenu() {
+        slideView.setVisibility(View.VISIBLE);
+        TranslateAnimation animate = new TranslateAnimation(
+                0,
+                0,
+                0,
+                slideView.getY());
+        animate.setDuration(500);
+        animate.setFillAfter(true);
+        slideView.startAnimation(animate);
+    }
+
 }
