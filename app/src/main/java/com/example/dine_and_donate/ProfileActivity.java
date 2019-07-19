@@ -63,7 +63,6 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-
     private void navigationHelper(Class activity) {
         final Intent loginToTimeline = new Intent(this, activity);
         startActivity(loginToTimeline);

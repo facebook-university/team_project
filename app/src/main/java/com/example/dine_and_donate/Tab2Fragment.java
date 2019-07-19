@@ -20,10 +20,13 @@ public class Tab2Fragment extends Fragment {
     private ArrayList<String> mImageUrls = new ArrayList<>();
     private ArrayList<String> mNames = new ArrayList<>();
 
+    //default constructor
     public Tab2Fragment() {
-
+        mImageUrls = new ArrayList<>();
+        mNames = new ArrayList<>();
     }
 
+    //inflates layout of fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.tab2_fragment, container, false);
         recyclerView = v.findViewById(R.id.rv_past_vouchers);
@@ -34,10 +37,9 @@ public class Tab2Fragment extends Fragment {
         return v;
     }
 
+    //initial creation of fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mImageUrls = new ArrayList<>();
-        mNames = new ArrayList<>();
         initBitmaps();
     }
 
@@ -45,8 +47,8 @@ public class Tab2Fragment extends Fragment {
     private void initBitmaps() {
         for(int i = 0; i < 20; i++) {
             mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
-
         }
+
         for(int i = 0; i < 10; i++) {
             mNames.add("udblrjtkbtecidtincndrftftglgelkc");
             mNames.add("dogs");

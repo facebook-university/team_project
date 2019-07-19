@@ -21,16 +21,15 @@ public class Tab1Fragment extends Fragment {
     private ArrayList<String> mImageUrls = new ArrayList<>();
     private ArrayList<String> mNames = new ArrayList<>();
 
-
+    //default constructor
     public Tab1Fragment() {
-
+        mImageUrls = new ArrayList<>();
+        mNames = new ArrayList<>();
     }
 
     //initial creation of fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mImageUrls = new ArrayList<>();
-        mNames = new ArrayList<>();
         initBitmaps();
     }
 
@@ -49,8 +48,8 @@ public class Tab1Fragment extends Fragment {
     private void initBitmaps() {
         for(int i = 0; i < 20; i++) {
             mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
-
         }
+
         for(int i = 0; i < 10; i++) {
             mNames.add("Tree");
             mNames.add("fjcutcnerdfdluvhbuegnecgvlkclbidjvnlvfubjrbeugtfdrtnikledvtbhguvuhrtjcvcfguekrfrihjfehbjllfdutbg");
