@@ -11,6 +11,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -18,6 +19,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPagerAdadpter viewPagerAdadpter;
     private ViewPager viewPager;
+    private FirebaseAuth user;
 
 
 
@@ -33,6 +35,7 @@ public class ProfileActivity extends AppCompatActivity {
        //Add Fragment Here
         viewPagerAdadpter.AddFragment(new Tab1Fragment(), "tab 1 fragment");
         viewPagerAdadpter.AddFragment(new Tab2Fragment(), "tab 2 fragment");
+
         viewPager.setAdapter(viewPagerAdadpter);
         tabLayout.setupWithViewPager(viewPager);
 
