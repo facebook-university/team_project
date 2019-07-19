@@ -69,23 +69,6 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(loginToTimeline);
     }
 
-   // @Override
-//    public boolean onPrepareOptionsMenu(Menu menu) {
-//        // Store instance of the menu item containing progress
-//        createEvent = menu.findItem(R.id.createEvent);
-//        createEvent.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                createEvent();
-//                return false;
-//            }
-//        });
-//
-//
-//        // Return to finish
-//        return super.onPrepareOptionsMenu(menu);
-//    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Associate searchable configuration with the SearchView

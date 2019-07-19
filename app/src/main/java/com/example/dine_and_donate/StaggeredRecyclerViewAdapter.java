@@ -15,26 +15,33 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 
+//bind the data to the view
 public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<StaggeredRecyclerViewAdapter.ViewHolder> {
 
-
-    public StaggeredRecyclerViewAdapter(Tab1Fragment mContext, ArrayList<String> mNames, ArrayList<String> mImageUrls) {
-        this.mNames = mNames;
-        this.mImageUrls = mImageUrls;
-        this.mContext = mContext;
-    }
 
     private ArrayList<String> mNames = new ArrayList<>();
     private ArrayList<String> mImageUrls = new ArrayList<>();
     private ArrayList<String> mNamesTwo = new ArrayList<>();
     private ArrayList<String> mImageUrlsTwo = new ArrayList<>();
-    private Tab1Fragment mContext;
-    private Tab2Fragment mContextTwo;
+    private Tab1Fragment tab1;
+    private Tab2Fragment tab2;
+    private boolean isTabOne;
 
-    public StaggeredRecyclerViewAdapter(Tab2Fragment tab2Fragment, ArrayList<String> mNames, ArrayList<String> mImageUrls) {
-        this.mNamesTwo = mNames;
-        this.mImageUrlsTwo = mImageUrls;
-        this.mContextTwo = tab2Fragment;
+
+    //constructor with Tab1Fragment
+    public StaggeredRecyclerViewAdapter(Tab1Fragment tab1, ArrayList<String> mNames, ArrayList<String> mImageUrls) {
+        this.mNames = mNames;
+        this.mImageUrls = mImageUrls;
+        this.tab1 = tab1;
+        isTabOne = true;
+    }
+
+    //constructor with Tab2Fragment
+    public StaggeredRecyclerViewAdapter(Tab2Fragment tab2, ArrayList<String> mNamesTwo, ArrayList<String> mImageUrlsTwo) {
+        this.mNamesTwo = mNamesTwo;
+        this.mImageUrlsTwo = mImageUrlsTwo;
+        this.tab2 = tab2;
+        isTabOne = false;
     }
 
     @NonNull
@@ -52,35 +59,42 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
         RequestOptions requestOptions = new RequestOptions()
             .placeholder(R.drawable.ic_launcher_background);
 
-        Glide.with(mContext)
-                .load(mImageUrls.get(position))
+        if(isTabOne) {
+            //populate recycler view for first tab fragment
+            Glide.with(tab1)
+                    .load(mImageUrls.get(position))
+                    .apply(requestOptions)
+                    .into(holder.image);
+            holder.name.setText(mNames.get(position));
+        } else {
+            //populate recycler view for second tab fragment
+            Glide.with(tab2)
+                .load(mImageUrlsTwo.get(position))
                 .apply(requestOptions)
                 .into(holder.image);
-
-        holder.name.setText(mNames.get(position));
-        holder.image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("TAG", "onClick: clicked on: " + mNames.get(position));
-                //Toast.makeText(mContext, mNames.get(position), Toast.LENGTH_SHORT).show();
-            }
-        });
+            holder.name.setText(mNamesTwo.get(position));
+        }
     }
 
     @Override
+    //return number of images present held by the adapter
     public int getItemCount() {
-        return mImageUrls.size();
+        if(isTabOne) {
+            return mImageUrls.size();
+        }
+        return mImageUrlsTwo.size();
     }
 
+    //describes an item view inside a recycler view
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
         TextView name;
 
+        //constructor
         public ViewHolder(View itemView) {
             super(itemView);
             this.image = itemView.findViewById(R.id.voucher_image);
             this.name = itemView.findViewById(R.id.name);
         }
-
     }
 }

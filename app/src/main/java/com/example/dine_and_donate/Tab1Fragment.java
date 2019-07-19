@@ -22,13 +22,20 @@ public class Tab1Fragment extends Fragment {
     private ArrayList<String> mNames = new ArrayList<>();
 
 
-
     public Tab1Fragment() {
 
     }
 
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    //initial creation of fragment
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mImageUrls = new ArrayList<>();
+        mNames = new ArrayList<>();
+        initBitmaps();
+    }
 
+    //create view based on data in array lists, inflates the layout of the fragment
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.tab1_fragment, container, false);
         recyclerView = v.findViewById(R.id.rv_vouchers);
         StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(this, mNames, mImageUrls);
@@ -38,21 +45,8 @@ public class Tab1Fragment extends Fragment {
         return v;
     }
 
-    public void setRecyclerView(RecyclerView rv) {
-
-    }
-
-
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mImageUrls = new ArrayList<>();
-        mNames = new ArrayList<>();
-        initBitmaps();
-
-    }
-
-        private void initBitmaps() {
+    //add images and descriptions to arrayLists
+    private void initBitmaps() {
         for(int i = 0; i < 20; i++) {
             mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
 
