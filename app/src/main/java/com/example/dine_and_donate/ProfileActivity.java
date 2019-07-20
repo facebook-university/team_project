@@ -7,24 +7,21 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.viewpager.widget.ViewPager;
 
-import com.example.dine_and_donate.Models.StaggeredRecyclerViewAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.util.ArrayList;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class ProfileActivity extends AppCompatActivity {
-    MenuItem createEvent;
 
-    private static final String TAG = "ProfileActivity";
-    private static final int NUM_COLUMNS = 2;
+    //elements in layout
+    private TabLayout tabLayout;
+    private ViewPagerAdadpter viewPagerAdadpter;
+    private ViewPager viewPager;
+    private FirebaseAuth user;
 
-    private ArrayList<String> mImageUrls = new ArrayList<>();
-    private ArrayList<String> mNames = new ArrayList<>();
-    private ArrayList<String> mDescription = new ArrayList<>();
 
 
     @Override
@@ -32,8 +29,19 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_activity);
 
-        initImageBitmaps();
-        initRecyclerView();
+//        NavigationView nav = findViewById(R.id.settings_navigation);
+//        nav.setItemIconTintList(null);
+
+        tabLayout = findViewById(R.id.tabs_profile);
+        viewPager = (ViewPager) findViewById(R.id.viewpager_id);
+        viewPagerAdadpter = new ViewPagerAdadpter(getSupportFragmentManager());
+
+       //Add Fragment Here
+        viewPagerAdadpter.AddFragment(new Tab1Fragment(), "tab 1 fragment");
+        viewPagerAdadpter.AddFragment(new Tab2Fragment(), "tab 2 fragment");
+
+        viewPager.setAdapter(viewPagerAdadpter);
+        tabLayout.setupWithViewPager(viewPager);
 
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -61,53 +69,11 @@ public class ProfileActivity extends AppCompatActivity {
                 return true;
             }
         });
-
-
-
-    }
-
-    private void initImageBitmaps() {
-        for(int i = 0; i < 20; i++) {
-            mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
-
-        }
-        for(int i = 0; i < 10; i++) {
-            mNames.add("Tree");
-            mNames.add("fjcutcnerdfdluvhbuegnecgvlkclbidjvnlvfubjrbeugtfdrtnikledvtbhguvuhrtjcvcfguekrfrihjfehbjllfdutbg");
-        }
-
-    }
-
-    private void initRecyclerView() {
-        RecyclerView recyclerView = findViewById(R.id.rv_vouchers);
-        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter =
-                new StaggeredRecyclerViewAdapter(this, mNames, mImageUrls);
-        StaggeredGridLayoutManager staggeredGridLayoutManager =
-                new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        recyclerView.setAdapter(staggeredRecyclerViewAdapter);
     }
 
     private void navigationHelper(Class activity) {
         final Intent loginToTimeline = new Intent(this, activity);
         startActivity(loginToTimeline);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // Store instance of the menu item containing progress
-        createEvent = menu.findItem(R.id.createEvent);
-        createEvent.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                createEvent();
-                return false;
-            }
-        });
-
-
-        // Return to finish
-        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

@@ -101,8 +101,8 @@ public class MapActivity extends AppCompatActivity {
     public static final String TAG = MapActivity.class.getSimpleName();
     public JSONArray restaurantsNearbyJSON = new JSONArray();
     private boolean loaded;
-    Double cameraLatitude;
-    Double cameraLongitude;
+    private Double cameraLatitude;
+    private Double cameraLongitude;
 
     private View slideView;
     private boolean slideViewIsUp;

@@ -11,7 +11,7 @@
         android:layout_gravity="start"
         android:background="@color/white"
         app:itemTextColor="@color/colorPrimaryDark"
-        app:menu="@menu/drawer_menu">
+        app:menu="@menu/map_filter_drawer">
 
     </com.google.android.material.navigation.NavigationView>
 

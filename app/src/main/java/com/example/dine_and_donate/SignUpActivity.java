@@ -174,8 +174,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                             Log.e("LoginActivity", "Failed Registration", e);
                             Toast.makeText(SignUpActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
                         }
-
-                        // ...
                     }
                 });
     }
