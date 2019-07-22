@@ -4,9 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -21,16 +27,15 @@ public class ProfileActivity extends AppCompatActivity {
     private ViewPagerAdadpter viewPagerAdadpter;
     private ViewPager viewPager;
     private FirebaseAuth user;
-
-
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle aToggle;
+    private Toolbar toolbar;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_activity);
-
-//        NavigationView nav = findViewById(R.id.settings_navigation);
-//        nav.setItemIconTintList(null);
 
         tabLayout = findViewById(R.id.tabs_profile);
         viewPager = (ViewPager) findViewById(R.id.viewpager_id);
@@ -43,6 +48,30 @@ public class ProfileActivity extends AppCompatActivity {
         viewPager.setAdapter(viewPagerAdadpter);
         tabLayout.setupWithViewPager(viewPager);
 
+//        mDrawerLayout = (DrawerLayout) findViewById(R.id.settings_navigation);
+//        aToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.icons8_menu_50, "Open", R.string.Close);
+        navigationView = (NavigationView) findViewById(R.id.settings_navigation);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+             @Override
+             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                 switch (menuItem.getItemId()) {
+                     case R.id.createEvent:
+                         System.out.println("HERE");
+                         Intent shareOnFB = new Intent(ProfileActivity.this, ShareEventActivity.class);
+                         startActivity(shareOnFB);
+                         break;
+                 }
+                 return false;
+             }
+         });
+
+//        mDrawerLayout.addDrawerListener(aToggle);
+//        toolbar = (Toolbar) findViewById(R.id.nav_action);
+//        toolbar.setNavigationIcon(R.drawable.navig);
+//        setSupportActionBar(toolbar);
+//        aToggle.syncState();
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        navigationView.setItemIconTintList(null);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -83,8 +112,19 @@ public class ProfileActivity extends AppCompatActivity {
         return true;
     }
 
-    private void createEvent() {
-        System.out.println("Clicked on Create Event!");
-        //TO DO
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        System.out.println("HERE1");
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.createEvent:
+                System.out.println("HERE");
+                Intent shareOnFB = new Intent (ProfileActivity.this, ShareEventActivity.class);
+                startActivity(shareOnFB);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 }
