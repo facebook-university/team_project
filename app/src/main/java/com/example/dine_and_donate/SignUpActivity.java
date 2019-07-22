@@ -154,7 +154,8 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             user = mAuth.getCurrentUser();
-                            writeNewUser(user.getUid(), name.getText().toString(), email, spinner.getSelectedItem().toString().equals("Organization"));
+                            User userInfo = writeNewUser(user.getUid(), name.getText().toString(), email, spinner.getSelectedItem().toString().equals("Organization"));
+                            // TODO: parcel to pass through intent
                             Intent intent = new Intent(SignUpActivity.this, MapActivity.class);
                             startActivity(intent);
                             finish();
@@ -174,7 +175,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                 });
     }
 
-    private void writeNewUser(String userId, String name, String email, boolean isOrg) {
+    private User writeNewUser(String userId, String name, String email, boolean isOrg) {
         User user;
         if(!isOrg) {
             user = new User(name, email);
@@ -182,5 +183,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
             user = new User(name, email, orgPhone.getText().toString());
         }
         mDatabase.child("users").child(userId).setValue(user);
+        return user;
     }
+
 }
