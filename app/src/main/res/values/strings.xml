@@ -6,4 +6,15 @@
         <item>Organization</item>
     </string-array>
     <string name="google_maps_api_key">AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg</string>
+
+    <!--event activity-->
+    <string name="createTextView">Create a Fundraiser</string>
+    <string name="pickRestaurantTextView">Pick a Restaurant</string>
+    <string name="chooseDateTextView">Choose a Date</string>
+    <string name="startTimeTextView">Start Time</string>
+    <string name="endTimeTextView">End Time</string>
+    <string name="eventDescriptionTextView">Event Description</string>
+    <string name="createButton">Create Event</string>
+    <string name="findAutocompleteHint">Find Restaurant</string>
+    <string name="eventDescriptionHint">The proceeds for this event will...</string>
 </resources>

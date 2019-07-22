@@ -182,12 +182,11 @@ public class MapActivity extends AppCompatActivity {
             }
         });
 
-        // setting uo slide view with restaurant info
+        // setting up slide view with restaurant info
         slideView = findViewById(R.id.slide_menu);
         slideView.setVisibility(View.INVISIBLE);
         slideView.setY(1200);
         slideViewIsUp = false;
-
 
         // slide view can be swiped down to dismiss and swiped up for more info
         slideView.setOnTouchListener(new OnSwipeTouchListener(MapActivity.this) {
@@ -227,7 +226,6 @@ public class MapActivity extends AppCompatActivity {
                 if (cameraLatitude == null || cameraLongitude == null) {
                     cameraLatitude = newLatitude;
                     cameraLongitude = newLongitude;
-                    getRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
                 }
 
                 if (((Math.abs(newLongitude - cameraLongitude) > 0.03)
@@ -235,8 +233,9 @@ public class MapActivity extends AppCompatActivity {
                     && (map.getCameraPosition().zoom > 10)) {
                     cameraLongitude = newLongitude;
                     cameraLatitude = newLatitude;
-                    getRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
                 }
+
+                getRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
             }
         });
 
@@ -348,6 +347,13 @@ public class MapActivity extends AppCompatActivity {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
                         onLocationChanged(locationResult.getLastLocation());
+                        if(!loaded) {
+                            LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+                            map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
+                            map.animateCamera(CameraUpdateFactory.zoomTo(15));
+                            loaded = true;
+                        }
+
                     }
                 },
                 Looper.myLooper());
@@ -358,19 +364,9 @@ public class MapActivity extends AppCompatActivity {
         if (location == null) {
             return;
         }
+        mCurrentLocation = location;
 
         // Report to the UI that the location was updated
-
-        mCurrentLocation = location;
-        String longitude = Double.toString(mCurrentLocation.getLongitude());
-        String latitude = Double.toString(mCurrentLocation.getLatitude());
-
-        if(!loaded) {
-            LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
-            map.animateCamera(CameraUpdateFactory.zoomTo(15));
-            loaded = true;
-        }
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -430,7 +426,7 @@ public class MapActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         }
-                        addRestaurantMarkers();
+                        //addRestaurantMarkers();
 
                     } catch (JSONException e) {
                         e.printStackTrace();

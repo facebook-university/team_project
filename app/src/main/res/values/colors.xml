@@ -6,4 +6,6 @@
     <color name="white">#fff</color>
 
     <color name="beige">#d6d6c2</color>
+
+    <color name="greyBackground">#68ACACAC</color>
 </resources>

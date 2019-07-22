@@ -17,9 +17,7 @@ public class Event {
     public long endTime;
     public String info;
 
-    public Event() {
-
-    }
+    public Event() {}
 
     public Event(String orgId, double locationLong, double locationLat, String locationString, long startTime, long endTime, String info) {
         this.orgId = orgId;
@@ -28,6 +26,62 @@ public class Event {
         this.locationString = locationString;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.info = info;
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+
+    public double getLocationLong() {
+        return locationLong;
+    }
+
+    public void setLocationLong(double locationLong) {
+        this.locationLong = locationLong;
+    }
+
+    public double getLocationLat() {
+        return locationLat;
+    }
+
+    public void setLocationLat(double locationLat) {
+        this.locationLat = locationLat;
+    }
+
+    public String getLocationString() {
+        return locationString;
+    }
+
+    public void setLocationString(String locationString) {
+        this.locationString = locationString;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
         this.info = info;
     }
 }
