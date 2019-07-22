@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,14 +15,25 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ProfileActivity extends AppCompatActivity {
 
     //elements in layout
     private TabLayout tabLayout;
-    private ViewPagerAdadpter viewPagerAdadpter;
-    private ViewPager viewPager;
+    private ViewPagerAdadpter voucherPagerAdadpter;
+    private ViewPager voucherView;
+
+    private FirebaseUser createdUser;
     private FirebaseAuth user;
+    private TextView userName;
+    private TextView bio;
+    private ImageView profPic;
+    private ImageView blurredPic;
+
+    private ViewFlipper viewFlipper;
+    private FirebaseDatabase mDatabase;
 
 
 
@@ -28,17 +42,31 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_activity);
 
+        mDatabase = FirebaseDatabase.getInstance();
+
+        //set up for top of profile page
+
+
+        viewFlipper = findViewById(R.id.viewFlipper);
+        userName = findViewById(R.id.et_name);
+        //TODO if isOrg...change boolean to isOrg boolean user attribute
+        if(false) {
+            viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forOrg)));
+        } else {
+            viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forConsumer)));
+        }
+
+
         tabLayout = findViewById(R.id.tabs_profile);
-        viewPager = (ViewPager) findViewById(R.id.viewpager_id);
-        viewPagerAdadpter = new ViewPagerAdadpter(getSupportFragmentManager());
+        voucherView = (ViewPager) findViewById(R.id.viewpager_id);
+        voucherPagerAdadpter = new ViewPagerAdadpter(getSupportFragmentManager());
 
        //Add Fragment Here
-        viewPagerAdadpter.AddFragment(new Tab1Fragment(), "tab 1 fragment");
-        viewPagerAdadpter.AddFragment(new Tab2Fragment(), "tab 2 fragment");
+        voucherPagerAdadpter.AddFragment(new Tab1Fragment(), "tab 1 fragment");
+        voucherPagerAdadpter.AddFragment(new Tab2Fragment(), "tab 2 fragment");
 
-        viewPager.setAdapter(viewPagerAdadpter);
-        tabLayout.setupWithViewPager(viewPager);
-
+        voucherView.setAdapter(voucherPagerAdadpter);
+        tabLayout.setupWithViewPager(voucherView);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -65,6 +93,9 @@ public class ProfileActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+
+
     }
 
     private void navigationHelper(Class activity) {

@@ -1,7 +1,6 @@
 package com.example.dine_and_donate;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,8 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.dine_and_donate.Models.Consumer;
-import com.example.dine_and_donate.Models.Organization;
 import com.example.dine_and_donate.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -24,14 +21,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class SignUpActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -44,6 +35,8 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private Button backToLogin;
     private FirebaseAuth mAuth;
     FirebaseUser user;
+    User createdUser;
+
 
     private DatabaseReference mDatabase;
 
@@ -55,6 +48,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        createdUser = new User();
 
         spinner = findViewById(R.id.user_options);
         name = findViewById(R.id.et_name);
@@ -166,6 +160,8 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                             finish();
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("create", "createUserWithEmail:success");
+                            createdUser.name = name.getText().toString();
+                            createdUser.isOrg = spinner.getSelectedItem().toString() == "Organization";
                             Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
                         } else {
                             // If sign in fails, display a message to the user.
