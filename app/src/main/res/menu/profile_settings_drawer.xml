@@ -31,33 +31,29 @@
         android:orderInCategory="4"
         app:showAsAction="always">
 
-        <menu>
+        <menu
+            android:id="@+id/submenu">
 
             <item
                 android:id="@+id/shareFacebook"
                 android:orderInCategory="1"
                 android:visible="true"
                 android:title="Facebook"
-                android:icon="@drawable/facebook"
-                app:showAsAction="always" >
-
-            </item>
+                android:icon="@drawable/facebook" />
 
             <item
                 android:id="@+id/shareInstagram"
                 android:orderInCategory="2"
                 android:visible="true"
                 android:title="Instagram"
-                android:icon="@drawable/instagram"
-                app:showAsAction="always" />
+                android:icon="@drawable/instagram" />
 
             <item
                 android:id="@+id/shareTwitter"
                 android:orderInCategory="3"
                 android:visible="true"
                 android:title="Twitter"
-                android:icon="@drawable/twitter"
-                app:showAsAction="always" />
+                android:icon="@drawable/twitter" />
 
         </menu>
     </item>

@@ -48,30 +48,19 @@ public class ProfileActivity extends AppCompatActivity {
         viewPager.setAdapter(viewPagerAdadpter);
         tabLayout.setupWithViewPager(viewPager);
 
-//        mDrawerLayout = (DrawerLayout) findViewById(R.id.settings_navigation);
-//        aToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.icons8_menu_50, "Open", R.string.Close);
         navigationView = (NavigationView) findViewById(R.id.settings_navigation);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
              @Override
              public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                  switch (menuItem.getItemId()) {
-                     case R.id.createEvent:
-                         System.out.println("HERE");
-                         Intent shareOnFB = new Intent(ProfileActivity.this, ShareEventActivity.class);
+                     case R.id.shareFacebook:
+                         Intent shareOnFB = new Intent (ProfileActivity.this, ShareEventActivity.class);
                          startActivity(shareOnFB);
-                         break;
+                         return true;
                  }
-                 return false;
+                 return true;
              }
          });
-
-//        mDrawerLayout.addDrawerListener(aToggle);
-//        toolbar = (Toolbar) findViewById(R.id.nav_action);
-//        toolbar.setNavigationIcon(R.drawable.navig);
-//        setSupportActionBar(toolbar);
-//        aToggle.syncState();
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        navigationView.setItemIconTintList(null);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -109,22 +98,6 @@ public class ProfileActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Associate searchable configuration with the SearchView
         getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        System.out.println("HERE1");
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.createEvent:
-                System.out.println("HERE");
-                Intent shareOnFB = new Intent (ProfileActivity.this, ShareEventActivity.class);
-                startActivity(shareOnFB);
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
         return true;
     }
 }
