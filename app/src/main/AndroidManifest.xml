@@ -26,7 +26,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
@@ -38,7 +37,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<<<<<<< HEAD
         <activity android:name=".NotificationsActivity" android:theme="@style/noAnimTheme" />
         <activity android:name=".MapActivity" android:theme="@style/noAnimTheme" />
         <activity android:name=".ProfileActivity" android:theme="@style/noAnimTheme" >
@@ -46,19 +44,8 @@
         <activity android:name=".SignUpActivity"/>
         <activity android:name=".ShareEventActivity" />
         <activity android:name="com.facebook.FacebookActivity" />
-=======
-        <activity
-            android:name=".NotificationsActivity"
-            android:theme="@style/noAnimTheme" />
-        <activity
-            android:name=".MapActivity"
-            android:theme="@style/noAnimTheme" />
-        <activity
-            android:name=".ProfileActivity"
-            android:theme="@style/noAnimTheme"></activity>
-        <activity android:name=".SignUpActivity" />
+
         <activity android:name=".EventActivity"/>
->>>>>>> 5f071ce73859b2deda18238a3a347252c6b795f8
 
         <uses-library
             android:name="com.google.android.maps"
@@ -70,14 +57,10 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-<<<<<<< HEAD
-
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <provider android:authorities="com.facebook.app.FacebookContentProvider443391136243627"
             android:name="com.facebook.FacebookContentProvider"
             android:exported="true" />
-=======
->>>>>>> 5f071ce73859b2deda18238a3a347252c6b795f8
     </application>
 
 </manifest>

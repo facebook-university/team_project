@@ -5,12 +5,7 @@
     <color name="colorAccent">#D81B60</color>
     <color name="white">#fff</color>
     <color name="black">#000</color>
-
-<<<<<<< HEAD
-    <color name="beige">#CAC8D5</color>
-=======
     <color name="beige">#d6d6c2</color>
 
     <color name="greyBackground">#68ACACAC</color>
->>>>>>> 5f071ce73859b2deda18238a3a347252c6b795f8
 </resources>
