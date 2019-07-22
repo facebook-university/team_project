@@ -1,6 +1,7 @@
 package com.example.dine_and_donate;
 
 import android.content.Intent;
+import android.graphics.Movie;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +24,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.parceler.Parcels;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText email;
@@ -40,9 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         final FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null) { // if someone is already signed in, skip sign in process
-            Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
-            startActivity(intent);
-            finish();
+            startNewActivity();
         }
         email = findViewById(R.id.et_email);
         password = findViewById(R.id.et_password);
@@ -79,34 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("signIn", "signInWithEmail:success");
-                            final FirebaseUser user = mAuth.getCurrentUser();
-
-                            FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-                            DatabaseReference mRef = mDatabase.getReference();
-
-                            DatabaseReference ref = mRef.child("users"); // reference to users in database
-
-                            ref.addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
-                                    DataSnapshot userData = dataSnapshot.child(user.getUid());
-                                    User userInfo = new User();
-                                    userInfo.setName(userData.child("name").toString());
-                                    userInfo.setOrg(Boolean.parseBoolean(userData.child("isOrg").toString()));
-                                    userInfo.setEmail(userData.child("email").toString());
-                                    if(userInfo.isOrg()) {
-                                        userInfo.setPhoneNumber(userData.child("phoneNumber").toString());
-                                    }
-                                }
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    Log.e("tag", "onCancelled", databaseError.toException());
-                                }
-                            });
-                            // TODO: parcel to pass through intent
-                            Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
-                            startActivity(intent);
-                            finish();
+                            startNewActivity();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("signIn", "signInWithEmail:failure", task.getException());
@@ -117,4 +91,35 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    private void startNewActivity() {
+        final FirebaseUser user = mAuth.getCurrentUser();
+        final User userInfo = new User();
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference mRef = mDatabase.getReference();
+
+        DatabaseReference ref = mRef.child("users"); // reference to users in database
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
+                DataSnapshot userData = dataSnapshot.child(user.getUid());
+                userInfo.setName(userData.child("name").getValue().toString());
+                userInfo.setOrg(Boolean.parseBoolean(userData.child("isOrg").getValue().toString()));
+                userInfo.setEmail(userData.child("email").getValue().toString());
+                if(userInfo.isOrg()) {
+                    userInfo.setPhoneNumber(userData.child("phoneNumber").getValue().toString());
+                }
+                Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(userInfo));
+                startActivity(intent);
+                finish();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("tag", "onCancelled", databaseError.toException());
+            }
+        });
+    }
+
 }

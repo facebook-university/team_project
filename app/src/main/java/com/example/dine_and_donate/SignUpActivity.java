@@ -25,8 +25,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.parceler.Parcels;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -161,10 +166,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                         if (task.isSuccessful()) {
                             user = mAuth.getCurrentUser();
                             User userInfo = writeNewUser(user.getUid(), name.getText().toString(), email, spinner.getSelectedItem().toString().equals("Organization"));
-                            // TODO: parcel to pass through intent
-                            Intent intent = new Intent(SignUpActivity.this, MapActivity.class);
-                            startActivity(intent);
-                            finish();
+                            startNewActivity();
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("create", "createUserWithEmail:success");
                             Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
@@ -190,6 +192,36 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         }
         mDatabase.child("users").child(userId).setValue(user);
         return user;
+    }
+
+    private void startNewActivity() {
+        final FirebaseUser user = mAuth.getCurrentUser();
+        final User userInfo = new User();
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference mRef = mDatabase.getReference();
+
+        DatabaseReference ref = mRef.child("users"); // reference to users in database
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
+                DataSnapshot userData = dataSnapshot.child(user.getUid());
+                userInfo.setName(userData.child("name").toString());
+                userInfo.setOrg(Boolean.parseBoolean(userData.child("isOrg").toString()));
+                userInfo.setEmail(userData.child("email").toString());
+                if(userInfo.isOrg()) {
+                    userInfo.setPhoneNumber(userData.child("phoneNumber").toString());
+                }
+                Intent intent = new Intent(SignUpActivity.this, ProfileActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(userInfo));
+                startActivity(intent);
+                finish();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("tag", "onCancelled", databaseError.toException());
+            }
+        });
     }
 
 }

@@ -1,9 +1,11 @@
 package com.example.dine_and_donate;
 
 import android.content.Intent;
+import android.graphics.Movie;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.dine_and_donate.Models.StaggeredRecyclerViewAdapter;
+import com.example.dine_and_donate.Models.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
@@ -26,6 +31,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ArrayList<String> mNames = new ArrayList<>();
     private ArrayList<String> mDescription = new ArrayList<>();
 
+    private User mCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
         initImageBitmaps();
         initRecyclerView();
 
+        mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -61,21 +68,16 @@ public class ProfileActivity extends AppCompatActivity {
                 return true;
             }
         });
-
-
-
     }
 
     private void initImageBitmaps() {
         for(int i = 0; i < 20; i++) {
             mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
-
         }
         for(int i = 0; i < 10; i++) {
             mNames.add("Tree");
             mNames.add("fjcutcnerdfdluvhbuegnecgvlkclbidjvnlvfubjrbeugtfdrtnikledvtbhguvuhrtjcvcfguekrfrihjfehbjllfdutbg");
         }
-
     }
 
     private void initRecyclerView() {
@@ -89,8 +91,9 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void navigationHelper(Class activity) {
-        final Intent loginToTimeline = new Intent(this, activity);
-        startActivity(loginToTimeline);
+        final Intent intent = new Intent(this, activity);
+        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
+        startActivity(intent);
     }
 
     @Override
@@ -104,7 +107,6 @@ public class ProfileActivity extends AppCompatActivity {
                 return false;
             }
         });
-
 
         // Return to finish
         return super.onPrepareOptionsMenu(menu);
