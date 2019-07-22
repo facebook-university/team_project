@@ -8,6 +8,7 @@
     android:orientation="vertical" >
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -16,23 +17,22 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/beige"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs_profile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="414dp"
+                android:layout_height="56dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="127dp"
                 android:layout_marginBottom="8dp"
                 android:background="@color/colorPrimary"
                 app:layout_constraintBottom_toTopOf="@+id/viewpager_id"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintHorizontal_bias="0.727"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="1.0"
+                app:layout_constraintTop_toTopOf="@+id/frameLayout"
                 app:tabGravity="fill"
                 app:tabIndicatorColor="@color/colorAccent"
                 app:tabMode="fixed">
@@ -57,9 +57,9 @@
                 android:layout_height="355dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent">
 
             </androidx.viewpager.widget.ViewPager>
@@ -79,20 +79,21 @@
                 app:menu="@menu/menu_bottom_navigation" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ViewFlipper android:id="@+id/viewFlipper"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent">
+        <ViewFlipper
+            android:id="@+id/viewFlipper"
+            android:layout_width="433dp"
+            android:layout_height="115dp">
 
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/forOrg"
                 android:layout_width="match_parent"
-                android:layout_height="176dp">
+                android:layout_height="127dp">
 
                 <ImageView
                     android:id="@+id/org_prof_pic"
                     android:layout_width="94dp"
-                    android:layout_height="128dp"
+                    android:layout_height="105dp"
                     android:layout_marginStart="48dp"
                     android:layout_marginLeft="48dp"
                     android:layout_marginTop="8dp"
@@ -119,9 +120,9 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/forConsumer"
                 android:layout_width="match_parent"
-                android:layout_height="174dp"
-                android:id="@+id/forConsumer">
+                android:layout_height="174dp">
 
                 <ImageView
                     android:id="@+id/blurred_consumer_pic"
