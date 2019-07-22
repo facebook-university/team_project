@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <permission android:name="android.permission.ACCESS_FINE_LOCATION" android:protectionLevel="dangerous"/>
     <permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:protectionLevel="dangerous"/>
@@ -37,6 +38,8 @@
         <activity android:name=".ProfileActivity" android:theme="@style/noAnimTheme" >
         </activity>
         <activity android:name=".SignUpActivity"/>
+        <activity android:name=".ShareEventActivity" />
+        <activity android:name="com.facebook.FacebookActivity" />
 
         <uses-library android:required="true" android:name="com.google.android.maps" />
 
@@ -48,6 +51,10 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <provider android:authorities="com.facebook.app.FacebookContentProvider443391136243627"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true" />
     </application>
 
 </manifest>
