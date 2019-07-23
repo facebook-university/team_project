@@ -107,15 +107,15 @@ public class EventActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String orgId = currentUser.getUid();
-                double locationLong = intent.getDoubleExtra("longitude", 0);
-                double locationLat = intent.getDoubleExtra("latitude", 0);
+                String yelpId = intent.getStringExtra("yelpID");
                 long eventDate = mCalendarView.getDate();
                 long startTime = convert(eventDate, mStartHour.getSelectedItemPosition()+1, mStartMin.getSelectedItemPosition(), mStartHalf.getSelectedItem().equals("PM"));
                 long endTime = convert(eventDate, mEndHour.getSelectedItemPosition()+1, mEndMin.getSelectedItemPosition(), mEndHalf.getSelectedItem().equals("PM"));
                 String info = mEtEventInfo.getText().toString();
-                Event newEvent = new Event(orgId, locationLong, locationLat, location, startTime, endTime, info);
-                mRef.child("events").child(UUID.randomUUID().toString()).setValue(newEvent);
+                Event newEvent = new Event(orgId, location, yelpId, info, startTime, endTime);
+                mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
                 Intent newIntent = new Intent(EventActivity.this, MapActivity.class);
+                newIntent.putExtra("isOrg", intent.getBooleanExtra("isOrg", false));
                 startActivity(newIntent);
             }
         });
@@ -124,7 +124,4 @@ public class EventActivity extends AppCompatActivity {
     private long convert(long day, int hour, int min, boolean isPM) {
         return isPM ? (day + (2 * hour * 3600000) + (min * 60000)) : (day + (hour * 3600000) + (min * 60000));
     }
-
-
-
 }
