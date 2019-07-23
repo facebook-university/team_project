@@ -1,6 +1,5 @@
 package com.example.dine_and_donate;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,11 +19,9 @@ public class CurrentVouchersFragment extends Fragment {
     private RecyclerView recyclerView;
     private ArrayList<String> mImageUrls = new ArrayList<>();
     private ArrayList<String> mNames = new ArrayList<>();
-    private Context mContext;
 
     //create view based on data in array lists, inflates the layout of the fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //super.onCreate(savedInstanceState);
         return inflater.inflate(R.layout.tab_fragment, container, false);
     }
 

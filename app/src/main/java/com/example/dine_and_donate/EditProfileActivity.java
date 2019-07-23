@@ -1,6 +1,7 @@
 package com.example.dine_and_donate;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -27,5 +28,18 @@ public class EditProfileActivity extends AppCompatActivity {
 
 
 
+        mClearName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEditName.setText("");
+            }
+        });
+
+        mClearNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEditName.setText("");
+            }
+        });
     }
 }

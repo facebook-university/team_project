@@ -19,14 +19,14 @@ import java.util.ArrayList;
 //bind the data to the view
 public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<StaggeredRecyclerViewAdapter.ViewHolder> {
 
-    private ArrayList<String> descriptions = new ArrayList<>();
-    private ArrayList<String> images = new ArrayList<>();
+    private ArrayList<String> mDescriptions = new ArrayList<>();
+    private ArrayList<String> mImages = new ArrayList<>();
     private Context mContext;
 
     //constructor; takes in context, list of strings, list of URLs
     public StaggeredRecyclerViewAdapter(Context context, ArrayList<String> descriptions, ArrayList<String> imageUrls) {
-        this.descriptions = descriptions;
-        this.images = imageUrls;
+        this.mDescriptions = descriptions;
+        this.mImages = imageUrls;
         mContext = context;
     }
 
@@ -49,16 +49,16 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
 
         //populate recycler view for tab fragment
         Glide.with(mContext)
-                .load(images.get(position))
+                .load(mImages.get(position))
                 .apply(requestOptions)
                 .into(holder.image);
-        holder.name.setText(descriptions.get(position));
+        holder.name.setText(mDescriptions.get(position));
     }
 
     @Override
     //return number of images present held by the adapter
     public int getItemCount() {
-        return images.size();
+        return mImages.size();
     }
 
     //describes an item view inside a recycler view

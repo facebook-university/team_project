@@ -16,7 +16,7 @@
         tools:layout_editor_absoluteY="16dp" />
 
     <TextView
-        android:id="@+id/restaunrant_name_tv"
+        android:id="@+id/restaurant_name_tv"
         android:layout_width="217dp"
         android:layout_height="20dp"
         android:text="1. Restaurant"
