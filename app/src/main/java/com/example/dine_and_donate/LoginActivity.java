@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.dine_and_donate.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,21 +30,29 @@ public class LoginActivity extends AppCompatActivity {
     private EditText password;
     private Button login;
     private Button signup;
-
     private FirebaseAuth mAuth;
+    private User currentUserModel;
+    private BottomNavigationView bottomNavigationView;
+    private FirebaseDatabase mDatabase;
+    private FirebaseUser fbUser;
+    private DatabaseReference mRef;
+    private DatabaseReference ref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
-
         mAuth = FirebaseAuth.getInstance();
-        final FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null) { // if someone is already signed in, skip sign in process
-            Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
-            startActivity(intent);
-            finish();
+        mDatabase = FirebaseDatabase.getInstance();
+        fbUser = FirebaseAuth.getInstance().getCurrentUser();
+        mRef = mDatabase.getReference();
+        ref = mRef.child("users");
+
+        if(fbUser != null) { // if someone is already signed in, skip sign in process
+            createUserModel();
+            goToProfile();
         }
+
         email = findViewById(R.id.et_email);
         password = findViewById(R.id.et_password);
         login = findViewById(R.id.login_btn);
@@ -78,34 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                         // Sign in success, update UI with the signed-in user's information
                         if (task.isSuccessful()) {
                             Log.d("signIn", "signInWithEmail:success");
-                            final FirebaseUser user = mAuth.getCurrentUser();
-
-                            FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-                            DatabaseReference mRef = mDatabase.getReference();
-
-                            DatabaseReference ref = mRef.child("users"); // reference to users in database
-
-                            ref.addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
-                                    DataSnapshot userData = dataSnapshot.child(user.getUid());
-                                    User userInfo = new User();
-                                    userInfo.setName(userData.child("name").toString());
-                                    userInfo.setOrg(Boolean.parseBoolean(userData.child("isOrg").toString()));
-                                    userInfo.setEmail(userData.child("email").toString());
-                                    if(userInfo.isOrg()) {
-                                        userInfo.setPhoneNumber(userData.child("phoneNumber").toString());
-                                    }
-                                }
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    Log.e("tag", "onCancelled", databaseError.toException());
-                                }
-                            });
-                            // TODO: parcel to pass through intent
-                            Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
-                            startActivity(intent);
-                            finish();
+                            goToProfile();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("signIn", "signInWithEmail:failure", task.getException());
@@ -113,5 +95,31 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void createUserModel() {
+        ref.child(fbUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
+                currentUserModel = new User();
+                currentUserModel.setName(dataSnapshot.child("name").getValue().toString());
+                currentUserModel.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
+                currentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
+                if(currentUserModel.getIsOrg()) {
+                    currentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("tag", "onCancelled", databaseError.toException());
+            }
+        });
+    }
+
+    private void goToProfile() {
+        Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+        // TO DO
+        startActivity(intent);
+        finish();
     }
 }

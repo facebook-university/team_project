@@ -37,6 +37,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.example.dine_and_donate.Models.Restaurant;
+import com.example.dine_and_donate.Models.User;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -62,6 +63,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.FirebaseError;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.maps.android.ui.IconGenerator;
 
@@ -107,7 +116,12 @@ public class MapActivity extends AppCompatActivity {
 
     private View slideView;
     private boolean slideViewIsUp;
-    Button btnCreate;
+    private Button btnCreate;
+    private boolean isOrg;
+
+    private FirebaseUser currentUser;
+    private FirebaseAuth mAuth;
+    private User currentUserModel;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -122,6 +136,8 @@ public class MapActivity extends AppCompatActivity {
         setContentView(R.layout.map_activity);
 
         loaded = false;
+        mAuth = FirebaseAuth.getInstance();
+        isOrg = true;
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -144,10 +160,6 @@ public class MapActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
-
-
-
-
 
         // Initialize Places.
         Places.initialize(getApplicationContext(), API_KEY);
@@ -235,7 +247,7 @@ public class MapActivity extends AppCompatActivity {
                     cameraLatitude = newLatitude;
                 }
 
-                getRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                generateMarkers(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
             }
         });
 
@@ -285,17 +297,13 @@ public class MapActivity extends AppCompatActivity {
                 });
     }
 
-    /*
-     * Called when the Activity becomes visible.
-     */
+    // Called when the Activity becomes visible.
     @Override
     protected void onStart() {
         super.onStart();
     }
 
-    /*
-     * Called when the Activity is no longer visible.
-     */
+    // Called when the Activity is no longer visible.
     @Override
     protected void onStop() {
         super.onStop();
@@ -304,9 +312,6 @@ public class MapActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // Display the connection status
-
         if (mCurrentLocation != null) {
             Toast.makeText(this, "GPS location was found!", Toast.LENGTH_SHORT).show();
             LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
@@ -333,14 +338,8 @@ public class MapActivity extends AppCompatActivity {
         SettingsClient settingsClient = LocationServices.getSettingsClient(this);
         settingsClient.checkLocationSettings(locationSettingsRequest);
         //noinspection MissingPermission
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    Activity#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, new LocationCallback() {
@@ -353,7 +352,6 @@ public class MapActivity extends AppCompatActivity {
                             map.animateCamera(CameraUpdateFactory.zoomTo(15));
                             loaded = true;
                         }
-
                     }
                 },
                 Looper.myLooper());
@@ -365,8 +363,6 @@ public class MapActivity extends AppCompatActivity {
             return;
         }
         mCurrentLocation = location;
-
-        // Report to the UI that the location was updated
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -379,7 +375,7 @@ public class MapActivity extends AppCompatActivity {
         startActivity(loginToTimeline);
     }
 
-    private void getRestaurants(String longitude, String latitude) {
+    private void generateMarkers(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
         YelpService.findRestaurants(longitude, latitude, new Callback() {
             @Override
@@ -393,41 +389,50 @@ public class MapActivity extends AppCompatActivity {
                     String jsonData = response.body().string();
                     try {
                         restaurantsNearbyJSON = new JSONObject(jsonData).getJSONArray("businesses");
-
-                        Log.v("response", restaurantsNearbyJSON.toString());
                         //add marker to each restaurant nearby
                         for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
-                            try {
-                                final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
-                                JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
-                                final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
-                                final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
-                                final int finalI = i;
-                                MapActivity.this.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
-                                        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                            final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
+                            String yelpID = restaurantJSON.getString("id");
+                            System.out.println("ID: " + yelpID + " " + restaurantJSON.getString("name") + "\n");
+                            FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+                            DatabaseReference mRef = mDatabase.getReference();
+                            DatabaseReference ref = mRef.child("events");
+                            JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
+                            final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
+                            final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
+                            final int finalI = i;
+
+                            ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    if (snapshot.exists() || isOrg) {
+                                        MapActivity.this.runOnUiThread(new Runnable() {
                                             @Override
-                                            public boolean onMarkerClick(Marker marker) {
-                                                try {
-                                                    //TODO: slide menu comes up here
-                                                    slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
-                                                    slideViewIsUp = true;
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                return false;
+                                            public void run() {
+                                                map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
+                                                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                                    @Override
+                                                    public boolean onMarkerClick(Marker marker) {
+                                                        try {
+                                                            slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                            slideViewIsUp = true;
+                                                        } catch (JSONException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                        return false;
+                                                    }
+                                                });
                                             }
                                         });
                                     }
-                                });
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        //addRestaurantMarkers();
+                                }
 
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -436,38 +441,6 @@ public class MapActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void addRestaurantMarkers() {
-        //add marker to each restaurant nearby
-        for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
-            try {
-                final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
-                JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
-                final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
-                final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
-                final int finalI = i;
-                MapActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
-                        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                            @Override
-                            public boolean onMarkerClick(Marker marker) {
-                                try {
-                                    slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                return false;
-                            }
-                        });
-                    }
-                });
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private void slideUpMenu(final JSONObject restaurant) throws JSONException {
@@ -491,8 +464,8 @@ public class MapActivity extends AppCompatActivity {
                 try {
                     intent.putExtra("location", Restaurant.format(restaurant));
                     JSONObject restLocation = restaurant.getJSONObject("coordinates");
-                    intent.putExtra("latitude", restLocation.getDouble("latitude"));
-                    intent.putExtra("longitude", restLocation.getDouble("longitude"));
+                    intent.putExtra("yelpID", restaurant.getString("id"));
+                    intent.putExtra("isOrg", isOrg);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -512,5 +485,4 @@ public class MapActivity extends AppCompatActivity {
         animate.setFillAfter(true);
         slideView.startAnimation(animate);
     }
-
 }

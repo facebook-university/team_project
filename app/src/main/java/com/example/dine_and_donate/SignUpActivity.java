@@ -21,8 +21,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class SignUpActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -36,7 +39,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private User mCreatedUser;
-
 
     private DatabaseReference mDatabase;
 
@@ -63,6 +65,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mPassword.setVisibility(View.GONE);
         mOrgPhone.setVisibility(View.GONE);
         mSignUpBtn.setVisibility(View.GONE);
+
 
         //display specific text views depending on user type selected
         mSpinner = findViewById(R.id.user_options);
@@ -122,9 +125,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mBackToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
+                navigationHelper(LoginActivity.class);
             }
         });
     }
@@ -164,6 +165,8 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                             mCreatedUser.name = mName.getText().toString();
                             mCreatedUser.isOrg = mSpinner.getSelectedItem().toString() == "Organization";
                             Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
+                            writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
+                            navigationHelper(ProfileActivity.class);
                         } else {
                             // If sign in fails, display a message to the user.
                             //Log.w("create", "createUserWithEmail:failure", task.getException());
@@ -186,4 +189,10 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         return user;
     }
 
+    private void navigationHelper(Class goToClass) {
+        Intent intent = new Intent(SignUpActivity.this, goToClass);
+        // pass user
+        startActivity(intent);
+        finish();
+    }
 }
