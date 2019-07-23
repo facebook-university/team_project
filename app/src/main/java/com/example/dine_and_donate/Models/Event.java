@@ -16,6 +16,7 @@ public class Event {
     public long startTime;
     public long endTime;
     public String info;
+    public String imageUrl;
 
     public Event() {}
 

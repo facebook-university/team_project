@@ -17,4 +17,6 @@
     <string name="createButton">Create Event</string>
     <string name="findAutocompleteHint">Find Restaurant</string>
     <string name="eventDescriptionHint">The proceeds for this event will...</string>
+    <string name="uploadVoucherTextView">Upload Voucher Image for Event</string>
+    <string name="choosePhotoButton">Choose Photo</string>
 </resources>
