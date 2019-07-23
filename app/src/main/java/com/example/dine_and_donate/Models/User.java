@@ -35,5 +35,39 @@ public class User {
         isOrg = true;
     }
 
+<<<<<<< HEAD
 
+=======
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isOrg() {
+        return isOrg;
+    }
+
+    public void setOrg(boolean org) {
+        isOrg = org;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+>>>>>>> 5f071ce73859b2deda18238a3a347252c6b795f8
 }
