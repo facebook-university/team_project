@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toolbar;
@@ -11,6 +12,7 @@ import android.widget.Toolbar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
@@ -38,6 +40,8 @@ public class ProfileActivity extends AppCompatActivity {
     private ActionBarDrawerToggle aToggle;
     private Toolbar mToolbar;
     private NavigationView mNavigationView;
+    private ConstraintLayout mLayoutForOrg;
+    private ConstraintLayout mLayoutForConsumer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,46 +49,26 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.profile_activity);
 
         mDatabase = FirebaseDatabase.getInstance();
+        mLayoutForConsumer = findViewById(R.id.forConsumer);
+        mLayoutForOrg = findViewById(R.id.forOrg);
+        mTabLayout = findViewById(R.id.tabs_profile);
+        mVoucherView = findViewById(R.id.viewpager_id);
+        mVoucherPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        mVoucherView.setAdapter(mVoucherPagerAdapter);
+        mTabLayout.setupWithViewPager(mVoucherView);
 
         //set up for top of profile page
         mUserName = findViewById(R.id.et_name);
         //TODO change boolean to isOrg boolean user attribute to display correct profile
         if(false) {
-            //mViewFlipper.setDisplayedChild(mViewFlipper.indexOfChild(findViewById(R.id.forOrg)));
+            mLayoutForOrg.setVisibility(View.INVISIBLE);
+            mLayoutForConsumer.setVisibility(View.VISIBLE);
         } else {
-            //mViewFlipper.setDisplayedChild(mViewFlipper.indexOfChild(findViewById(R.id.forConsumer)));
+            mLayoutForOrg.setVisibility(View.VISIBLE);
+            mLayoutForConsumer.setVisibility(View.INVISIBLE);
         }
 
-
-        mTabLayout = findViewById(R.id.tabs_profile);
-        mVoucherView = (ViewPager) findViewById(R.id.viewpager_id);
-        mVoucherPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-
-       //Add Fragment Here
-
-        mVoucherView.setAdapter(mVoucherPagerAdapter);
-        mTabLayout.setupWithViewPager(mVoucherView);
-
-
-        mVoucherView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
-        //TODO indentation
-        mNavigationView = (NavigationView) findViewById(R.id.settings_navigation);
+        mNavigationView = findViewById(R.id.settings_navigation);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
              @Override
              public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -95,9 +79,9 @@ public class ProfileActivity extends AppCompatActivity {
                          return true;
 
                      case R.id.editProfile:
-                             Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-                             startActivity(intent);
-                             return true;
+                         Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+                         startActivity(intent);
+                         return true;
                  }
                  return true;
              }

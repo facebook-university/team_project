@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import java.util.ArrayList;
 
-public class Tab1Fragment extends Fragment {
+public class CurrentVouchersFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private ArrayList<String> mImageUrls = new ArrayList<>();

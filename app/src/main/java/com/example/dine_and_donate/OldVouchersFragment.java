@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import java.util.ArrayList;
 
-public class Tab2Fragment extends Fragment {
+public class OldVouchersFragment extends Fragment {
 
     View v;
     private RecyclerView recyclerView;
@@ -23,7 +23,7 @@ public class Tab2Fragment extends Fragment {
     private Context mContext;
 
     //default constructor
-    public Tab2Fragment() {
+    public OldVouchersFragment() {
         mImageUrls = new ArrayList<>();
         mNames = new ArrayList<>();
     }

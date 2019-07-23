@@ -14,9 +14,9 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new Tab1Fragment();
+                return new CurrentVouchersFragment();
             case 1:
-                return new Tab2Fragment();
+                return new OldVouchersFragment();
             default:
                 return null;
         }

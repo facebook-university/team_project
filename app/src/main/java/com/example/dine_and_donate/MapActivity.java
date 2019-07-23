@@ -381,7 +381,7 @@ public class MapActivity extends AppCompatActivity {
 
     private void getRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
-        yelpService.findRestaurants(longitude, latitude, new Callback() {
+        YelpService.findRestaurants(longitude, latitude, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
