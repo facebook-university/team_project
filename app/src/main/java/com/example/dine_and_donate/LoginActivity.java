@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.dine_and_donate.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,15 +35,21 @@ public class LoginActivity extends AppCompatActivity {
     private Button signup;
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
+    private User currentUserModel;
+    private BottomNavigationView bottomNavigationView;
+    private DatabaseReference mDatabase;
+    private FirebaseUser fbUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
         mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if(currentUser != null) { // if someone is already signed in, skip sign in process
+            createUserModel();
             goToProfile();
         }
 
@@ -90,8 +97,28 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
+    private void createUserModel() {
+        mDatabase.child("users").child(fbUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
+                currentUserModel = new User();
+                currentUserModel.setName(dataSnapshot.child("name").getValue().toString());
+                currentUserModel.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
+                currentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
+                if(currentUserModel.getIsOrg()) {
+                    currentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("tag", "onCancelled", databaseError.toException());
+            }
+        });
+    }
+
     private void goToProfile() {
         Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+        // TO DO
         startActivity(intent);
         finish();
     }

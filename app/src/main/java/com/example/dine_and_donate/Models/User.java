@@ -57,7 +57,7 @@ public class User implements Serializable {
     }
 
     public void setOrg(boolean org) {
-        isOrg = org;
+        this.isOrg = org;
     }
 
     public String getPhoneNumber() {

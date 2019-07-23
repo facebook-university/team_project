@@ -137,7 +137,7 @@ public class MapActivity extends AppCompatActivity {
 
         loaded = false;
         mAuth = FirebaseAuth.getInstance();
-        isOrg = getIntent().getBooleanExtra("isOrg", false);
+        isOrg = true;
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -393,6 +393,7 @@ public class MapActivity extends AppCompatActivity {
                         for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
                             final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
                             String yelpID = restaurantJSON.getString("id");
+                            System.out.println("ID: " + yelpID + " " + restaurantJSON.getString("name") + "\n");
                             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
                             DatabaseReference mRef = mDatabase.getReference();
                             DatabaseReference ref = mRef.child("events");
