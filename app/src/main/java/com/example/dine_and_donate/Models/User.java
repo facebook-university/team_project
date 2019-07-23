@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 @IgnoreExtraProperties
-public class User implements Serializable {
+public class User {
 
     public String name;
     public String email;
