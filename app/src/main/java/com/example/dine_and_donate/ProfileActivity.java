@@ -2,6 +2,7 @@ package com.example.dine_and_donate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -15,12 +16,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.dine_and_donate.Models.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -45,15 +51,19 @@ public class ProfileActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private NavigationView navigationView;
 
+    private FirebaseUser currentUser;
+    private FirebaseAuth mAuth;
+    private User currentUserModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_activity);
-
-        mDatabase = FirebaseDatabase.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        createUserModel ();
 
         //set up for top of profile page
-
 
         viewFlipper = findViewById(R.id.viewFlipper);
         userName = findViewById(R.id.et_name);
@@ -63,7 +73,6 @@ public class ProfileActivity extends AppCompatActivity {
         } else {
             viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forConsumer)));
         }
-
 
         tabLayout = findViewById(R.id.tabs_profile);
         voucherView = (ViewPager) findViewById(R.id.viewpager_id);
@@ -115,13 +124,11 @@ public class ProfileActivity extends AppCompatActivity {
                 return true;
             }
         });
-
-
-
     }
 
     private void navigationHelper(Class activity) {
         final Intent loginToTimeline = new Intent(this, activity);
+        loginToTimeline.putExtra("isOrg", currentUserModel.isOrg);
         startActivity(loginToTimeline);
     }
 
@@ -130,5 +137,32 @@ public class ProfileActivity extends AppCompatActivity {
         // Associate searchable configuration with the SearchView
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
+    }
+
+    private void createUserModel () {
+        final FirebaseUser user = mAuth.getCurrentUser();
+
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference mRef = mDatabase.getReference();
+
+        DatabaseReference ref = mRef.child("users"); // reference to users in database
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
+                DataSnapshot userData = dataSnapshot.child(user.getUid());
+                currentUserModel = new User();
+                currentUserModel.setName(userData.child("name").toString());
+                currentUserModel.setOrg(Boolean.parseBoolean(userData.child("isOrg").toString()));
+                currentUserModel.setEmail(userData.child("email").toString());
+                if(currentUserModel.isOrg()) {
+                    currentUserModel.setPhoneNumber(userData.child("phoneNumber").toString());
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("tag", "onCancelled", databaseError.toException());
+            }
+        });
     }
 }

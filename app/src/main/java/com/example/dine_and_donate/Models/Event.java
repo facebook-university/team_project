@@ -10,8 +10,7 @@ import java.util.Date;
 @IgnoreExtraProperties
 public class Event {
     public String orgId;
-    public double locationLong;
-    public double locationLat;
+    public String yelpID;
     public String locationString;
     public long startTime;
     public long endTime;
@@ -19,10 +18,9 @@ public class Event {
 
     public Event() {}
 
-    public Event(String orgId, double locationLong, double locationLat, String locationString, long startTime, long endTime, String info) {
+    public Event(String orgId, String locationString, String yelpID, String info, long startTime, long endTime) {
         this.orgId = orgId;
-        this.locationLong = locationLong;
-        this.locationLat = locationLat;
+        this.yelpID = yelpID;
         this.locationString = locationString;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -37,20 +35,12 @@ public class Event {
         this.orgId = orgId;
     }
 
-    public double getLocationLong() {
-        return locationLong;
+    public String getYelpID() {
+        return this.yelpID;
     }
 
-    public void setLocationLong(double locationLong) {
-        this.locationLong = locationLong;
-    }
-
-    public double getLocationLat() {
-        return locationLat;
-    }
-
-    public void setLocationLat(double locationLat) {
-        this.locationLat = locationLat;
+    public void setYelpID(String yelpID) {
+        this.yelpID = yelpID;
     }
 
     public String getLocationString() {

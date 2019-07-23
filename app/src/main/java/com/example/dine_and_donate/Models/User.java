@@ -3,10 +3,11 @@ package com.example.dine_and_donate.Models;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 @IgnoreExtraProperties
-public class User {
+public class User implements Serializable {
 
     public String name;
     public String email;
