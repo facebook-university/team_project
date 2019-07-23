@@ -1,9 +1,10 @@
-package com.example.dine_and_donate;
+package com.example.dine_and_donate.HomeFragments;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.dine_and_donate.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
