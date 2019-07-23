@@ -18,8 +18,8 @@ public class Tab1Fragment extends Fragment {
 
     View v;
     private RecyclerView recyclerView;
-    private ArrayList<String> mImageUrls = new ArrayList<>();
-    private ArrayList<String> mNames = new ArrayList<>();
+    private ArrayList<String> mImageUrls;
+    private ArrayList<String> mNames;
 
     //default constructor
     public Tab1Fragment() {

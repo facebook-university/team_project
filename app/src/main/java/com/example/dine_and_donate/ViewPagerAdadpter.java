@@ -9,8 +9,6 @@ import java.util.List;
 
 public class ViewPagerAdadpter extends FragmentPagerAdapter {
 
-
-
     private final List<Fragment> fragmentOne = new ArrayList<>();
     private final List<String> fragmentOneTitles = new ArrayList<>();
 
@@ -26,18 +24,12 @@ public class ViewPagerAdadpter extends FragmentPagerAdapter {
         return fragmentOneTitles.size();
     }
 
-
     public CharSequence getDescription(int position) {
         return fragmentOneTitles.get(position);
     }
 
-
-
     public void AddFragment(Fragment fragment, String description) {
         fragmentOne.add(fragment);
         fragmentOneTitles.add(description);
-
     }
-
-
 }

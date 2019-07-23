@@ -17,8 +17,8 @@ public class Tab2Fragment extends Fragment {
 
     View v;
     private RecyclerView recyclerView;
-    private ArrayList<String> mImageUrls = new ArrayList<>();
-    private ArrayList<String> mNames = new ArrayList<>();
+    private ArrayList<String> mImageUrls;
+    private ArrayList<String> mNames;
 
     //default constructor
     public Tab2Fragment() {
@@ -45,10 +45,12 @@ public class Tab2Fragment extends Fragment {
 
     //add images and descriptions to respective arrayLists
     private void initBitmaps() {
+        //image URL
         for(int i = 0; i < 20; i++) {
             mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
         }
 
+        //voucher descriptions
         for(int i = 0; i < 10; i++) {
             mNames.add("udblrjtkbtecidtijijhbfitduvgdnvbtlujberlvuubtdbkfhdfihgudjbvnbbjhgejvdefhcturgucfnenhjdfffijrkiftbenjrjijhugvfujncndrftftglgelkc");
             mNames.add("dogs");

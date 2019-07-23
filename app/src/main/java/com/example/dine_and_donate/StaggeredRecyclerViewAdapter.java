@@ -19,27 +19,27 @@ import java.util.ArrayList;
 public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<StaggeredRecyclerViewAdapter.ViewHolder> {
 
 
-    private ArrayList<String> mNames = new ArrayList<>();
-    private ArrayList<String> mImageUrls = new ArrayList<>();
-    private ArrayList<String> mNamesTwo = new ArrayList<>();
-    private ArrayList<String> mImageUrlsTwo = new ArrayList<>();
+    private ArrayList<String> tabOneDescription = new ArrayList<>();
+    private ArrayList<String> tabOneImages = new ArrayList<>();
+    private ArrayList<String> tabTwoDescription = new ArrayList<>();
+    private ArrayList<String> tabTwoImages = new ArrayList<>();
     private Tab1Fragment tab1;
     private Tab2Fragment tab2;
     private boolean isTabOne;
 
 
     //constructor with Tab1Fragment
-    public StaggeredRecyclerViewAdapter(Tab1Fragment tab1, ArrayList<String> mNames, ArrayList<String> mImageUrls) {
-        this.mNames = mNames;
-        this.mImageUrls = mImageUrls;
+    public StaggeredRecyclerViewAdapter(Tab1Fragment tab1, ArrayList<String> descriptions, ArrayList<String> imageUrls) {
+        this.tabOneDescription = descriptions;
+        this.tabOneImages = imageUrls;
         this.tab1 = tab1;
         isTabOne = true;
     }
 
     //constructor with Tab2Fragment
     public StaggeredRecyclerViewAdapter(Tab2Fragment tab2, ArrayList<String> mNamesTwo, ArrayList<String> mImageUrlsTwo) {
-        this.mNamesTwo = mNamesTwo;
-        this.mImageUrlsTwo = mImageUrlsTwo;
+        this.tabTwoDescription = mNamesTwo;
+        this.tabTwoImages = mImageUrlsTwo;
         this.tab2 = tab2;
         isTabOne = false;
     }
@@ -59,20 +59,21 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
         RequestOptions requestOptions = new RequestOptions()
             .placeholder(R.drawable.ic_launcher_background);
 
+        //populate recycler view for first tab fragment
         if(isTabOne) {
-            //populate recycler view for first tab fragment
             Glide.with(tab1)
-                    .load(mImageUrls.get(position))
+                    .load(tabOneImages.get(position))
                     .apply(requestOptions)
                     .into(holder.image);
-            holder.name.setText(mNames.get(position));
-        } else {
-            //populate recycler view for second tab fragment
+            holder.name.setText(tabOneDescription.get(position));
+        }
+        //populate recycler view for second tab fragment
+        else {
             Glide.with(tab2)
-                .load(mImageUrlsTwo.get(position))
+                .load(tabTwoImages.get(position))
                 .apply(requestOptions)
                 .into(holder.image);
-            holder.name.setText(mNamesTwo.get(position));
+            holder.name.setText(tabTwoDescription.get(position));
         }
     }
 
@@ -80,9 +81,9 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
     //return number of images present held by the adapter
     public int getItemCount() {
         if(isTabOne) {
-            return mImageUrls.size();
+            return tabOneImages.size();
         }
-        return mImageUrlsTwo.size();
+        return tabTwoImages.size();
     }
 
     //describes an item view inside a recycler view

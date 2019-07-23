@@ -18,8 +18,6 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -29,9 +27,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ViewPagerAdadpter voucherPagerAdadpter;
     private ViewPager voucherView;
 
-    private FirebaseUser createdUser;
-    private FirebaseAuth user;
-
+    //TODO populate these fields based on database information
     private TextView userName;
     private TextView bio;
     private ImageView profPic;
@@ -53,11 +49,9 @@ public class ProfileActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance();
 
         //set up for top of profile page
-
-
         viewFlipper = findViewById(R.id.viewFlipper);
         userName = findViewById(R.id.et_name);
-        //TODO if isOrg...change boolean to isOrg boolean user attribute
+        //TODO change boolean to isOrg boolean user attribute to display correct profile
         if(false) {
             viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forOrg)));
         } else {
@@ -85,6 +79,11 @@ public class ProfileActivity extends AppCompatActivity {
                          Intent shareOnFB = new Intent (ProfileActivity.this, ShareEventActivity.class);
                          startActivity(shareOnFB);
                          return true;
+
+                     case R.id.editProfile:
+                             Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+                             startActivity(intent);
+                             return true;
                  }
                  return true;
              }
@@ -115,9 +114,6 @@ public class ProfileActivity extends AppCompatActivity {
                 return true;
             }
         });
-
-
-
     }
 
     private void navigationHelper(Class activity) {
