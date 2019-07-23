@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -38,7 +39,6 @@ public class LoginActivity extends AppCompatActivity {
     private User currentUserModel;
     private BottomNavigationView bottomNavigationView;
     private DatabaseReference mDatabase;
-    private FirebaseUser fbUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void createUserModel() {
-        mDatabase.child("users").child(fbUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
+        mDatabase.child("users").child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
                 currentUserModel = new User();
@@ -117,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToProfile() {
-        Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         // TO DO
         startActivity(intent);
         finish();
