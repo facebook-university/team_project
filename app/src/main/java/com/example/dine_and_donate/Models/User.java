@@ -35,9 +35,6 @@ public class User {
         isOrg = true;
     }
 
-<<<<<<< HEAD
-
-=======
     public String getName() {
         return name;
     }
@@ -69,5 +66,4 @@ public class User {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
->>>>>>> 5f071ce73859b2deda18238a3a347252c6b795f8
 }

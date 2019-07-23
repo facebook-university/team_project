@@ -33,7 +33,7 @@
 
     <TextView
         android:id="@+id/textView4"
-        android:layout_width="143dp"
+        android:layout_width="wrap_content"
         android:layout_height="22dp"
         android:text="(7 fundraisers)"
         tools:layout_editor_absoluteX="219dp"

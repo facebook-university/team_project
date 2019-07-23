@@ -13,7 +13,6 @@
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/linearLayout4"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/beige"
@@ -21,31 +20,28 @@
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs_profile"
-                android:layout_width="414dp"
+                android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="127dp"
-                android:layout_marginBottom="8dp"
                 android:background="@color/colorPrimary"
                 app:layout_constraintBottom_toTopOf="@+id/viewpager_id"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.727"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/frameLayout"
+                app:layout_constraintTop_toBottomOf="@+id/forOrg"
+                app:layout_constraintVertical_bias="0.609"
                 app:tabGravity="fill"
                 app:tabIndicatorColor="@color/colorAccent"
                 app:tabMode="fixed">
 
                 <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Monday">
 
                 </com.google.android.material.tabs.TabItem>
 
                 <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Tuesday" />
 
@@ -53,13 +49,13 @@
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/viewpager_id"
-                android:layout_width="406dp"
-                android:layout_height="355dp"
+                android:layout_width="410dp"
+                android:layout_height="362dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent">
 
             </androidx.viewpager.widget.ViewPager>
@@ -71,110 +67,104 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary"
-                app:itemIconTint="#fff"
-                app:itemTextColor="#fff"
+                app:itemIconTint="@color/white"
+                app:itemTextColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:menu="@menu/menu_bottom_navigation" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ViewFlipper
-            android:id="@+id/viewFlipper"
-            android:layout_width="433dp"
-            android:layout_height="115dp">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/forOrg"
+            android:layout_width="match_parent"
+            android:layout_height="127dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/forOrg"
-                android:layout_width="match_parent"
-                android:layout_height="127dp">
+            <ImageView
+                android:id="@+id/org_prof_pic"
+                android:layout_width="94dp"
+                android:layout_height="105dp"
+                android:layout_marginStart="48dp"
+                android:layout_marginLeft="48dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/forOrg"
+                app:layout_constraintRight_toLeftOf="@id/org_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/forOrg"
+                app:srcCompat="@drawable/instagram_user_outline_24" />
 
-                <ImageView
-                    android:id="@+id/org_prof_pic"
-                    android:layout_width="94dp"
-                    android:layout_height="105dp"
-                    android:layout_marginStart="48dp"
-                    android:layout_marginLeft="48dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/forOrg"
-                    app:layout_constraintRight_toLeftOf="@id/org_name"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/forOrg"
-                    app:srcCompat="@drawable/instagram_user_outline_24" />
+            <TextView
+                android:id="@+id/org_name"
+                android:layout_width="153dp"
+                android:layout_height="28dp"
+                android:layout_marginTop="56dp"
+                android:layout_marginEnd="92dp"
+                android:layout_marginRight="92dp"
+                android:layout_marginBottom="8dp"
+                android:text="TextView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <TextView
-                    android:id="@+id/org_name"
-                    android:layout_width="153dp"
-                    android:layout_height="28dp"
-                    android:layout_marginTop="56dp"
-                    android:layout_marginEnd="92dp"
-                    android:layout_marginRight="92dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="TextView"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/forConsumer"
+            android:layout_width="match_parent"
+            android:layout_height="127dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/forConsumer"
-                android:layout_width="match_parent"
-                android:layout_height="174dp">
+            <ImageView
+                android:id="@+id/blurred_consumer_pic"
+                android:layout_width="403dp"
+                android:layout_height="129dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.003"
+                app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
-                <ImageView
-                    android:id="@+id/blurred_consumer_pic"
-                    android:layout_width="0dp"
-                    android:layout_height="174dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginBottom="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.003"
-                    app:srcCompat="@android:drawable/screen_background_light_transparent" />
+            <ImageView
+                android:id="@+id/iv_prof_pic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/blurred_consumer_pic"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.492"
+                app:layout_constraintStart_toStartOf="@+id/blurred_consumer_pic"
+                app:layout_constraintTop_toTopOf="@+id/blurred_consumer_pic"
+                app:layout_constraintVertical_bias="0.252"
+                app:srcCompat="@drawable/instagram_user_outline_24" />
 
-                <ImageView
-                    android:id="@+id/iv_prof_pic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/blurred_consumer_pic"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.492"
-                    app:layout_constraintStart_toStartOf="@+id/blurred_consumer_pic"
-                    app:layout_constraintTop_toTopOf="@+id/blurred_consumer_pic"
-                    app:layout_constraintVertical_bias="0.252"
-                    app:srcCompat="@drawable/instagram_user_outline_24" />
-
-                <TextView
-                    android:id="@+id/tv_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="27dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="TextView"
-                    app:layout_constraintBottom_toBottomOf="@+id/blurred_consumer_pic"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/iv_prof_pic"
-                    app:layout_constraintVertical_bias="0.196" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </ViewFlipper>
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="wrap_content"
+                android:layout_height="27dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="TextView"
+                app:layout_constraintBottom_toBottomOf="@+id/blurred_consumer_pic"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_prof_pic"
+                app:layout_constraintVertical_bias="0.196" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 
     <com.google.android.material.navigation.NavigationView

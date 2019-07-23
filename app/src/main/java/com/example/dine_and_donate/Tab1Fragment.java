@@ -1,10 +1,12 @@
 package com.example.dine_and_donate;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,33 +17,26 @@ import java.util.ArrayList;
 
 public class Tab1Fragment extends Fragment {
 
-
-    View v;
     private RecyclerView recyclerView;
-    private ArrayList<String> mImageUrls;
-    private ArrayList<String> mNames;
-
-    //default constructor
-    public Tab1Fragment() {
-        mImageUrls = new ArrayList<>();
-        mNames = new ArrayList<>();
-    }
-
-    //initial creation of fragment
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initBitmaps();
-    }
+    private ArrayList<String> mImageUrls = new ArrayList<>();
+    private ArrayList<String> mNames = new ArrayList<>();
+    private Context mContext;
 
     //create view based on data in array lists, inflates the layout of the fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.tab1_fragment, container, false);
-        recyclerView = v.findViewById(R.id.rv_vouchers);
-        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(this, mNames, mImageUrls);
+        //super.onCreate(savedInstanceState);
+        return inflater.inflate(R.layout.tab_fragment, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initBitmaps();
+        recyclerView = view.findViewById(R.id.rv_vouchers);
+        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);
-        return v;
     }
 
     //add images and descriptions to arrayLists

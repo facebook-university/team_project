@@ -7,7 +7,6 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toolbar;
-import android.widget.ViewFlipper;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -23,23 +22,22 @@ import com.google.firebase.database.FirebaseDatabase;
 public class ProfileActivity extends AppCompatActivity {
 
     //elements in layout
-    private TabLayout tabLayout;
-    private ViewPagerAdadpter voucherPagerAdadpter;
-    private ViewPager voucherView;
+    private TabLayout mTabLayout;
+    private ViewPagerAdapter mVoucherPagerAdapter;
+    private ViewPager mVoucherView;
 
     //TODO populate these fields based on database information
-    private TextView userName;
-    private TextView bio;
-    private ImageView profPic;
-    private ImageView blurredPic;
+    private TextView mUserName;
+    private TextView mBio;
+    private ImageView mProfPic;
+    private ImageView mBlurredPic;
 
-    private ViewFlipper viewFlipper;
     private FirebaseDatabase mDatabase;
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle aToggle;
-    private Toolbar toolbar;
-    private NavigationView navigationView;
+    private Toolbar mToolbar;
+    private NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,34 +47,50 @@ public class ProfileActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance();
 
         //set up for top of profile page
-        viewFlipper = findViewById(R.id.viewFlipper);
-        userName = findViewById(R.id.et_name);
+        mUserName = findViewById(R.id.et_name);
         //TODO change boolean to isOrg boolean user attribute to display correct profile
         if(false) {
-            viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forOrg)));
+            //mViewFlipper.setDisplayedChild(mViewFlipper.indexOfChild(findViewById(R.id.forOrg)));
         } else {
-            viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forConsumer)));
+            //mViewFlipper.setDisplayedChild(mViewFlipper.indexOfChild(findViewById(R.id.forConsumer)));
         }
 
 
-        tabLayout = findViewById(R.id.tabs_profile);
-        voucherView = (ViewPager) findViewById(R.id.viewpager_id);
-        voucherPagerAdadpter = new ViewPagerAdadpter(getSupportFragmentManager());
+        mTabLayout = findViewById(R.id.tabs_profile);
+        mVoucherView = (ViewPager) findViewById(R.id.viewpager_id);
+        mVoucherPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
        //Add Fragment Here
-        voucherPagerAdadpter.AddFragment(new Tab1Fragment(), "tab 1 fragment");
-        voucherPagerAdadpter.AddFragment(new Tab2Fragment(), "tab 2 fragment");
 
-        voucherView.setAdapter(voucherPagerAdadpter);
-        tabLayout.setupWithViewPager(voucherView);
+        mVoucherView.setAdapter(mVoucherPagerAdapter);
+        mTabLayout.setupWithViewPager(mVoucherView);
 
-        navigationView = (NavigationView) findViewById(R.id.settings_navigation);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+
+        mVoucherView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        //TODO indentation
+        mNavigationView = (NavigationView) findViewById(R.id.settings_navigation);
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
              @Override
              public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                  switch (menuItem.getItemId()) {
                      case R.id.shareFacebook:
-                         Intent shareOnFB = new Intent (ProfileActivity.this, ShareEventActivity.class);
+                         Intent shareOnFB = new Intent(ProfileActivity.this, ShareEventActivity.class);
                          startActivity(shareOnFB);
                          return true;
 

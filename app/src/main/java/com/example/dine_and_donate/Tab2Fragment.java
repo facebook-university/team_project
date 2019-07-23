@@ -1,5 +1,6 @@
 package com.example.dine_and_donate;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ public class Tab2Fragment extends Fragment {
     private RecyclerView recyclerView;
     private ArrayList<String> mImageUrls;
     private ArrayList<String> mNames;
+    private Context mContext;
 
     //default constructor
     public Tab2Fragment() {
@@ -28,9 +30,9 @@ public class Tab2Fragment extends Fragment {
 
     //inflates layout of fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.tab2_fragment, container, false);
-        recyclerView = v.findViewById(R.id.rv_past_vouchers);
-        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(this, mNames, mImageUrls);
+        v = inflater.inflate(R.layout.tab_fragment, container, false);
+        recyclerView = v.findViewById(R.id.rv_vouchers);
+        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);
