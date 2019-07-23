@@ -26,14 +26,14 @@ public class User implements Serializable {
     public User(String name, String email) {
         this.name = name;
         this.email = email;
-        isOrg = false;
+        this.isOrg = false;
     }
 
     public User(String name, String email, String phoneNumber) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        isOrg = true;
+        this.isOrg = true;
     }
 
     public String getName() {
@@ -52,7 +52,7 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public boolean isOrg() {
+    public boolean getIsOrg() {
         return isOrg;
     }
 

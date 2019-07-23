@@ -38,38 +38,38 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.login_activity);
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
         if(currentUser != null) { // if someone is already signed in, skip sign in process
             goToProfile();
-        } else {
-            setContentView(R.layout.login_activity);
-            email = findViewById(R.id.et_email);
-            password = findViewById(R.id.et_password);
-            login = findViewById(R.id.login_btn);
-            signup = findViewById(R.id.signup_btn);
-
-            //action for login button
-            login.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    signIn(email.getText().toString(), password.getText().toString());
-                }
-            });
-
-            //action for signup button
-            signup.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    //go to Sign Up page
-                    Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            });
         }
+
+        email = findViewById(R.id.et_email);
+        password = findViewById(R.id.et_password);
+        login = findViewById(R.id.login_btn);
+        signup = findViewById(R.id.signup_btn);
+
+        //action for login button
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn(email.getText().toString(), password.getText().toString());
+            }
+        });
+
+        //action for signup button
+        signup.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //go to Sign Up page
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     private void signIn(String email, String password) {

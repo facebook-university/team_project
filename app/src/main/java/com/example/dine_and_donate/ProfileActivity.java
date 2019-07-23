@@ -61,24 +61,13 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.profile_activity);
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        createUserModel ();
-
-        //set up for top of profile page
-
-        viewFlipper = findViewById(R.id.viewFlipper);
-        userName = findViewById(R.id.et_name);
-        //TODO if isOrg...change boolean to isOrg boolean user attribute
-        if(false) {
-            viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forOrg)));
-        } else {
-            viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forConsumer)));
-        }
+        createUserModel();
 
         tabLayout = findViewById(R.id.tabs_profile);
         voucherView = (ViewPager) findViewById(R.id.viewpager_id);
         voucherPagerAdadpter = new ViewPagerAdadpter(getSupportFragmentManager());
 
-       //Add Fragment Here
+        //Add Fragment Here
         voucherPagerAdadpter.AddFragment(new Tab1Fragment(), "tab 1 fragment");
         voucherPagerAdadpter.AddFragment(new Tab2Fragment(), "tab 2 fragment");
 
@@ -128,7 +117,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void navigationHelper(Class activity) {
         final Intent loginToTimeline = new Intent(this, activity);
-        loginToTimeline.putExtra("isOrg", currentUserModel.isOrg);
+        loginToTimeline.putExtra("isOrg", currentUserModel.getIsOrg());
         startActivity(loginToTimeline);
     }
 
@@ -141,10 +130,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void createUserModel () {
         final FirebaseUser user = mAuth.getCurrentUser();
-
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference mRef = mDatabase.getReference();
-
         DatabaseReference ref = mRef.child("users"); // reference to users in database
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
@@ -152,17 +139,30 @@ public class ProfileActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
                 DataSnapshot userData = dataSnapshot.child(user.getUid());
                 currentUserModel = new User();
-                currentUserModel.setName(userData.child("name").toString());
-                currentUserModel.setOrg(Boolean.parseBoolean(userData.child("isOrg").toString()));
-                currentUserModel.setEmail(userData.child("email").toString());
-                if(currentUserModel.isOrg()) {
-                    currentUserModel.setPhoneNumber(userData.child("phoneNumber").toString());
+                currentUserModel.setName(userData.child("name").getValue().toString());
+                currentUserModel.setOrg(Boolean.parseBoolean(userData.child("isOrg").getValue().toString()));
+                currentUserModel.setEmail(userData.child("email").getValue().toString());
+                if(currentUserModel.getIsOrg()) {
+                    currentUserModel.setPhoneNumber(userData.child("phoneNumber").getValue().toString());
                 }
+                setUpTopProfile();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("tag", "onCancelled", databaseError.toException());
             }
         });
+    }
+
+    private void setUpTopProfile() {
+        //set up for top of profile page
+        viewFlipper = findViewById(R.id.viewFlipper);
+        userName = findViewById(R.id.et_name);
+
+        if(currentUserModel.getIsOrg()) {
+            viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forOrg)));
+        } else {
+            viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forConsumer)));
+        }
     }
 }

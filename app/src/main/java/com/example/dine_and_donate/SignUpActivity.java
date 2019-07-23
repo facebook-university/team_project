@@ -37,7 +37,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     FirebaseUser user;
     User createdUser;
 
-
     private DatabaseReference mDatabase;
 
     @Override
@@ -48,7 +47,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        createdUser = new User();
 
         spinner = findViewById(R.id.user_options);
         name = findViewById(R.id.et_name);
@@ -122,9 +120,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         backToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
+                navigationHelper(LoginActivity.class);
             }
         });
     }
@@ -154,16 +150,8 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             user = mAuth.getCurrentUser();
-                            User userInfo = writeNewUser(user.getUid(), name.getText().toString(), email, spinner.getSelectedItem().toString().equals("Organization"));
-                            // TODO: parcel to pass through intent
-                            Intent intent = new Intent(SignUpActivity.this, MapActivity.class);
-                            startActivity(intent);
-                            finish();
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("create", "createUserWithEmail:success");
-                            createdUser.name = name.getText().toString();
-                            createdUser.isOrg = spinner.getSelectedItem().toString() == "Organization";
-                            Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
+                            writeNewUser(user.getUid(), name.getText().toString(), email, spinner.getSelectedItem().toString().equals("Organization"));
+                            navigationHelper(ProfileActivity.class);
                         } else {
                             // If sign in fails, display a message to the user.
                             //Log.w("create", "createUserWithEmail:failure", task.getException());
@@ -186,4 +174,9 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         return user;
     }
 
+    private void navigationHelper(Class goToClass) {
+        Intent intent = new Intent(SignUpActivity.this, goToClass);
+        startActivity(intent);
+        finish();
+    }
 }
