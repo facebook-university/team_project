@@ -103,7 +103,6 @@ public class ProfileFragment extends Fragment {
                         Intent shareOnFB = new Intent(getActivity(), ShareEventActivity.class);
                         startActivity(shareOnFB);
                         return true;
-
                     case R.id.editProfile:
                         Intent intent = new Intent(getActivity(), EditProfileActivity.class);
                         startActivity(intent);

@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -166,7 +167,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                             mCreatedUser.isOrg = mSpinner.getSelectedItem().toString() == "Organization";
                             Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
                             writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
-                            //navigationHelper(ProfileActivity.class);
+                            navigationHelper(HomeActivity.class);
                         } else {
                             // If sign in fails, display a message to the user.
                             //Log.w("create", "createUserWithEmail:failure", task.getException());
