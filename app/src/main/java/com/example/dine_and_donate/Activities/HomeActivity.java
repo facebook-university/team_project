@@ -51,7 +51,7 @@ public class HomeActivity extends AppCompatActivity {
                 }
                 fragmentManager.beginTransaction()
                         .replace(R.id.flContainer, fragment)
-                        .addToBackStack(null)
+                        .addToBackStack(null) // TODO: look into if this can cause mem problem
                         .commit();
                 return true;
             }
