@@ -24,31 +24,31 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class LoginActivity extends AppCompatActivity {
 
     private EditText email;
     private EditText password;
     private Button login;
     private Button signup;
-    private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
     private User currentUserModel;
     private BottomNavigationView bottomNavigationView;
-    private DatabaseReference mDatabase;
+    private FirebaseDatabase mDatabase;
     private FirebaseUser fbUser;
+    private DatabaseReference mRef;
+    private DatabaseReference ref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance();
+        fbUser = FirebaseAuth.getInstance().getCurrentUser();
+        mRef = mDatabase.getReference();
+        ref = mRef.child("users");
 
-        if(currentUser != null) { // if someone is already signed in, skip sign in process
+        if(fbUser != null) { // if someone is already signed in, skip sign in process
             createUserModel();
             goToProfile();
         }
@@ -84,8 +84,8 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        // Sign in success, update UI with the signed-in user's information
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
                             Log.d("signIn", "signInWithEmail:success");
                             goToProfile();
                         } else {
@@ -98,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void createUserModel() {
-        mDatabase.child("users").child(fbUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
+        ref.child(fbUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
                 currentUserModel = new User();

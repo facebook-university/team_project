@@ -11,12 +11,9 @@
         android:layout_gravity="start"
         android:background="@color/white"
         app:itemTextColor="@color/colorPrimaryDark"
-        app:menu="@menu/map_filter_drawer">
-
-    </com.google.android.material.navigation.NavigationView>
+        app:menu="@menu/map_filter_drawer"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -38,7 +35,7 @@
                 android:id="@+id/tv_restaurant_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Restaurant Name Here"
+                android:text="@string/resturantName"
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
@@ -48,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:background="#00C853"
                 android:fontFamily="serif"
-                android:text="Create Event"
+                android:text="@string/createEvent"
                 android:textColor="#E6575151" />
         </LinearLayout>
 
@@ -57,8 +54,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            app:itemIconTint="#fff"
-            app:itemTextColor="#fff"
+            app:itemIconTint="@color/white"
+            app:itemTextColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -6,7 +6,7 @@
         android:id="@+id/createEvent"
         android:orderInCategory="1"
         android:visible="true"
-        android:title="Launch a Fundraiser"
+        android:title="@string/launchFundraiser"
         android:icon="@drawable/icons8_add_64"
         app:showAsAction="always" />
 

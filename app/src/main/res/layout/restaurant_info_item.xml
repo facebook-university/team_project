@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/restaurant_iv"
         android:layout_width="82dp"
         android:layout_height="88dp"
         app:srcCompat="@color/common_google_signin_btn_text_dark_focused"
@@ -16,7 +16,7 @@
         tools:layout_editor_absoluteY="16dp" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/restaurant_name_tv"
         android:layout_width="217dp"
         android:layout_height="20dp"
         android:text="1. Restaurant"
@@ -33,7 +33,7 @@
 
     <TextView
         android:id="@+id/textView4"
-        android:layout_width="143dp"
+        android:layout_width="wrap_content"
         android:layout_height="22dp"
         android:text="(7 fundraisers)"
         tools:layout_editor_absoluteX="219dp"

@@ -2,25 +2,22 @@ package com.example.dine_and_donate;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toolbar;
-import android.widget.ViewFlipper;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.dine_and_donate.Models.User;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
@@ -32,97 +29,112 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ProfileActivity extends AppCompatActivity {
 
     //elements in layout
-    private TabLayout tabLayout;
-    private ViewPagerAdadpter voucherPagerAdadpter;
-    private ViewPager voucherView;
-
-    private TextView userName;
-    private TextView bio;
-    private ImageView profPic;
-    private ImageView blurredPic;
-
-    private ViewFlipper viewFlipper;
+    private TabLayout mTabLayout;
+    private ViewPagerAdapter mVoucherPagerAdapter;
+    private ViewPager mVoucherView;
+    private TextView mOrgName;
+    private TextView mConsumerName;
+    private TextView mBio;
+    private ImageView mProfPic;
+    private ImageView mBlurredPic;
+    private Button mLogOutBtn;
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle aToggle;
-    private Toolbar toolbar;
-    private NavigationView navigationView;
+    private Toolbar mToolbar;
+    private NavigationView mNavigationView;
+    private ConstraintLayout mLayoutForOrg;
+    private ConstraintLayout mLayoutForConsumer;
 
     private User currentUserModel;
     private BottomNavigationView bottomNavigationView;
-    private DatabaseReference mDatabase;
-    private FirebaseUser fbUser;
 
-    private boolean isOrg = false;
+    private FirebaseDatabase mDatabase;
+    private FirebaseUser mFbUser;
+    private DatabaseReference mRef;
+    private FirebaseAuth mAuth;
+    private boolean mIsOrg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_activity);
 
-        tabLayout = findViewById(R.id.tabs_profile);
-        voucherView = (ViewPager) findViewById(R.id.viewpager_id);
-        voucherPagerAdadpter = new ViewPagerAdadpter(getSupportFragmentManager());
+        mDatabase = FirebaseDatabase.getInstance();
+        mLayoutForConsumer = findViewById(R.id.forConsumer);
+        mLayoutForOrg = findViewById(R.id.forOrg);
+        mTabLayout = findViewById(R.id.tabs_profile);
+        mVoucherView = findViewById(R.id.viewpager_id);
+        mVoucherPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        mVoucherView.setAdapter(mVoucherPagerAdapter);
+        mTabLayout.setupWithViewPager(mVoucherView);
+        mNavigationView = findViewById(R.id.settings_navigation);
+        mLogOutBtn = findViewById(R.id.logout);
+        mOrgName = findViewById(R.id.org_name);
+        mConsumerName = findViewById(R.id.cons_name);
 
-        //Add Fragment Here
-        voucherPagerAdadpter.AddFragment(new Tab1Fragment(), "tab 1 fragment");
-        voucherPagerAdadpter.AddFragment(new Tab2Fragment(), "tab 2 fragment");
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance();
+        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+        mRef = mDatabase.getReference().child("users").child(mFbUser.getUid());
 
-        voucherView.setAdapter(voucherPagerAdadpter);
-        tabLayout.setupWithViewPager(voucherView);
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+             switch (menuItem.getItemId()) {
+                 case R.id.shareFacebook:
+                     Intent shareOnFB = new Intent(ProfileActivity.this, ShareEventActivity.class);
+                     startActivity(shareOnFB);
+                     return true;
 
-        navigationView = (NavigationView) findViewById(R.id.settings_navigation);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-             @Override
-             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                 switch (menuItem.getItemId()) {
-                     case R.id.shareFacebook:
-                         Intent shareOnFB = new Intent (ProfileActivity.this, ShareEventActivity.class);
-                         startActivity(shareOnFB);
-                         return true;
-                 }
-                 return true;
+                 case R.id.editProfile:
+                     Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+                     startActivity(intent);
+                     return true;
+                 case R.id.logout:
+                     Intent logoutIntent = new Intent(ProfileActivity.this, LoginActivity.class);
+                     startActivity(logoutIntent);
+                     return true;
              }
-         });
+             return true;
+         }
+     });
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-
         //Change bottom navigation profile icon to filled
         bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
-
         setUpBottomNav();
-        setUpTopProfile();
+
+        //retrieve values from database
+        mRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mIsOrg = (Boolean) dataSnapshot.child("isOrg").getValue();
+                setUpTopProfile(dataSnapshot.child("name").getValue().toString());
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    private void setUpTopProfile() {
-        //set up for top of profile page
-        viewFlipper = findViewById(R.id.viewFlipper);
-        userName = findViewById(R.id.et_name);
-
-        if (isOrg) {
-            viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forOrg)));
+    //set up for top of profile page based on user type
+    private void setUpTopProfile(String name) {
+       //display orgView when user type is an organization
+        if(mIsOrg) {
+            mLayoutForOrg.setVisibility(View.VISIBLE);
+            mLayoutForConsumer.setVisibility(View.INVISIBLE);
+            mOrgName.setText(name);
         } else {
-            viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(findViewById(R.id.forConsumer)));
+            mLayoutForOrg.setVisibility(View.INVISIBLE);
+            mLayoutForConsumer.setVisibility(View.VISIBLE);
+            mConsumerName.setText(name);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Associate searchable configuration with the SearchView
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
-    }
-
-    private void navigationHelper(Class activity) {
-        final Intent loginToTimeline = new Intent(this, activity);
-        // loginToTimeline.putExtra("isOrg", currentUserModel.getIsOrg());
-        startActivity(loginToTimeline);
     }
 
     private void setUpBottomNav() {
@@ -146,5 +158,17 @@ public class ProfileActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void navigationHelper(Class activity) {
+        final Intent loginToTimeline = new Intent(this, activity);
+        startActivity(loginToTimeline);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Associate searchable configuration with the SearchView
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        return true;
     }
 }
