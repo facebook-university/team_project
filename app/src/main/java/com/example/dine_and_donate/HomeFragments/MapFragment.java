@@ -71,7 +71,6 @@ import okhttp3.Response;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 @RuntimePermissions
 public class MapFragment extends Fragment {
@@ -87,6 +86,7 @@ public class MapFragment extends Fragment {
     public static final String TAG = MapActivity.class.getSimpleName();
     public JSONArray restaurantsNearbyJSON = new JSONArray();
     private boolean loaded;
+    private boolean cameraSet;
     private Double cameraLatitude;
     private Double cameraLongitude;
 
@@ -114,10 +114,15 @@ public class MapFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        loaded = false;
+    }
+
+    @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        loaded = false;
         mAuth = FirebaseAuth.getInstance();
         isOrg = true;
         mContext = view.getContext();
@@ -126,11 +131,7 @@ public class MapFragment extends Fragment {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
         }
 
-        if (savedInstanceState != null && savedInstanceState.keySet().contains(KEY_LOCATION)) {
-            // Since KEY_LOCATION was found in the Bundle, we can be sure that mCurrentLocation
-            // is not null.
-            mCurrentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-        } else {
+        if (!loaded) {
             mapFragment = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map));
             if (mapFragment != null) {
                 mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -138,16 +139,16 @@ public class MapFragment extends Fragment {
                     @Override
                     public void onMapReady(GoogleMap map) {
                         loadMap(map);
-                        Toast.makeText(mContext, "here", Toast.LENGTH_SHORT).show();
                     }
                 });
+                loaded = true;
             } else {
-                Toast.makeText(view.getContext(), "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
             }
         }
 
         // Initialize Places.
-        Places.initialize(getApplicationContext(), API_KEY);
+        Places.initialize(mContext.getApplicationContext(), API_KEY);
 
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(mContext);
@@ -258,20 +259,6 @@ public class MapFragment extends Fragment {
                 });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mCurrentLocation != null) {
-            Toast.makeText(mContext, "GPS location was found!", Toast.LENGTH_SHORT).show();
-            LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
-            map.animateCamera(cameraUpdate);
-        } else {
-            Toast.makeText(mContext, "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
-        }
-        MapDemoFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
@@ -296,11 +283,11 @@ public class MapFragment extends Fragment {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
                         onLocationChanged(locationResult.getLastLocation());
-                        if(!loaded) {
+                        if(!cameraSet) {
                             LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
                             map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
                             map.animateCamera(CameraUpdateFactory.zoomTo(15));
-                            loaded = true;
+                            cameraSet = true;
                         }
                     }
                 },
