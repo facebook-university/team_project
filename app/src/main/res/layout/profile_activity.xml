@@ -21,15 +21,16 @@
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs_profile"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="55dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="@color/colorPrimary"
                 app:layout_constraintBottom_toTopOf="@+id/viewpager_id"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="1.0"
                 app:tabGravity="fill"
                 app:tabIndicatorColor="@color/colorAccent"
                 app:tabMode="fixed">
@@ -50,21 +51,27 @@
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/viewpager_id"
-                android:layout_width="408dp"
-                android:layout_height="348dp"
+                android:layout_width="match_parent"
+                android:layout_height="320dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <!-- Main content -->
 
             <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/bottom_navigation"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="4dp"
                 android:background="@color/colorPrimary"
                 app:itemIconTint="@color/white"
                 app:itemTextColor="@color/white"
@@ -72,97 +79,92 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:menu="@menu/menu_bottom_navigation" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/forOrg"
-            android:layout_width="match_parent"
-            android:layout_height="127dp">
-
-            <ImageView
-                android:id="@+id/org_prof_pic"
-                android:layout_width="94dp"
-                android:layout_height="105dp"
-                android:layout_marginStart="48dp"
-                android:layout_marginLeft="48dp"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/forOrg"
+                android:layout_width="match_parent"
+                android:layout_height="155dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/forOrg"
-                app:layout_constraintRight_toLeftOf="@id/org_name"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/forOrg"
-                app:srcCompat="@drawable/instagram_user_outline_24" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/org_name"
-                android:layout_width="153dp"
-                android:layout_height="28dp"
-                android:layout_marginTop="56dp"
-                android:layout_marginEnd="92dp"
-                android:layout_marginRight="92dp"
-                android:layout_marginBottom="8dp"
-                android:text="TextView"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <ImageView
+                    android:id="@+id/org_prof_pic"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginStart="36dp"
+                    android:layout_marginLeft="36dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/instagram_user_outline_24" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/forConsumer"
-            android:layout_width="match_parent"
-            android:layout_height="127dp">
+                <TextView
+                    android:id="@+id/org_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="128dp"
+                    android:layout_marginRight="128dp"
+                    android:text="TextView"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/org_prof_pic"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <ImageView
-                android:id="@+id/blurred_consumer_pic"
-                android:layout_width="406dp"
-                android:layout_height="128dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.003"
-                app:srcCompat="@android:drawable/screen_background_light_transparent" />
-
-            <ImageView
-                android:id="@+id/cons_prof_pic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/blurred_consumer_pic"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.492"
-                app:layout_constraintStart_toStartOf="@+id/blurred_consumer_pic"
-                app:layout_constraintTop_toTopOf="@+id/blurred_consumer_pic"
-                app:layout_constraintVertical_bias="0.252"
-                app:srcCompat="@drawable/instagram_user_outline_24" />
-
-            <TextView
-                android:id="@+id/cons_name"
-                android:layout_width="wrap_content"
-                android:layout_height="27dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/forConsumer"
+                android:layout_width="match_parent"
+                android:layout_height="155dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="TextView"
-                app:layout_constraintBottom_toBottomOf="@+id/blurred_consumer_pic"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/tabs_profile"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cons_prof_pic"
-                app:layout_constraintVertical_bias="0.196" />
+                app:layout_constraintTop_toTopOf="@+id/forOrg">
+
+                <ImageView
+                    android:id="@+id/blurred_consumer_pic"
+                    android:layout_width="match_parent"
+                    android:layout_height="154dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@android:drawable/screen_background_light_transparent" />
+
+                <ImageView
+                    android:id="@+id/cons_prof_pic"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/blurred_consumer_pic"
+                    app:layout_constraintStart_toStartOf="@+id/blurred_consumer_pic"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/instagram_user_outline_24" />
+
+                <TextView
+                    android:id="@+id/cons_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="27dp"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="TextView"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/cons_prof_pic"
+                    app:layout_constraintStart_toStartOf="@+id/cons_prof_pic"
+                    app:layout_constraintTop_toBottomOf="@+id/cons_prof_pic" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </FrameLayout>
@@ -200,5 +202,4 @@
         </LinearLayout>
 
     </com.google.android.material.navigation.NavigationView>
-
 </androidx.drawerlayout.widget.DrawerLayout>

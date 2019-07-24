@@ -27,7 +27,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private ImageButton mClearNumber;
     private ImageView mProfPic;
     private Button mSaveBtn;
-    private TextView mNumber;
+    private TextView mNumberTextView;
 
     private FirebaseDatabase mDatabase;
     private FirebaseUser mFbUser;
@@ -44,7 +44,7 @@ public class EditProfileActivity extends AppCompatActivity {
         mClearName = findViewById(R.id.edit_name_btn);
         mClearNumber = findViewById(R.id.edit_number_btn);
         mSaveBtn = findViewById(R.id.save_btn);
-        mNumber = findViewById(R.id.edit_number_tv);
+        mNumberTextView = findViewById(R.id.edit_number_tv);
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
@@ -58,14 +58,15 @@ public class EditProfileActivity extends AppCompatActivity {
                 mEditName.setText(dataSnapshot.child("name").getValue().toString());
                 mEditNumber.setVisibility(View.INVISIBLE);
                 mClearNumber.setVisibility(View.INVISIBLE);
-                mNumber.setVisibility(View.INVISIBLE);
+                mNumberTextView.setVisibility(View.INVISIBLE);
                 if((Boolean)dataSnapshot.child("isOrg").getValue()) {
                     mEditNumber.setVisibility(View.VISIBLE);
                     mClearNumber.setVisibility(View.VISIBLE);
-                    mNumber.setVisibility(View.VISIBLE);
+                    mNumberTextView.setVisibility(View.VISIBLE);
                     mEditNumber.setText(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -94,6 +95,5 @@ public class EditProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
-
     }
 }
