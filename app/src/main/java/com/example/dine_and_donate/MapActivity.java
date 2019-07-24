@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
@@ -156,7 +157,7 @@ public class MapActivity extends AppCompatActivity {
                         break;
                     case R.id.action_profile:
                         //Go to Profile
-                        navigationHelper(ProfileActivity.class);
+                        navigationHelper(HomeActivity.class);
                         break;
                     default:
                         break;

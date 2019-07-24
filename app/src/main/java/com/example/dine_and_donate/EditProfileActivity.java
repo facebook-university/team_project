@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -89,7 +90,7 @@ public class EditProfileActivity extends AppCompatActivity {
         mSaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(EditProfileActivity.this, ProfileActivity.class);
+                Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
                 startActivity(intent);
                 finish();
             }

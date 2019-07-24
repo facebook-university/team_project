@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class NotificationsActivity extends AppCompatActivity {
@@ -34,7 +35,7 @@ public class NotificationsActivity extends AppCompatActivity {
                         break;
                     case R.id.action_profile:
                         //Go to Profile
-                        navigationHelper(ProfileActivity.class);
+                        navigationHelper(HomeActivity.class);
                         break;
                     default: break;
                 }
