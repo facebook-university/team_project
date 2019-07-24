@@ -136,10 +136,10 @@ public class ProfileFragment extends Fragment {
         //display orgView when user type is an organization
         if(mIsOrg) {
             mLayoutForOrg.setVisibility(View.VISIBLE);
-            mLayoutForConsumer.setVisibility(View.INVISIBLE);
+            mLayoutForConsumer.setVisibility(View.GONE);
             mOrgName.setText(name);
         } else {
-            mLayoutForOrg.setVisibility(View.INVISIBLE);
+            mLayoutForOrg.setVisibility(View.GONE);
             mLayoutForConsumer.setVisibility(View.VISIBLE);
             mConsumerName.setText(name);
         }
