@@ -2,10 +2,10 @@ package com.example.dine_and_donate;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toolbar;
@@ -41,6 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView mBio;
     private ImageView mProfPic;
     private ImageView mBlurredPic;
+    private Button mLogOutBtn;
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle aToggle;
@@ -72,7 +73,7 @@ public class ProfileActivity extends AppCompatActivity {
         mVoucherView.setAdapter(mVoucherPagerAdapter);
         mTabLayout.setupWithViewPager(mVoucherView);
         mNavigationView = findViewById(R.id.settings_navigation);
-
+        mLogOutBtn = findViewById(R.id.logout);
         mOrgName = findViewById(R.id.org_name);
         mConsumerName = findViewById(R.id.cons_name);
 
@@ -93,6 +94,10 @@ public class ProfileActivity extends AppCompatActivity {
                  case R.id.editProfile:
                      Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
                      startActivity(intent);
+                     return true;
+                 case R.id.logout:
+                     Intent logoutIntent = new Intent(ProfileActivity.this, LoginActivity.class);
+                     startActivity(logoutIntent);
                      return true;
              }
              return true;
@@ -124,12 +129,10 @@ public class ProfileActivity extends AppCompatActivity {
         if(mIsOrg) {
             mLayoutForOrg.setVisibility(View.VISIBLE);
             mLayoutForConsumer.setVisibility(View.INVISIBLE);
-            Log.d("name", name);
             mOrgName.setText(name);
         } else {
             mLayoutForOrg.setVisibility(View.INVISIBLE);
             mLayoutForConsumer.setVisibility(View.VISIBLE);
-            Log.d("consumer name", name);
             mConsumerName.setText(name);
         }
     }
