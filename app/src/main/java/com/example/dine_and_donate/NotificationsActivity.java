@@ -34,7 +34,7 @@ public class NotificationsActivity extends AppCompatActivity {
                         break;
                     case R.id.action_profile:
                         //Go to Profile
-                        navigationHelper(ProfileActivity.class);
+//                        navigationHelper(ProfileActivity.class);
                         break;
                     default: break;
                 }

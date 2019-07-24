@@ -6,6 +6,7 @@
         <item>Organization</item>
     </string-array>
     <string name="google_maps_api_key">AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg</string>
+
     <string name="facebook_app_id">443391136243627</string>
 
     <!--event activity-->
@@ -18,4 +19,7 @@
     <string name="createButton">Create Event</string>
     <string name="findAutocompleteHint">Find Restaurant</string>
     <string name="eventDescriptionHint">The proceeds for this event will...</string>
+    <string name="createEvent">Create Event</string>
+    <string name="resturantName">Restaurant Name Here</string>
+    <string name="launchFundraiser">Launch a Fundraiser</string>
 </resources>
