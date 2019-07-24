@@ -22,7 +22,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-//import com.example.dine_and_donate.HomeFragments.CustomWindowAdapter;
+
+import com.example.dine_and_donate.Activities.HomeActivity;
+
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
@@ -57,6 +59,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -158,7 +161,7 @@ public class MapActivity extends AppCompatActivity {
                         break;
                     case R.id.action_profile:
                         //Go to Profile
-                        navigationHelper(ProfileActivity.class);
+                        navigationHelper(HomeActivity.class);
                         break;
                     default:
                         break;
@@ -349,8 +352,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void generateMarkers(String longitude, String latitude) {
-        final YelpService yelpService = new YelpService();
-        yelpService.findRestaurants(longitude, latitude, new Callback() {
+        YelpService.findRestaurants(longitude, latitude, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();

@@ -1,5 +1,6 @@
 package com.example.dine_and_donate;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,18 +14,29 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import java.util.ArrayList;
 
-public class Tab1Fragment extends Fragment {
-
+public class OldVouchersFragment extends Fragment {
 
     View v;
     private RecyclerView recyclerView;
-    private ArrayList<String> mImageUrls = new ArrayList<>();
-    private ArrayList<String> mNames = new ArrayList<>();
+    private ArrayList<String> mImageUrls;
+    private ArrayList<String> mNames;
+    private Context mContext;
 
     //default constructor
-    public Tab1Fragment() {
+    public OldVouchersFragment() {
         mImageUrls = new ArrayList<>();
         mNames = new ArrayList<>();
+    }
+
+    //inflates layout of fragment
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        v = inflater.inflate(R.layout.tab_fragment, container, false);
+        recyclerView = v.findViewById(R.id.rv_vouchers);
+        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
+        recyclerView.setAdapter(staggeredRecyclerViewAdapter);
+        return v;
     }
 
     //initial creation of fragment
@@ -33,26 +45,17 @@ public class Tab1Fragment extends Fragment {
         initBitmaps();
     }
 
-    //create view based on data in array lists, inflates the layout of the fragment
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.tab1_fragment, container, false);
-        recyclerView = v.findViewById(R.id.rv_vouchers);
-        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(this, mNames, mImageUrls);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        recyclerView.setAdapter(staggeredRecyclerViewAdapter);
-        return v;
-    }
-
-    //add images and descriptions to arrayLists
+    //add images and descriptions to respective arrayLists
     private void initBitmaps() {
+        //image URL
         for(int i = 0; i < 20; i++) {
             mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
         }
 
+        //voucher descriptions
         for(int i = 0; i < 10; i++) {
-            mNames.add("Tree");
-            mNames.add("fjcutcnerdfdluvhbuegnecgvlkclbidjvnlvfubjrbeugtfdrtnikledvtbhguvuhrtjcvcfguekrfrihjfehbjllfdutbg");
+            mNames.add("udblrjtkbtecidtijijhbfitduvgdnvbtlujberlvuubtdbkfhdfihgudjbvnbbjhgejvdefhcturgucfnenhjdfffijrkiftbenjrjijhugvfujncndrftftglgelkc");
+            mNames.add("dogs");
         }
     }
 }
