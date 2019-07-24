@@ -2,6 +2,7 @@ package com.example.dine_and_donate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,9 +21,13 @@ import com.example.dine_and_donate.Models.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
+import com.google.firebase.database.ValueEventListener;
 
 
 public class ProfileActivity extends AppCompatActivity {
@@ -31,13 +36,11 @@ public class ProfileActivity extends AppCompatActivity {
     private TabLayout mTabLayout;
     private ViewPagerAdapter mVoucherPagerAdapter;
     private ViewPager mVoucherView;
-    //TODO populate these fields based on database information
-    private TextView mUserName;
+    private TextView mOrgName;
+    private TextView mConsumerName;
     private TextView mBio;
     private ImageView mProfPic;
     private ImageView mBlurredPic;
-
-    private FirebaseDatabase mDatabase;
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle aToggle;
@@ -48,7 +51,12 @@ public class ProfileActivity extends AppCompatActivity {
 
     private User currentUserModel;
     private BottomNavigationView bottomNavigationView;
-    private FirebaseUser fbUser;
+
+    private FirebaseDatabase mDatabase;
+    private FirebaseUser mFbUser;
+    private DatabaseReference mRef;
+    private FirebaseAuth mAuth;
+    private boolean mIsOrg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +71,15 @@ public class ProfileActivity extends AppCompatActivity {
         mVoucherPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         mVoucherView.setAdapter(mVoucherPagerAdapter);
         mTabLayout.setupWithViewPager(mVoucherView);
-        mUserName = findViewById(R.id.et_name);
         mNavigationView = findViewById(R.id.settings_navigation);
-        setUpTopProfile();
+
+        mOrgName = findViewById(R.id.org_name);
+        mConsumerName = findViewById(R.id.cons_name);
+
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance();
+        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+        mRef = mDatabase.getReference().child("users").child(mFbUser.getUid());
 
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -89,17 +103,34 @@ public class ProfileActivity extends AppCompatActivity {
         //Change bottom navigation profile icon to filled
         bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
         setUpBottomNav();
+
+        //retrieve values from database
+        mRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mIsOrg = (Boolean) dataSnapshot.child("isOrg").getValue();
+                setUpTopProfile(dataSnapshot.child("name").getValue().toString());
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    //set up for top of profile page
-    private void setUpTopProfile() {
-        //TODO change boolean to isOrg boolean user attribute to display correct profile
-        if(false) {
-            mLayoutForOrg.setVisibility(View.INVISIBLE);
-            mLayoutForConsumer.setVisibility(View.VISIBLE);
-        } else {
+    //set up for top of profile page based on user type
+    private void setUpTopProfile(String name) {
+       //display orgView when user type is an organization
+        if(mIsOrg) {
             mLayoutForOrg.setVisibility(View.VISIBLE);
             mLayoutForConsumer.setVisibility(View.INVISIBLE);
+            Log.d("name", name);
+            mOrgName.setText(name);
+        } else {
+            mLayoutForOrg.setVisibility(View.INVISIBLE);
+            mLayoutForConsumer.setVisibility(View.VISIBLE);
+            Log.d("consumer name", name);
+            mConsumerName.setText(name);
         }
     }
 

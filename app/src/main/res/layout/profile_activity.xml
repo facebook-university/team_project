@@ -132,7 +132,7 @@
                 app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
             <ImageView
-                android:id="@+id/iv_prof_pic"
+                android:id="@+id/cons_prof_pic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -148,7 +148,7 @@
                 app:srcCompat="@drawable/instagram_user_outline_24" />
 
             <TextView
-                android:id="@+id/tv_name"
+                android:id="@+id/cons_name"
                 android:layout_width="wrap_content"
                 android:layout_height="27dp"
                 android:layout_marginStart="8dp"
@@ -161,7 +161,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/blurred_consumer_pic"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/iv_prof_pic"
+                app:layout_constraintTop_toBottomOf="@+id/cons_prof_pic"
                 app:layout_constraintVertical_bias="0.196" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
