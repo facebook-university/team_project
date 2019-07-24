@@ -22,4 +22,5 @@
     <string name="resturantName">Restaurant Name Here</string>
     <string name="launchFundraiser">Launch a Fundraiser</string>
     <string name="savedButton">Save</string>
+    <string name="editProfNameTextView">Name</string>
 </resources>
