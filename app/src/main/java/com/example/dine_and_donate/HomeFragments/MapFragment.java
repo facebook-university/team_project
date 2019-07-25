@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.example.dine_and_donate.MapActivity;
@@ -99,7 +100,7 @@ public class MapFragment extends Fragment {
 
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
-    private User currentUserModel;
+    private HomeActivity HomeActivity;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -123,8 +124,10 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        HomeActivity = (HomeActivity) getActivity();
+        isOrg = HomeActivity.mCurrentUser.isOrg;
+
         mAuth = FirebaseAuth.getInstance();
-        isOrg = true;
         mContext = view.getContext();
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {

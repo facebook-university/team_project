@@ -101,16 +101,13 @@ public class HomeActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.shareFacebook:
-                        Intent shareOnFB = new Intent(HomeActivity.this, ShareEventActivity.class);
-                        startActivity(shareOnFB);
+                        navigationHelper(ShareEventActivity.class);
                         return true;
                     case R.id.editProfile:
-                        Intent intent = new Intent(HomeActivity.this, EditProfileActivity.class);
-                        startActivity(intent);
+                        navigationHelper(EditProfileActivity.class);
                         return true;
                     case R.id.logout:
-                        Intent logoutIntent = new Intent(HomeActivity.this, LoginActivity.class);
-                        startActivity(logoutIntent);
+                        // TO DO
                         return true;
                 }
                 return true;
@@ -121,5 +118,11 @@ public class HomeActivity extends AppCompatActivity {
     private void lockDrawer() {
         drawerNav.closeDrawers();
         drawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    }
+
+    private void navigationHelper(Class navigateToClass) {
+        Intent intent = new Intent(HomeActivity.this, navigateToClass);
+        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
+        startActivity(intent);
     }
 }

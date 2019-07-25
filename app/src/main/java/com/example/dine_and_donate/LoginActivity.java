@@ -29,17 +29,17 @@ import org.parceler.Parcels;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText email;
-    private EditText password;
-    private Button login;
-    private Button signup;
+    private EditText mEmail;
+    private EditText mPassword;
+    private Button mLogin;
+    private Button mSignup;
     private FirebaseAuth mAuth;
-    private User currentUserModel;
+    private User mCurrentUserModel;
     private BottomNavigationView bottomNavigationView;
     private FirebaseDatabase mDatabase;
-    private FirebaseUser fbUser;
+    private FirebaseUser mFbUser;
     private DatabaseReference mRef;
-    private DatabaseReference ref;
+    private DatabaseReference mRefChild;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,29 +47,30 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.login_activity);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
-        fbUser = FirebaseAuth.getInstance().getCurrentUser();
+        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference();
-        ref = mRef.child("users");
+        mRefChild = mRef.child("users");
 
-        if(fbUser != null) { // if someone is already signed in, skip sign in process
+        //if someone is already signed in, skip sign in process
+        if(mFbUser != null) {
             createUserModel();
         }
 
-        email = findViewById(R.id.et_email);
-        password = findViewById(R.id.et_password);
-        login = findViewById(R.id.login_btn);
-        signup = findViewById(R.id.signup_btn);
+        mEmail = findViewById(R.id.et_email);
+        mPassword = findViewById(R.id.et_password);
+        mLogin = findViewById(R.id.login_btn);
+        mSignup = findViewById(R.id.signup_btn);
 
         //action for login button
-        login.setOnClickListener(new View.OnClickListener() {
+        mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signIn(email.getText().toString(), password.getText().toString());
+                signIn(mEmail.getText().toString(), mPassword.getText().toString());
             }
         });
 
         //action for signup button
-        signup.setOnClickListener(new View.OnClickListener() {
+        mSignup.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -83,32 +84,32 @@ public class LoginActivity extends AppCompatActivity {
 
     private void signIn(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        // Sign in success, update UI with the signed-in user's information
-                        if (task.isSuccessful()) {
-                            Log.d("signIn", "signInWithEmail:success");
-                            goToProfile();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("signIn", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                        }
+            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    // Sign in success, update UI with the signed-in user's information
+                    if (task.isSuccessful()) {
+                        Log.d("signIn", "signInWithEmail:success");
+                        goToProfile();
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w("signIn", "signInWithEmail:failure", task.getException());
+                        Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                     }
-                });
+                }
+            });
     }
 
     private void createUserModel() {
-        ref.child(fbUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
+        mRefChild.child(mFbUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
-                currentUserModel = new User();
-                currentUserModel.setName(dataSnapshot.child("name").getValue().toString());
-                currentUserModel.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
-                currentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
-                if(currentUserModel.getIsOrg()) {
-                    currentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
+                mCurrentUserModel = new User();
+                mCurrentUserModel.setName(dataSnapshot.child("name").getValue().toString());
+                mCurrentUserModel.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
+                mCurrentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
+                if(mCurrentUserModel.getIsOrg()) {
+                    mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
                 goToProfile();
             }
@@ -121,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void goToProfile() {
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(currentUserModel));
+        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUserModel));
         startActivity(intent);
         finish();
     }

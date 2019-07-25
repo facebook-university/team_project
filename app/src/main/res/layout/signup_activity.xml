@@ -7,27 +7,30 @@
 
     <TextView
         android:id="@+id/tv_iAm"
-        android:layout_width="104dp"
+        android:layout_width="wrap_content"
         android:layout_height="31dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="68dp"
+        android:layout_marginLeft="4dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
-        android:text="I am a/an..."
+        android:text="@string/userTypeIntro"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/et_name"
         app:layout_constraintEnd_toStartOf="@+id/user_options"
-        app:layout_constraintHorizontal_bias="0.891"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/user_options"
         app:layout_constraintVertical_bias="0.0" />
 
     <Spinner
         android:id="@+id/user_options"
         android:layout_width="202dp"
         android:layout_height="43dp"
-        android:layout_marginTop="56dp"
-        android:layout_marginEnd="48dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="28dp"
+        android:layout_marginRight="28dp"
+        android:layout_marginBottom="76dp"
+        app:layout_constraintBottom_toTopOf="@+id/et_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,64 +39,57 @@
         android:layout_width="287dp"
         android:layout_height="43dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="16dp"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_options" />
+        app:layout_constraintBottom_toTopOf="@+id/et_email"
+        app:layout_constraintEnd_toEndOf="@+id/user_options"
+        app:layout_constraintHorizontal_bias="0.562"
+        app:layout_constraintStart_toStartOf="@+id/tv_iAm" />
 
     <EditText
         android:id="@+id/et_email"
         android:layout_width="292dp"
         android:layout_height="43dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="12dp"
         android:ems="10"
         android:hint="Email"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.524"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_name" />
+        app:layout_constraintBottom_toTopOf="@+id/et_password2"
+        app:layout_constraintEnd_toEndOf="@+id/et_name"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/et_name" />
 
     <EditText
         android:id="@+id/et_password2"
         android:layout_width="292dp"
         android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="28dp"
         android:ems="10"
         android:hint="Password"
         android:inputType="textPersonName"
         android:password="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_email" />
+        app:layout_constraintBottom_toTopOf="@+id/et_org_phone"
+        app:layout_constraintEnd_toEndOf="@+id/et_email"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/et_email" />
 
     <EditText
         android:id="@+id/et_org_phone"
         android:layout_width="292dp"
         android:layout_height="43dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="204dp"
-        android:ems="10"
 
+        android:layout_marginBottom="36dp"
+        android:ems="10"
         android:hint="Phone Number"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_password2"
-        app:layout_constraintVertical_bias="0.063" />
+        app:layout_constraintBottom_toTopOf="@+id/final_signup_btn"
+        app:layout_constraintEnd_toEndOf="@+id/et_password2"
+        app:layout_constraintStart_toStartOf="@+id/et_password2" />
 
     <Button
         android:id="@+id/final_signup_btn"
@@ -101,43 +97,38 @@
         android:layout_height="35dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="36dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginBottom="48dp"
         android:text="Sign Up"
+        app:layout_constraintBottom_toTopOf="@+id/haveAcct_tv"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_org_phone" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/haveAcct_tv"
-        android:layout_width="164dp"
+        android:layout_width="wrap_content"
         android:layout_height="25dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginLeft="36dp"
-        android:layout_marginBottom="8dp"
-        android:text="Already have an account?"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/final_signup_btn"
-        app:layout_constraintVertical_bias="0.882" />
-
-    <Button
-        android:id="@+id/back_to_login_btn"
-        android:layout_width="94dp"
-        android:layout_height="35dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
+        android:text="@string/haveAcct"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/back_to_login_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/back_to_login_btn" />
+
+    <Button
+        android:id="@+id/back_to_login_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginEnd="72dp"
+        android:layout_marginRight="72dp"
+        android:layout_marginBottom="32dp"
         android:text="Log In"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.079"
-        app:layout_constraintStart_toEndOf="@+id/haveAcct_tv"
-        app:layout_constraintTop_toBottomOf="@+id/final_signup_btn"
-        app:layout_constraintVertical_bias="0.87" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

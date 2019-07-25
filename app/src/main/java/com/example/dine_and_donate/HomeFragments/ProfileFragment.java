@@ -22,13 +22,10 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.EditProfileActivity;
 import com.example.dine_and_donate.LoginActivity;
-import com.example.dine_and_donate.MapActivity;
 import com.example.dine_and_donate.Models.User;
-import com.example.dine_and_donate.NotificationsActivity;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.ShareEventActivity;
 import com.example.dine_and_donate.ViewPagerAdapter;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -58,9 +55,7 @@ public class ProfileFragment extends Fragment {
     private ConstraintLayout mLayoutForConsumer;
 
     private User currentUserModel;
-
     private HomeActivity HomeActivity;
-
 
     @Nullable
     @Override

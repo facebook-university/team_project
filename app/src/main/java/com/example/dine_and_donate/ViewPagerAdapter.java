@@ -1,5 +1,6 @@
 package com.example.dine_and_donate;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -25,5 +26,18 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return 2;
+    }
+
+    @Nullable
+    @Override
+    public CharSequence getPageTitle(int position) {
+        switch (position) {
+            case 0:
+                return "Current Vouchers";
+            case 1:
+                return "Past Vouchers";
+            default:
+                return null;
+        }
     }
 }

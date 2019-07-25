@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "572197996842-sejcuieie2jv4a1u6assrpilafd99ash.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dine_and_donate",
+            "certificate_hash": "3d0f02f0f408dd8ab46bd22336da0f198bfd0b57"
+          }
+        },
+        {
           "client_id": "572197996842-qkve8jbl1plafdgrph0c76f42u91eb6e.apps.googleusercontent.com",
           "client_type": 3
         }

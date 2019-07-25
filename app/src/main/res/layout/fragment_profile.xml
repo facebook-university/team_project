@@ -24,10 +24,8 @@
                     android:layout_height="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="1.0"
                     app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
                 <ImageView
@@ -36,7 +34,6 @@
                     android:layout_height="70dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/instagram_user_outline_24" />
@@ -48,7 +45,6 @@
                     android:layout_marginTop="15dp"
                     android:text="TextView"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/cons_prof_pic" />
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -104,21 +100,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:tabGravity="fill"
                 app:tabIndicatorColor="@color/colorAccent"
-                app:tabMode="fixed">
-
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Monday">
-
-                </com.google.android.material.tabs.TabItem>
-
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Tuesday" />
-
-            </com.google.android.material.tabs.TabLayout>
+                app:tabMode="fixed" />
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/viewpager_id"
@@ -127,7 +109,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tabs_profile" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
