@@ -85,8 +85,6 @@ public class ProfileFragment extends Fragment {
         mLayoutForOrg = view.findViewById(R.id.forOrg);
         mTabLayout = view.findViewById(R.id.tabs_profile);
         mTabLayout.setupWithViewPager(mVoucherView);
-        mNavigationView = view.findViewById(R.id.settings_navigation);
-        mLogOutBtn = view.findViewById(R.id.logout);
         mOrgName = view.findViewById(R.id.org_name);
         mConsumerName = view.findViewById(R.id.cons_name);
 
@@ -94,27 +92,6 @@ public class ProfileFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference().child("users").child(mFbUser.getUid());
-
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.shareFacebook:
-                        Intent shareOnFB = new Intent(getActivity(), ShareEventActivity.class);
-                        startActivity(shareOnFB);
-                        return true;
-                    case R.id.editProfile:
-                        Intent intent = new Intent(getActivity(), EditProfileActivity.class);
-                        startActivity(intent);
-                        return true;
-                    case R.id.logout:
-                        Intent logoutIntent = new Intent(getActivity(), LoginActivity.class);
-                        startActivity(logoutIntent);
-                        return true;
-                }
-                return true;
-            }
-        });
 
         //retrieve values from database
         mRef.addValueEventListener(new ValueEventListener() {
