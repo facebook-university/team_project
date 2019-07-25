@@ -22,7 +22,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+
 import com.example.dine_and_donate.Activities.HomeActivity;
+
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
@@ -58,11 +60,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.Response;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -230,7 +234,7 @@ public class MapActivity extends AppCompatActivity {
             MapDemoActivityPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
 
             //map.setOnMapLongClickListener(this);
-            map.setInfoWindowAdapter(new CustomWindowAdapter(getLayoutInflater()));
+            //map.setInfoWindowAdapter(new CustomWindowAdapter(getLayoutInflater()));
 
             map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         } else {

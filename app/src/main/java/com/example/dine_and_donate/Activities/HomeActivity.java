@@ -26,6 +26,10 @@ public class HomeActivity extends AppCompatActivity {
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
+        final Fragment notifications = new NotificationsFragment();
+        final Fragment map = new MapFragment();
+        final Fragment profile = new ProfileFragment();
+
         fragmentManager.beginTransaction().replace(R.id.flContainer, new ProfileFragment()).commit();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -36,16 +40,19 @@ public class HomeActivity extends AppCompatActivity {
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
-                        fragment = new NotificationsFragment();
+                        fragment = notifications;
                         break;
                     case R.id.action_map:
-                        fragment = new MapFragment();
+                        fragment = map;
                         break;
                     case R.id.action_profile:
-                        fragment = new ProfileFragment();
+                        fragment = profile;
                         break;
                 }
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.flContainer, fragment)
+                        .addToBackStack(null) // TODO: look into if this can cause mem problem
+                        .commit();
                 return true;
             }
         });
