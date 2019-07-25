@@ -25,6 +25,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.parceler.Parcels;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText mEmail;
@@ -52,7 +54,6 @@ public class LoginActivity extends AppCompatActivity {
         //if someone is already signed in, skip sign in process
         if(mFbUser != null) {
             createUserModel();
-            goToProfile();
         }
 
         mEmail = findViewById(R.id.et_email);
@@ -110,6 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                 if(mCurrentUserModel.getIsOrg()) {
                     mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
+                goToProfile();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -120,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void goToProfile() {
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-        // TO DO
+        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUserModel));
         startActivity(intent);
         finish();
     }
