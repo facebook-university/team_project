@@ -19,6 +19,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.EditProfileActivity;
 import com.example.dine_and_donate.LoginActivity;
 import com.example.dine_and_donate.MapActivity;
@@ -38,6 +39,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.parceler.Parcels;
+
 public class ProfileFragment extends Fragment {
 
     //elements in layout
@@ -51,20 +54,13 @@ public class ProfileFragment extends Fragment {
     private ImageView mBlurredPic;
     private Button mLogOutBtn;
 
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle aToggle;
-    private Toolbar mToolbar;
-    private NavigationView mNavigationView;
     private ConstraintLayout mLayoutForOrg;
     private ConstraintLayout mLayoutForConsumer;
 
     private User currentUserModel;
 
-    private FirebaseDatabase mDatabase;
-    private FirebaseUser mFbUser;
-    private DatabaseReference mRef;
-    private FirebaseAuth mAuth;
-    private boolean mIsOrg;
+    private HomeActivity HomeActivity;
+
 
     @Nullable
     @Override
@@ -80,7 +76,9 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mDatabase = FirebaseDatabase.getInstance();
+        HomeActivity = (HomeActivity) getActivity();
+        currentUserModel = HomeActivity.mCurrentUser;
+
         mLayoutForConsumer = view.findViewById(R.id.forConsumer);
         mLayoutForOrg = view.findViewById(R.id.forOrg);
         mTabLayout = view.findViewById(R.id.tabs_profile);
@@ -88,29 +86,13 @@ public class ProfileFragment extends Fragment {
         mOrgName = view.findViewById(R.id.org_name);
         mConsumerName = view.findViewById(R.id.cons_name);
 
-        mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance();
-        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
-        mRef = mDatabase.getReference().child("users").child(mFbUser.getUid());
-
-        //retrieve values from database
-        mRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                mIsOrg = (Boolean) dataSnapshot.child("isOrg").getValue();
-                setUpTopProfile(dataSnapshot.child("name").getValue().toString());
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        setUpTopProfile(currentUserModel.name);
     }
 
     //set up for top of profile page based on user type
     private void setUpTopProfile(String name) {
         //display orgView when user type is an organization
-        if(mIsOrg) {
+        if(currentUserModel.isOrg) {
             mLayoutForOrg.setVisibility(View.VISIBLE);
             mLayoutForConsumer.setVisibility(View.GONE);
             mOrgName.setText(name);

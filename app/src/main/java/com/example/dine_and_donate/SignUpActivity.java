@@ -28,6 +28,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.parceler.Parcels;
+
 public class SignUpActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private Spinner mSpinner;
@@ -192,7 +194,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
 
     private void navigationHelper(Class goToClass) {
         Intent intent = new Intent(SignUpActivity.this, goToClass);
-        // pass user
+        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCreatedUser));
         startActivity(intent);
         finish();
     }

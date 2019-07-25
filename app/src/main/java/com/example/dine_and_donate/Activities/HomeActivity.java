@@ -18,10 +18,13 @@ import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.HomeFragments.NotificationsFragment;
 import com.example.dine_and_donate.HomeFragments.ProfileFragment;
 import com.example.dine_and_donate.LoginActivity;
+import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.ShareEventActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+
+import org.parceler.Parcels;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -31,6 +34,7 @@ public class HomeActivity extends AppCompatActivity {
     private Fragment notifications = new NotificationsFragment();
     private Fragment map = new MapFragment();
     private Fragment profile = new ProfileFragment();
+    public User mCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,12 @@ public class HomeActivity extends AppCompatActivity {
 
         fragmentManager = getSupportFragmentManager();
         drawerNav = findViewById(R.id.drawerNav);
+        mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
+
+        fragmentManager.beginTransaction()
+                .replace(R.id.flContainer, profile)
+                .addToBackStack(null) // TODO: look into if this can cause mem problem
+                .commit();
 
         createDrawerNav();
         createBottomNav();
