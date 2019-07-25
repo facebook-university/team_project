@@ -22,11 +22,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
+import org.parceler.Parcels;
 
 public class SignUpActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -40,7 +39,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private User mCreatedUser;
-
     private DatabaseReference mDatabase;
 
     @Override
@@ -151,32 +149,32 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
 
     private void createAccount(final String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            mUser = mAuth.getCurrentUser();
-                            User userInfo = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
-                            // TODO: parcel to pass through intent
-                            Intent intent = new Intent(SignUpActivity.this, MapActivity.class);
-                            startActivity(intent);
-                            finish();
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("create", "createUserWithEmail:success");
-                            mCreatedUser.name = mName.getText().toString();
-                            mCreatedUser.isOrg = mSpinner.getSelectedItem().toString() == "Organization";
-                            Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
-                            writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
-                            navigationHelper(HomeActivity.class);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            //Log.w("create", "createUserWithEmail:failure", task.getException());
-                            FirebaseAuthException e = (FirebaseAuthException )task.getException();
-                            Log.e("LoginActivity", "Failed Registration", e);
-                            Toast.makeText(SignUpActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
-                        }
+            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        mUser = mAuth.getCurrentUser();
+                        User userInfo = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
+                        // TODO: parcel to pass through intent
+                        Intent intent = new Intent(SignUpActivity.this, MapActivity.class);
+                        startActivity(intent);
+                        finish();
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d("create", "createUserWithEmail:success");
+                        mCreatedUser.name = mName.getText().toString();
+                        mCreatedUser.isOrg = mSpinner.getSelectedItem().toString() == "Organization";
+                        Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
+                        writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
+                        navigationHelper(HomeActivity.class);
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        //Log.w("create", "createUserWithEmail:failure", task.getException());
+                        FirebaseAuthException e = (FirebaseAuthException )task.getException();
+                        Log.e("LoginActivity", "Failed Registration", e);
+                        Toast.makeText(SignUpActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
                     }
-                });
+                }
+            });
     }
 
     private User writeNewUser(String userId, String name, String email, boolean isOrg) {
@@ -192,7 +190,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
 
     private void navigationHelper(Class goToClass) {
         Intent intent = new Intent(SignUpActivity.this, goToClass);
-        // pass user
+        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCreatedUser));
         startActivity(intent);
         finish();
     }
