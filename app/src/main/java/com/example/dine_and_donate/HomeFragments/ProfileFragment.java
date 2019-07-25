@@ -21,13 +21,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.dine_and_donate.EditProfileActivity;
 import com.example.dine_and_donate.LoginActivity;
-import com.example.dine_and_donate.MapActivity;
 import com.example.dine_and_donate.Models.User;
-import com.example.dine_and_donate.NotificationsActivity;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.ShareEventActivity;
 import com.example.dine_and_donate.ViewPagerAdapter;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -81,6 +78,11 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mDatabase = FirebaseDatabase.getInstance();
+
+//        mVoucherView = findViewById(R.id.viewpager_id);
+//        mVoucherPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+//        mVoucherView.setAdapter(mVoucherPagerAdapter);
+
         mLayoutForConsumer = view.findViewById(R.id.forConsumer);
         mLayoutForOrg = view.findViewById(R.id.forOrg);
         mTabLayout = view.findViewById(R.id.tabs_profile);
@@ -89,6 +91,8 @@ public class ProfileFragment extends Fragment {
         mLogOutBtn = view.findViewById(R.id.logout);
         mOrgName = view.findViewById(R.id.org_name);
         mConsumerName = view.findViewById(R.id.cons_name);
+
+        mTabLayout.setupWithViewPager(mVoucherView);
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();

@@ -19,8 +19,8 @@ import java.util.ArrayList;
 //bind the data to the view
 public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<StaggeredRecyclerViewAdapter.ViewHolder> {
 
-    private ArrayList<String> mDescriptions = new ArrayList<>();
-    private ArrayList<String> mImages = new ArrayList<>();
+    private ArrayList<String> mDescriptions;
+    private ArrayList<String> mImages;
     private Context mContext;
 
     //constructor; takes in context, list of strings, list of URLs
@@ -41,7 +41,6 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
     //assign everything to the widgets
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         Log.d("tag", "onBindViewHolder: called");
-
 
         //dummy image
         RequestOptions requestOptions = new RequestOptions()

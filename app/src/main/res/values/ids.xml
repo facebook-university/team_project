@@ -2,5 +2,4 @@
 <resources>
     <item name="slide_menu" type="id" />
     <item name="flContainer" type="id" />
-    <item name="flContainer" type="id" />
 </resources>
