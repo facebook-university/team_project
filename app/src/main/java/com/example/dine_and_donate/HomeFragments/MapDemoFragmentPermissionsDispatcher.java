@@ -7,8 +7,6 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
-import com.example.dine_and_donate.MapActivity;
-
 import permissions.dispatcher.PermissionUtils;
 
 public final class MapDemoFragmentPermissionsDispatcher {
