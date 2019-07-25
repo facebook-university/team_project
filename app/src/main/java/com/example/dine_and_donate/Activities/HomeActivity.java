@@ -28,12 +28,11 @@ import org.parceler.Parcels;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private BottomNavigationView bottomNavigationView;
-    private FragmentManager fragmentManager;
-    private DrawerLayout drawerNav;
-    private Fragment notifications = new NotificationsFragment();
-    private Fragment map = new MapFragment();
-    private Fragment profile = new ProfileFragment();
+    private BottomNavigationView mBottomNavigationView;
+    private DrawerLayout mDrawerNav;
+    private Fragment mNotificationsFragment = new NotificationsFragment();
+    private Fragment mMapFragment = new MapFragment();
+    private Fragment mProfileFragment = new ProfileFragment();
     public User mCurrentUser;
 
     @Override
@@ -41,12 +40,11 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        fragmentManager = getSupportFragmentManager();
-        drawerNav = findViewById(R.id.drawerNav);
+        mDrawerNav = findViewById(R.id.drawerNav);
         mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
-        fragmentManager.beginTransaction()
-                .replace(R.id.flContainer, profile)
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.flContainer, mProfileFragment)
                 .addToBackStack(null) // TODO: look into if this can cause mem problem
                 .commit();
 
@@ -55,36 +53,36 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void createBottomNav() {
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        mBottomNavigationView = findViewById(R.id.bottom_navigation);
+        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
+        mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
                         lockDrawer();
-                        bottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
-                        bottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
-                        bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
-                        fragment = notifications;
+                        mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
+                        fragment = mNotificationsFragment;
                         break;
                     case R.id.action_map:
                         lockDrawer();
-                        bottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
-                        bottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
-                        bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
-                        fragment = map;
+                        mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
+                        fragment = mMapFragment;
                         break;
                     case R.id.action_profile:
-                        drawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                        bottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
-                        bottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
-                        bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
-                        fragment = profile;
+                        mDrawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
+                        fragment = mProfileFragment;
                         break;
                 }
-                fragmentManager.beginTransaction()
+                getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, fragment)
                         .addToBackStack(null) // TODO: look into if this can cause mem problem
                         .commit();
@@ -116,8 +114,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void lockDrawer() {
-        drawerNav.closeDrawers();
-        drawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        mDrawerNav.closeDrawers();
+        mDrawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
     private void navigationHelper(Class navigateToClass) {

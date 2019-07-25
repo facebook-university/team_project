@@ -100,7 +100,6 @@ public class MapFragment extends Fragment {
 
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
-    private HomeActivity HomeActivity;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -124,8 +123,8 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        HomeActivity = (HomeActivity) getActivity();
-        isOrg = HomeActivity.mCurrentUser.isOrg;
+        HomeActivity homeActivity = (HomeActivity) getActivity();
+        isOrg = homeActivity.mCurrentUser.isOrg;
 
         mAuth = FirebaseAuth.getInstance();
         mContext = view.getContext();

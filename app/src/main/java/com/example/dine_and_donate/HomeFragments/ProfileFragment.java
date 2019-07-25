@@ -54,8 +54,7 @@ public class ProfileFragment extends Fragment {
     private ConstraintLayout mLayoutForOrg;
     private ConstraintLayout mLayoutForConsumer;
 
-    private User currentUserModel;
-    private HomeActivity HomeActivity;
+    private User mCurrentUserModel;
 
     @Nullable
     @Override
@@ -71,8 +70,8 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        HomeActivity = (HomeActivity) getActivity();
-        currentUserModel = HomeActivity.mCurrentUser;
+        HomeActivity homeActivity = (HomeActivity) getActivity();
+        mCurrentUserModel = homeActivity.mCurrentUser;
 
         mLayoutForConsumer = view.findViewById(R.id.forConsumer);
         mLayoutForOrg = view.findViewById(R.id.forOrg);
@@ -81,13 +80,13 @@ public class ProfileFragment extends Fragment {
         mOrgName = view.findViewById(R.id.org_name);
         mConsumerName = view.findViewById(R.id.cons_name);
 
-        setUpTopProfile(currentUserModel.name);
+        setUpTopProfile(mCurrentUserModel.name);
     }
 
     //set up for top of profile page based on user type
     private void setUpTopProfile(String name) {
         //display orgView when user type is an organization
-        if(currentUserModel.isOrg) {
+        if(mCurrentUserModel.isOrg) {
             mLayoutForOrg.setVisibility(View.VISIBLE);
             mLayoutForConsumer.setVisibility(View.GONE);
             mOrgName.setText(name);
