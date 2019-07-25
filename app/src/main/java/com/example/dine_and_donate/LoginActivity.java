@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -117,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToProfile() {
-        Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         // TO DO
         startActivity(intent);
         finish();
