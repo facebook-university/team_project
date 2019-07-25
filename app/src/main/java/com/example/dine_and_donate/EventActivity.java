@@ -19,8 +19,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -61,6 +64,7 @@ public class EventActivity extends AppCompatActivity {
     private User mCurrentUser;
 
     private Uri mSelectedImage;
+    private FirebaseUser currentUser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,7 +74,7 @@ public class EventActivity extends AppCompatActivity {
         mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
         mAuth = FirebaseAuth.getInstance();
-        final FirebaseUser currentUser = mAuth.getCurrentUser();
+        currentUser = mAuth.getCurrentUser();
 
         mDatabase = FirebaseDatabase.getInstance();
         mRef = mDatabase.getReference();
@@ -133,11 +137,12 @@ public class EventActivity extends AppCompatActivity {
         });
 
         mBtnCreate.setOnClickListener(new View.OnClickListener() {
+            final Uri[] downloadUri = new Uri[1];
             @Override
             public void onClick(View v) {
 
                 if(mSelectedImage != null) {
-                    StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
+                    final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
                     UploadTask uploadTask = ref.putFile(mSelectedImage);
                     uploadTask.addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -150,19 +155,47 @@ public class EventActivity extends AppCompatActivity {
                             // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
                         }
                     });
+
+                    Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                        @Override
+                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                            if (!task.isSuccessful()) {
+                                throw task.getException();
+                            }
+
+                            // Continue with the task to get the download URL
+                            return ref.getDownloadUrl();
+                        }
+                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if (task.isSuccessful()) {
+                                downloadUri[0] = task.getResult();
+                                String s = downloadUri[0].toString();
+                                writeEvent(intent, s, location);
+                            } else {
+                                // Handle failures
+                            }
+                        }
+                    });
+
                 }
 
-                String orgId = currentUser.getUid();
-                String yelpId = intent.getStringExtra("yelpID");
-                long eventDate = mCalendarView.getDate();
-                long startTime = convert(eventDate, mStartHour.getSelectedItemPosition()+1, mStartMin.getSelectedItemPosition(), mStartHalf.getSelectedItem().equals("PM"));
-                long endTime = convert(eventDate, mEndHour.getSelectedItemPosition()+1, mEndMin.getSelectedItemPosition(), mEndHalf.getSelectedItem().equals("PM"));
-                String info = mEtEventInfo.getText().toString();
-                Event newEvent = new Event(orgId, location, yelpId, info, startTime, endTime);
-                mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
-                finish();
+
             }
         });
+    }
+
+    private void writeEvent(Intent intent, String url, String location) {
+        String orgId = currentUser.getUid();
+        String yelpId = intent.getStringExtra("yelpID");
+        long eventDate = mCalendarView.getDate();
+        long startTime = convert(eventDate, mStartHour.getSelectedItemPosition()+1, mStartMin.getSelectedItemPosition(), mStartHalf.getSelectedItem().equals("PM"));
+        long endTime = convert(eventDate, mEndHour.getSelectedItemPosition()+1, mEndMin.getSelectedItemPosition(), mEndHalf.getSelectedItem().equals("PM"));
+        String info = mEtEventInfo.getText().toString();
+        Event newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
+        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
+        finish();
     }
 
     public void onActivityResult(int requestCode,int resultCode,Intent data){
