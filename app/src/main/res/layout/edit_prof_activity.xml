@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/circular_edit_prof_pic"
         android:layout_width="110dp"
@@ -16,7 +15,6 @@
         app:civ_border_width="1.7dp"
         app:layout_constraintCircleRadius="700dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,13 +24,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
-        android:text="Change Profile Picture"
+        android:text="@string/changeProfPic"
         android:textColor="#1078CC"
         app:layout_constraintTop_toBottomOf="@+id/circular_edit_prof_pic"
-        tools:layout_editor_absoluteX="0dp">
-
-
-    </Button>
+        tools:layout_editor_absoluteX="0dp" />
 
     <LinearLayout
         android:id="@+id/nameLayout"
@@ -91,7 +86,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Number" />
+            android:text="@string/number" />
 
         <EditText
             android:id="@+id/edit_number_et"

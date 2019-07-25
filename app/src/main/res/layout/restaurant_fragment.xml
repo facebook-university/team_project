@@ -7,12 +7,12 @@
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Restaurant Name"
+        android:text="@string/resturantName"
         android:textSize="18dp" />
 
     <Button
         android:id="@+id/callRestaurant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Call Restaurant" />
+        android:text="@string/callRestaurant" />
 </LinearLayout>

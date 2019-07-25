@@ -15,7 +15,6 @@
     <string name="startTimeTextView">Start Time</string>
     <string name="endTimeTextView">End Time</string>
     <string name="eventDescriptionTextView">Event Description</string>
-    <string name="createButton">Create Event</string>
     <string name="findAutocompleteHint">Find Restaurant</string>
     <string name="eventDescriptionHint">The proceeds for this event will...</string>
     <string name="createEvent">Create Event</string>
@@ -23,4 +22,13 @@
     <string name="launchFundraiser">Launch a Fundraiser</string>
     <string name="savedButton">Save</string>
     <string name="editProfNameTextView">Name</string>
+    <string name="hours">Hours</string>
+    <string name="number">Number</string>
+    <string name="changeProfPic">Change Profile Picture</string>
+    <string name="logOut">Log Out</string>
+    <string name="help">Help</string>
+    <string name="callRestaurant">Call Restaurant</string>
+    <string name="userTypeIntro">I am looking to...</string>
+    <string name="haveAcct">Already have an account?.</string>
+
 </resources>

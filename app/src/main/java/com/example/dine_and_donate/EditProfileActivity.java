@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,14 +25,13 @@ public class EditProfileActivity extends AppCompatActivity {
     private EditText mEditNumber;
     private ImageButton mClearName;
     private ImageButton mClearNumber;
-    private ImageView mProfPic;
     private Button mSaveBtn;
     private TextView mNumberTextView;
 
     private FirebaseDatabase mDatabase;
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
-    private DatabaseReference ref;
+    private DatabaseReference mRefForUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +48,10 @@ public class EditProfileActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference(); //need an instance of database reference
-        ref = mRef.child("users").child(mFbUser.getUid());
+        mRefForUser = mRef.child("users").child(mFbUser.getUid());
 
         //retrieve values from database
-        ref.addValueEventListener(new ValueEventListener() {
+        mRefForUser.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mEditName.setText(dataSnapshot.child("name").getValue().toString());
@@ -67,7 +65,6 @@ public class EditProfileActivity extends AppCompatActivity {
                     mEditNumber.setText(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 

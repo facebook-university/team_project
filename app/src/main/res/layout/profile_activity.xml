@@ -22,56 +22,26 @@
                 android:id="@+id/tabs_profile"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
                 android:background="@color/colorPrimary"
                 app:layout_constraintBottom_toTopOf="@+id/viewpager_id"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tabGravity="fill"
                 app:tabIndicatorColor="@color/colorAccent"
-                app:tabMode="fixed">
-
-                <!--<com.google.android.material.tabs.TabItem-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="Monday">-->
-
-                <!--</com.google.android.material.tabs.TabItem>-->
-
-                <!--<com.google.android.material.tabs.TabItem-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="Tuesday" />-->
-
-            </com.google.android.material.tabs.TabLayout>
+                app:tabMode="fixed" />
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/viewpager_id"
                 android:layout_width="match_parent"
                 android:layout_height="320dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
-
-            <!-- Main content -->
 
             <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/bottom_navigation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="4dp"
                 android:background="@color/colorPrimary"
                 app:itemIconTint="@color/white"
                 app:itemTextColor="@color/white"
@@ -84,7 +54,6 @@
                 android:id="@+id/forOrg"
                 android:layout_width="match_parent"
                 android:layout_height="155dp"
-                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -93,7 +62,6 @@
                     android:id="@+id/org_prof_pic"
                     android:layout_width="110dp"
                     android:layout_height="110dp"
-                    android:layout_marginTop="52dp"
                     app:layout_constraintCircleRadius="700dp"
                     android:src="@drawable/instagram_user_outline_24"
                     app:civ_border_color="#FF000000"
@@ -106,11 +74,6 @@
                     android:id="@+id/org_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="128dp"
-                    android:layout_marginRight="128dp"
                     android:text="TextView"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -122,7 +85,6 @@
                 android:id="@+id/forConsumer"
                 android:layout_width="match_parent"
                 android:layout_height="155dp"
-                android:layout_marginTop="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/tabs_profile"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/forOrg">
@@ -130,9 +92,7 @@
                 <ImageView
                     android:id="@+id/blurred_consumer_pic"
                     android:layout_width="match_parent"
-                    android:layout_height="154dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
+                    android:layout_height="155dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -144,7 +104,6 @@
                     android:id="@+id/cons_prof_pic"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
-                    android:layout_marginTop="52dp"
                     app:layout_constraintCircleRadius="700dp"
                     android:src="@drawable/instagram_user_outline_24"
                     app:civ_border_color="#FF000000"
@@ -158,8 +117,6 @@
                     android:id="@+id/cons_name"
                     android:layout_width="wrap_content"
                     android:layout_height="27dp"
-                    android:layout_marginTop="7dp"
-                    android:layout_marginBottom="8dp"
                     android:text="TextView"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/cons_prof_pic"

@@ -8,7 +8,7 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Restaurant Name Here"
+        android:text="@string/resturantName"
         android:textSize="30sp"
         android:textStyle="bold" />
 
@@ -18,6 +18,6 @@
         android:layout_height="wrap_content"
         android:background="#00C853"
         android:fontFamily="serif"
-        android:text="Create Event"
+        android:text="@string/createEvent"
         android:textColor="#E6575151" />
 </LinearLayout>
