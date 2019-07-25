@@ -62,7 +62,8 @@ public class HomeActivity extends AppCompatActivity {
                         lockDrawer();
                         bottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         bottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
-                        bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);                        fragment = new MapFragment();
+                        bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
+                        fragment = new MapFragment();
                         break;
                     case R.id.action_profile:
                         drawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
