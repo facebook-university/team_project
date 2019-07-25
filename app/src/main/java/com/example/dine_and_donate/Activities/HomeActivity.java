@@ -28,6 +28,9 @@ public class HomeActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private FragmentManager fragmentManager;
     private DrawerLayout drawerNav;
+    private Fragment notifications = new NotificationsFragment();
+    private Fragment map = new MapFragment();
+    private Fragment profile = new ProfileFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +38,6 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.flContainer, new ProfileFragment()).commit();
-
         drawerNav = findViewById(R.id.drawerNav);
 
         createDrawerNav();
@@ -56,24 +57,27 @@ public class HomeActivity extends AppCompatActivity {
                         bottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
                         bottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
-                        fragment = new NotificationsFragment();
+                        fragment = notifications;
                         break;
                     case R.id.action_map:
                         lockDrawer();
                         bottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         bottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
                         bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
-                        fragment = new MapFragment();
+                        fragment = map;
                         break;
                     case R.id.action_profile:
                         drawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                         bottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         bottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         bottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
-                        fragment = new ProfileFragment();
+                        fragment = profile;
                         break;
                 }
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.flContainer, fragment)
+                        .addToBackStack(null) // TODO: look into if this can cause mem problem
+                        .commit();
                 return true;
             }
         });
