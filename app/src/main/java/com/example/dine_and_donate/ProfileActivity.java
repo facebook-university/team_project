@@ -71,11 +71,12 @@ public class ProfileActivity extends AppCompatActivity {
         mVoucherView = findViewById(R.id.viewpager_id);
         mVoucherPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         mVoucherView.setAdapter(mVoucherPagerAdapter);
-        mTabLayout.setupWithViewPager(mVoucherView);
         mNavigationView = findViewById(R.id.settings_navigation);
         mLogOutBtn = findViewById(R.id.logout);
         mOrgName = findViewById(R.id.org_name);
         mConsumerName = findViewById(R.id.cons_name);
+
+        mTabLayout.setupWithViewPager(mVoucherView);
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();

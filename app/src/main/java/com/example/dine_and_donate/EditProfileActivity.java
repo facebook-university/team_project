@@ -32,7 +32,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
-    private FirebaseAuth mAuth;
+    private DatabaseReference ref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +46,13 @@ public class EditProfileActivity extends AppCompatActivity {
         mSaveBtn = findViewById(R.id.save_btn);
         mNumberTextView = findViewById(R.id.edit_number_tv);
 
-        mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
-        mRef = mDatabase.getReference().child("users").child(mFbUser.getUid());
+        mRef = mDatabase.getReference(); //need an instance of database reference
+        ref = mRef.child("users").child(mFbUser.getUid());
 
         //retrieve values from database
-        mRef.addValueEventListener(new ValueEventListener() {
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mEditName.setText(dataSnapshot.child("name").getValue().toString());
@@ -90,6 +90,7 @@ public class EditProfileActivity extends AppCompatActivity {
         mSaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mRef.child("users").child(mFbUser.getUid()).child("name").setValue(mEditName.getText().toString());
                 Intent intent = new Intent(EditProfileActivity.this, ProfileActivity.class);
                 startActivity(intent);
                 finish();

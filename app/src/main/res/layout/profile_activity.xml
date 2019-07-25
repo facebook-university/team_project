@@ -35,17 +35,17 @@
                 app:tabIndicatorColor="@color/colorAccent"
                 app:tabMode="fixed">
 
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Monday">
+                <!--<com.google.android.material.tabs.TabItem-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="Monday">-->
 
-                </com.google.android.material.tabs.TabItem>
+                <!--</com.google.android.material.tabs.TabItem>-->
 
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Tuesday" />
+                <!--<com.google.android.material.tabs.TabItem-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="Tuesday" />-->
 
             </com.google.android.material.tabs.TabLayout>
 
@@ -89,18 +89,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/org_prof_pic"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_marginStart="36dp"
-                    android:layout_marginLeft="36dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:layout_marginTop="52dp"
+                    app:layout_constraintCircleRadius="700dp"
+                    android:src="@drawable/instagram_user_outline_24"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1.7dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/instagram_user_outline_24" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/org_name"
@@ -139,19 +139,20 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
-                <ImageView
+
+                <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/cons_prof_pic"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="52dp"
+                    app:layout_constraintCircleRadius="700dp"
+                    android:src="@drawable/instagram_user_outline_24"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1.7dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/blurred_consumer_pic"
                     app:layout_constraintStart_toStartOf="@+id/blurred_consumer_pic"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/instagram_user_outline_24" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/cons_name"
