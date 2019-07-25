@@ -27,6 +27,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText mEmail;
@@ -90,7 +92,8 @@ public class LoginActivity extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     if (task.isSuccessful()) {
                         Log.d("signIn", "signInWithEmail:success");
-                        goToProfile();
+                        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+                        createUserModel();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("signIn", "signInWithEmail:failure", task.getException());
@@ -110,6 +113,16 @@ public class LoginActivity extends AppCompatActivity {
                 mCurrentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
                 if(mCurrentUserModel.getIsOrg()) {
                     mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
+                }
+                Iterable<DataSnapshot> events = dataSnapshot.child("Events").getChildren();
+                if (events != null) {
+                    ArrayList<String> arrayEvents = new ArrayList<String>();
+                    for (int i = 0; i < dataSnapshot.child("Events").getChildrenCount(); i++) {
+                        arrayEvents.add(events.iterator().next().getValue().toString());
+                    }
+                    mCurrentUserModel.addSavedEventID(arrayEvents);
+                } else {
+                    mCurrentUserModel.addSavedEventID(new ArrayList<String>());
                 }
                 goToProfile();
             }

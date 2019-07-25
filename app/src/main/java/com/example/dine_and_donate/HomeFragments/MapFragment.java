@@ -25,6 +25,7 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
+import com.example.dine_and_donate.EditProfileActivity;
 import com.example.dine_and_donate.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.example.dine_and_donate.MapActivity;
@@ -62,8 +63,10 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -84,7 +87,7 @@ public class MapFragment extends Fragment {
     private long FASTEST_INTERVAL = 50000; /* 5 secs */
     private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
     private final static String KEY_LOCATION = "location";
-    public static final String TAG = MapActivity.class.getSimpleName();
+
     public JSONArray restaurantsNearbyJSON = new JSONArray();
     private boolean loaded;
     private boolean cameraSet;
@@ -94,12 +97,14 @@ public class MapFragment extends Fragment {
     private View slideView;
     private boolean slideViewIsUp;
     private Button btnCreate;
-    private boolean isOrg;
 
     private Context mContext;
 
-    private FirebaseUser currentUser;
-    private FirebaseAuth mAuth;
+    private FirebaseDatabase mDatabase;
+    private FirebaseUser mFbUser;
+    private DatabaseReference mRef;
+    private DatabaseReference mRefForUser;
+    private User mCurrentUser;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -124,9 +129,12 @@ public class MapFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         HomeActivity homeActivity = (HomeActivity) getActivity();
-        isOrg = homeActivity.mCurrentUser.isOrg;
+        mCurrentUser = homeActivity.mCurrentUser;
 
-        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance();
+        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+        mRef = mDatabase.getReference(); //need an instance of database reference
+        mRefForUser = mRef.child("users").child(mFbUser.getUid());
         mContext = view.getContext();
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
@@ -187,7 +195,6 @@ public class MapFragment extends Fragment {
                 // TODO: same as swipe up
             }
         });
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -326,7 +333,7 @@ public class MapFragment extends Fragment {
                         //add marker to each restaurant nearby
                         for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
                             final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
-                            String yelpID = restaurantJSON.getString("id");
+                            final String yelpID = restaurantJSON.getString("id");
                             System.out.println("ID: " + yelpID + " " + restaurantJSON.getString("name") + "\n");
                             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
                             DatabaseReference mRef = mDatabase.getReference();
@@ -338,8 +345,8 @@ public class MapFragment extends Fragment {
 
                             ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onDataChange(DataSnapshot snapshot) {
-                                    if (snapshot.exists() || isOrg) {
+                                public void onDataChange(final DataSnapshot snapshot) {
+                                    if (snapshot.exists() || mCurrentUser.isOrg) {
                                         getActivity().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
@@ -348,7 +355,11 @@ public class MapFragment extends Fragment {
                                                     @Override
                                                     public boolean onMarkerClick(Marker marker) {
                                                         try {
-                                                            slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                            if (mCurrentUser.isOrg) {
+                                                                slideUpMenuCreate(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                            } else {
+                                                                slideUpMenuSave(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()), snapshot);
+                                                            }
                                                             slideViewIsUp = true;
                                                         } catch (JSONException e) {
                                                             e.printStackTrace();
@@ -377,7 +388,7 @@ public class MapFragment extends Fragment {
         });
     }
 
-    private void slideUpMenu(final JSONObject restaurant) throws JSONException {
+    private void slideUpAnimation(final JSONObject restaurant) throws JSONException {
         TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
         restName.setText(restaurant.getString("name"));
         slideView.setVisibility(View.VISIBLE);
@@ -389,8 +400,11 @@ public class MapFragment extends Fragment {
         animate.setDuration(500);
         animate.setFillAfter(true);
         slideView.startAnimation(animate);
-
         btnCreate = slideView.findViewById(R.id.btn_create_event);
+    }
+
+    private void slideUpMenuCreate(final JSONObject restaurant) throws JSONException {
+        slideUpAnimation(restaurant);
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -399,11 +413,34 @@ public class MapFragment extends Fragment {
                     intent.putExtra("location", Restaurant.format(restaurant));
                     JSONObject restLocation = restaurant.getJSONObject("coordinates");
                     intent.putExtra("yelpID", restaurant.getString("id"));
-                    intent.putExtra("isOrg", isOrg);
+                    intent.putExtra("isOrg", mCurrentUser.isOrg);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 startActivity(intent);
+            }
+        });
+    }
+
+    private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) throws JSONException {
+        slideUpAnimation(restaurant);
+        btnCreate.setText("Save");
+        btnCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final ArrayList<String> savedEvents = mCurrentUser.savedEventsIDs;
+                savedEvents.add(snapshot.getKey());
+                mRef.child("users").child(mFbUser.getUid()).child("Events").setValue(mCurrentUser.getSavedEventsIDs(), new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        if (databaseError != null) {
+                            Toast.makeText(getContext(), "Error Saving Data To Database", Toast.LENGTH_LONG).show();
+                        } else {
+                            btnCreate.setText("Saved!");
+                            mCurrentUser.addSavedEventID(savedEvents);
+                        }
+                    }
+                });
             }
         });
     }

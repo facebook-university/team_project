@@ -19,8 +19,7 @@ public class User {
     public File profileImage;
     public String bio;
     public Boolean prefersPhoneContact;
-    public ArrayList<Event> upcomingEvents;
-    public ArrayList<Event> pastEvents;
+    public ArrayList<String> savedEventsIDs;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -70,4 +69,8 @@ public class User {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public ArrayList<String> getSavedEventsIDs() { return savedEventsIDs; }
+
+    public void addSavedEventID(ArrayList<String> ids) { this.savedEventsIDs = ids; }
 }
