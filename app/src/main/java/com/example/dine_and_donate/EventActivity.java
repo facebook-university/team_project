@@ -22,6 +22,7 @@ import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,6 +30,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +80,7 @@ public class EventActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance();
         mRef = mDatabase.getReference();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         mCalendarView = findViewById(R.id.cvChooseDate);
 
@@ -158,9 +165,10 @@ public class EventActivity extends AppCompatActivity {
                 String info = mEtEventInfo.getText().toString();
                 Event newEvent = new Event(orgId, location, yelpId, info, startTime, endTime);
                 mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
-                Intent newIntent = new Intent(EventActivity.this, HomeActivity.class);
-                newIntent.putExtra("isOrg", intent.getBooleanExtra("isOrg", false));
-                startActivity(newIntent);
+//                Intent newIntent = new Intent(EventActivity.this, HomeActivity.class);
+//                newIntent.putExtra("isOrg", intent.getBooleanExtra("isOrg", false));
+//                startActivity(newIntent);
+                finish();
             }
         });
     }

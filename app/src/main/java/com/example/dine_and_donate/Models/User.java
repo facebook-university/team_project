@@ -2,10 +2,13 @@ package com.example.dine_and_donate.Models;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import org.parceler.Parcel;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+@Parcel
 @IgnoreExtraProperties
 public class User {
 
