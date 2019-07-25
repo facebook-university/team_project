@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.EditProfileActivity;
@@ -67,8 +68,10 @@ import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import in.goodiebag.carouselpicker.CarouselPicker;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -424,25 +427,12 @@ public class MapFragment extends Fragment {
 
     private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) throws JSONException {
         slideUpAnimation(restaurant);
+        ArrayList<String> eventIDs = new ArrayList<String>();
+        for (DataSnapshot eventChild : snapshot.getChildren()) {
+            eventIDs.add(eventChild.getKey());
+        }
+        setUpCarousel(eventIDs);
         btnCreate.setText("Save");
-        btnCreate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ArrayList<String> savedEvents = mCurrentUser.savedEventsIDs;
-                savedEvents.add(snapshot.getKey());
-                mRef.child("users").child(mFbUser.getUid()).child("Events").setValue(mCurrentUser.getSavedEventsIDs(), new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                        if (databaseError != null) {
-                            Toast.makeText(getContext(), "Error Saving Data To Database", Toast.LENGTH_LONG).show();
-                        } else {
-                            btnCreate.setText("Saved!");
-                            mCurrentUser.addSavedEventID(savedEvents);
-                        }
-                    }
-                });
-            }
-        });
     }
 
     private void slideDownMenu() {
@@ -457,4 +447,48 @@ public class MapFragment extends Fragment {
         slideView.startAnimation(animate);
     }
 
+    private void setUpCarousel(final ArrayList<String> eventIDs) {
+        CarouselPicker carouselPicker = (CarouselPicker) slideView.findViewById(R.id.carousel);
+
+        List<CarouselPicker.PickerItem> mixItems = new ArrayList<>();
+        for (int i = 0; i < eventIDs.size(); i++) {
+            mixItems.add(new CarouselPicker.TextItem(eventIDs.get(i), 5));
+        }
+        CarouselPicker.CarouselViewAdapter mixAdapter = new CarouselPicker.CarouselViewAdapter(slideView.getContext(), mixItems, 0);
+        carouselPicker.setAdapter(mixAdapter);
+
+        carouselPicker.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(final int position) {
+                btnCreate.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final ArrayList<String> savedEvents = mCurrentUser.savedEventsIDs;
+                        savedEvents.add(eventIDs.get(position));
+                        mRef.child("users").child(mFbUser.getUid()).child("Events").setValue(mCurrentUser.getSavedEventsIDs(), new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                if (databaseError != null) {
+                                    Toast.makeText(getContext(), "Error Saving Data To Database", Toast.LENGTH_LONG).show();
+                                } else {
+                                    btnCreate.setText("Saved!");
+                                    mCurrentUser.addSavedEventID(savedEvents);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
 }
