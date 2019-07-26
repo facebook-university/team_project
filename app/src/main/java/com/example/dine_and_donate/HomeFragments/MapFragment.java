@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import com.example.dine_and_donate.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.example.dine_and_donate.MapActivity;
+import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
@@ -62,6 +63,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -99,6 +101,8 @@ public class MapFragment extends Fragment {
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
     private User currentUserModel;
+
+    private ArrayList<Event> nearbyEvents = new ArrayList<>();
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -338,6 +342,8 @@ public class MapFragment extends Fragment {
                                 public void onDataChange(DataSnapshot snapshot) {
                                     //checks if there is an event with the same id
                                     if (snapshot.exists() || isOrg) {
+                                        Event newEvent = snapshot.getValue(Event.class);
+                                        nearbyEvents.add(newEvent);
                                         getActivity().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {

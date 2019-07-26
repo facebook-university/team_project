@@ -42,6 +42,7 @@ public class HomeActivity extends AppCompatActivity {
                     case R.id.action_notify:
                         // Todo: do this better
                         ((NotificationsFragment) notifications).setmCurrentLocation(((MapFragment) map).getmCurrentLocation());
+
                         fragment = notifications;
                         break;
                     case R.id.action_map:
