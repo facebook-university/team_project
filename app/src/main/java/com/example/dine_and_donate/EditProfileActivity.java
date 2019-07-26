@@ -7,10 +7,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
+import com.example.dine_and_donate.Models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -18,6 +22,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.parceler.Parcels;
 
 public class EditProfileActivity extends AppCompatActivity {
 
@@ -32,6 +38,8 @@ public class EditProfileActivity extends AppCompatActivity {
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForUser;
+
+    private User mCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +58,7 @@ public class EditProfileActivity extends AppCompatActivity {
         mRef = mDatabase.getReference(); //need an instance of database reference
         mRefForUser = mRef.child("users").child(mFbUser.getUid());
 
+
         mClearName.setVisibility(View.INVISIBLE);
 
         //retrieve values from database
@@ -60,19 +69,39 @@ public class EditProfileActivity extends AppCompatActivity {
                 mEditNumber.setVisibility(View.INVISIBLE);
                 mClearNumber.setVisibility(View.INVISIBLE);
                 mNumberTextView.setVisibility(View.INVISIBLE);
-                if((Boolean)dataSnapshot.child("isOrg").getValue()) {
+                if ((Boolean) dataSnapshot.child("isOrg").getValue()) {
                     mEditNumber.setVisibility(View.VISIBLE);
                     mClearNumber.setVisibility(View.VISIBLE);
                     mNumberTextView.setVisibility(View.VISIBLE);
                     mEditNumber.setText(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
+        //retrieve User object
+        mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
+        populateFields();
+        setUpOnClickListeners();
+    }
 
+    private void populateFields() {
+        mEditName.setText(mCurrentUser.name);
+        mEditNumber.setVisibility(View.INVISIBLE);
+        mClearNumber.setVisibility(View.INVISIBLE);
+        mNumberTextView.setVisibility(View.INVISIBLE);
+        if (mCurrentUser.isOrg) {
+            mEditNumber.setVisibility(View.VISIBLE);
+            mClearNumber.setVisibility(View.VISIBLE);
+            mNumberTextView.setVisibility(View.VISIBLE);
+            mEditNumber.setText(mCurrentUser.phoneNumber);
+        }
+    }
+
+    private void setUpOnClickListeners() {
         mClearName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,10 +119,20 @@ public class EditProfileActivity extends AppCompatActivity {
         mSaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRef.child("users").child(mFbUser.getUid()).child("name").setValue(mEditName.getText().toString());
-                Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
-                startActivity(intent);
-                finish();
+                final String newName = mEditName.getText().toString();
+                mRef.child("users").child(mFbUser.getUid()).child("name").setValue(newName, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        if (databaseError != null) {
+                            Toast.makeText(EditProfileActivity.this, "Error Saving Data To Database", Toast.LENGTH_LONG).show();
+                        } else {
+                            mCurrentUser.setName(newName);
+                        }
+                        Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
+                        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
+                        startActivity(intent);
+                    }
+                });
             }
         });
 

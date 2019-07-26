@@ -149,14 +149,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Help" />
+                android:text="@string/help" />
 
             <Button
                 android:id="@+id/logout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Log out" />
+                android:text="@string/logOut" />
         </LinearLayout>
 
     </com.google.android.material.navigation.NavigationView>
