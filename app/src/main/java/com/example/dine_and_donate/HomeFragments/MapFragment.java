@@ -23,8 +23,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
+import com.example.dine_and_donate.EditProfileActivity;
 import com.example.dine_and_donate.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.example.dine_and_donate.MapActivity;
@@ -62,11 +64,19 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.io.IOException;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import in.goodiebag.carouselpicker.CarouselPicker;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -85,9 +95,10 @@ public class MapFragment extends Fragment {
     private long FASTEST_INTERVAL = 50000; /* 5 secs */
     private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
     private final static String KEY_LOCATION = "location";
-    public static final String TAG = MapActivity.class.getSimpleName();
+
     public JSONArray restaurantsNearbyJSON = new JSONArray();
     private boolean loaded;
+    private int position = 0;
     private boolean cameraSet;
     private Double cameraLatitude;
     private Double cameraLongitude;
@@ -95,12 +106,14 @@ public class MapFragment extends Fragment {
     private View slideView;
     private boolean slideViewIsUp;
     private Button btnCreate;
-    private boolean isOrg;
 
     private Context mContext;
 
-    private FirebaseUser currentUser;
-    private FirebaseAuth mAuth;
+    private FirebaseDatabase mDatabase;
+    private FirebaseUser mFbUser;
+    private DatabaseReference mRef;
+    private DatabaseReference mRefForUser;
+    private User mCurrentUser;
 
     private ArrayList<Event> nearbyEvents = new ArrayList<>();
 
@@ -127,9 +140,12 @@ public class MapFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         HomeActivity homeActivity = (HomeActivity) getActivity();
-        isOrg = homeActivity.mCurrentUser.isOrg;
+        mCurrentUser = homeActivity.mCurrentUser;
 
-        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance();
+        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+        mRef = mDatabase.getReference(); //need an instance of database reference
+        mRefForUser = mRef.child("users").child(mFbUser.getUid());
         mContext = view.getContext();
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
@@ -190,7 +206,6 @@ public class MapFragment extends Fragment {
                 // TODO: same as swipe up
             }
         });
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -329,7 +344,7 @@ public class MapFragment extends Fragment {
                         //add marker to each restaurant nearby
                         for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
                             final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
-                            String yelpID = restaurantJSON.getString("id");
+                            final String yelpID = restaurantJSON.getString("id");
                             System.out.println("ID: " + yelpID + " " + restaurantJSON.getString("name") + "\n");
                             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
                             DatabaseReference mRef = mDatabase.getReference();
@@ -341,20 +356,25 @@ public class MapFragment extends Fragment {
 
                             ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onDataChange(DataSnapshot snapshot) {
+                                public void onDataChange(final DataSnapshot snapshot) {
                                     //checks if there is an event with the same id
-                                    if (snapshot.exists() || isOrg) {
+                                    if (snapshot.exists() || mCurrentUser.isOrg) {
                                         Event newEvent = snapshot.getValue(Event.class);
                                         nearbyEvents.add(newEvent);
                                         getActivity().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
                                                 map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
+
                                                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                                     @Override
                                                     public boolean onMarkerClick(Marker marker) {
                                                         try {
-                                                            slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                            if (mCurrentUser.isOrg) {
+                                                                slideUpMenuCreate(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                            } else {
+                                                                slideUpMenuSave(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()), snapshot);
+                                                            }
                                                             slideViewIsUp = true;
                                                         } catch (JSONException e) {
                                                             e.printStackTrace();
@@ -383,7 +403,7 @@ public class MapFragment extends Fragment {
         });
     }
 
-    private void slideUpMenu(final JSONObject restaurant) throws JSONException {
+    private void slideUpAnimation(final JSONObject restaurant) throws JSONException {
         TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
         restName.setText(restaurant.getString("name"));
         slideView.setVisibility(View.VISIBLE);
@@ -395,8 +415,11 @@ public class MapFragment extends Fragment {
         animate.setDuration(500);
         animate.setFillAfter(true);
         slideView.startAnimation(animate);
-
         btnCreate = slideView.findViewById(R.id.btn_create_event);
+    }
+
+    private void slideUpMenuCreate(final JSONObject restaurant) throws JSONException {
+        slideUpAnimation(restaurant);
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -405,13 +428,19 @@ public class MapFragment extends Fragment {
                     intent.putExtra("location", Restaurant.format(restaurant));
                     JSONObject restLocation = restaurant.getJSONObject("coordinates");
                     intent.putExtra("yelpID", restaurant.getString("id"));
-                    intent.putExtra("isOrg", isOrg);
+                    intent.putExtra("isOrg", mCurrentUser.isOrg);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 startActivity(intent);
             }
         });
+    }
+
+    private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) throws JSONException {
+        slideUpAnimation(restaurant);
+        setUpCarousel(snapshot);
+        btnCreate.setText(getString(R.string.save));
     }
 
     private void slideDownMenu() {
@@ -426,7 +455,71 @@ public class MapFragment extends Fragment {
         slideView.startAnimation(animate);
     }
 
+
     public Location getmCurrentLocation() {
         return mCurrentLocation;
+    }
+
+    private void setUpCarousel(final DataSnapshot snapshot) {
+        CarouselPicker carouselPicker = (CarouselPicker) slideView.findViewById(R.id.carousel);
+
+        final ArrayList<String> eventIDs = new ArrayList<String>();
+        List<CarouselPicker.PickerItem> mixItems = new ArrayList<>();
+
+        for (DataSnapshot eventChild : snapshot.getChildren()) {
+            mixItems.add(new CarouselPicker.TextItem(getDate((long) eventChild.child("startTime").getValue(),
+                    "MMM dd, yyyy \n hh:mm"),
+                    5));
+            eventIDs.add(eventChild.getKey());
+        }
+
+        CarouselPicker.CarouselViewAdapter mixAdapter = new CarouselPicker.CarouselViewAdapter(slideView.getContext(), mixItems, 0);
+        carouselPicker.setAdapter(mixAdapter);
+
+        btnCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Map<String, String> savedEvents = mCurrentUser.getSavedEventsIDs();
+                savedEvents.put(eventIDs.get(position), snapshot.getKey());
+                mRef.child("users").child(mFbUser.getUid()).child("Events").setValue(savedEvents, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        if (databaseError != null) {
+                            Toast.makeText(getContext(), getString(R.string.errorMsg), Toast.LENGTH_LONG).show();
+                        } else {
+                            btnCreate.setText(getString(R.string.saved));
+                            mCurrentUser.addSavedEventID(savedEvents);
+                        }
+                    }
+                });
+            }
+        });
+
+        carouselPicker.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                btnCreate.setText(getString(R.string.save));
+            }
+
+            @Override
+            public void onPageSelected(final int i) {
+                position = i;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+    public static String getDate(long milliSeconds, String dateFormat) {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
     }
 }
