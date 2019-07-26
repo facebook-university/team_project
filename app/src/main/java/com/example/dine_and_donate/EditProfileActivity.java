@@ -50,6 +50,8 @@ public class EditProfileActivity extends AppCompatActivity {
         mRef = mDatabase.getReference(); //need an instance of database reference
         mRefForUser = mRef.child("users").child(mFbUser.getUid());
 
+        mClearName.setVisibility(View.INVISIBLE);
+
         //retrieve values from database
         mRefForUser.addValueEventListener(new ValueEventListener() {
             @Override
@@ -94,5 +96,22 @@ public class EditProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        mEditName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setState(mEditName, mClearName);
+            }
+        });
+    }
+
+    private void setState(EditText etField, ImageButton clearField) {
+        if(etField.getText().toString().isEmpty()) {
+            clearField.setVisibility(View.INVISIBLE);
+        } else {
+            clearField.setVisibility(View.VISIBLE);
+        }
     }
 }
+
+

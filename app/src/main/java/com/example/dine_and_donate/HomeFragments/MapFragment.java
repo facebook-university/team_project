@@ -38,7 +38,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -78,7 +77,7 @@ public class MapFragment extends Fragment {
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private LocationRequest mLocationRequest;
-    Location mCurrentLocation;
+    private Location mCurrentLocation;
     private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(6000);  /* 60 secs */
     private long FASTEST_INTERVAL = 50000; /* 5 secs */
     private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
@@ -337,6 +336,7 @@ public class MapFragment extends Fragment {
                             ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot snapshot) {
+                                    //checks if there is an event with the same id
                                     if (snapshot.exists() || isOrg) {
                                         getActivity().runOnUiThread(new Runnable() {
                                             @Override
@@ -418,4 +418,7 @@ public class MapFragment extends Fragment {
         slideView.startAnimation(animate);
     }
 
+    public Location getmCurrentLocation() {
+        return mCurrentLocation;
+    }
 }

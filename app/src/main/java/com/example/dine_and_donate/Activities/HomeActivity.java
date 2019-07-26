@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -30,7 +29,8 @@ public class HomeActivity extends AppCompatActivity {
         final Fragment map = new MapFragment();
         final Fragment profile = new ProfileFragment();
 
-        fragmentManager.beginTransaction().replace(R.id.flContainer, new ProfileFragment()).commit();
+
+        fragmentManager.beginTransaction().replace(R.id.flContainer, profile).commit();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -40,6 +40,8 @@ public class HomeActivity extends AppCompatActivity {
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
+                        // Todo: do this better
+                        ((NotificationsFragment) notifications).setmCurrentLocation(((MapFragment) map).getmCurrentLocation());
                         fragment = notifications;
                         break;
                     case R.id.action_map:
