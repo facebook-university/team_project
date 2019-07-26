@@ -26,10 +26,8 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
-import com.example.dine_and_donate.EditProfileActivity;
 import com.example.dine_and_donate.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
-import com.example.dine_and_donate.MapActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
@@ -64,14 +62,11 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.parceler.Parcels;
 
 import java.io.IOException;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
