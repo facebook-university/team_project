@@ -23,6 +23,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
+import com.example.dine_and_donate.HomeFragments.MapDemoFragmentPermissionsDispatcher;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
@@ -150,7 +151,7 @@ public class MapActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.action_notify:
                         //Go to Notifications
-                        navigationHelper(NotificationsActivity.class);
+//                        navigationHelper(NotificationsActivity.class);
                         break;
                     case R.id.action_map:
                         break;
@@ -291,7 +292,7 @@ public class MapActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
         }
-        MapDemoActivityPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
+        MapDemoFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
