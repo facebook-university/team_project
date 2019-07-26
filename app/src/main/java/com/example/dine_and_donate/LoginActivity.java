@@ -88,21 +88,21 @@ public class LoginActivity extends AppCompatActivity {
 
     private void signIn(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    // Sign in success, update UI with the signed-in user's information
-                    if (task.isSuccessful()) {
-                        Log.d("signIn", "signInWithEmail:success");
-                        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
-                        createUserModel();
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("signIn", "signInWithEmail:failure", task.getException());
-                        Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        // Sign in success, update UI with the signed-in user's information
+                        if (task.isSuccessful()) {
+                            Log.d("signIn", "signInWithEmail:success");
+                            mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+                            createUserModel();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("signIn", "signInWithEmail:failure", task.getException());
+                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
-            });
+                });
     }
 
     private void createUserModel() {

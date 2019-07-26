@@ -156,11 +156,16 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         mUser = mAuth.getCurrentUser();
-                        mCreatedUser.name = mName.getText().toString();
-                        mCreatedUser.isOrg = mSpinner.getSelectedItem().toString() == "Organization";
-                        Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
-                        writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
-                        navigationHelper(HomeActivity.class);
+
+                        // Todo: change this
+                        User userInfo = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
+                        // TODO: parcel to pass through intent
+                        Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d("create", "createUserWithEmail:success");
+
                     } else {
                         // If sign in fails, display a message to the user.
                         //Log.w("create", "createUserWithEmail:failure", task.getException());

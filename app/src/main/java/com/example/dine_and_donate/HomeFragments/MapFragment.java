@@ -26,10 +26,9 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
-import com.example.dine_and_donate.EditProfileActivity;
 import com.example.dine_and_donate.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
-import com.example.dine_and_donate.MapActivity;
+import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
@@ -41,7 +40,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -64,13 +62,11 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -113,6 +109,7 @@ public class MapFragment extends Fragment {
     private DatabaseReference mRef;
     private DatabaseReference mRefForUser;
     private User mCurrentUser;
+    private ArrayList<Event> mNearbyEvents;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -144,6 +141,7 @@ public class MapFragment extends Fragment {
         mRef = mDatabase.getReference(); //need an instance of database reference
         mRefForUser = mRef.child("users").child(mFbUser.getUid());
         mContext = view.getContext();
+        mNearbyEvents = new ArrayList<>();
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -174,7 +172,6 @@ public class MapFragment extends Fragment {
         // setting up slide view with restaurant info
         slideView = view.findViewById(R.id.slide_menu);
         slideView.setVisibility(View.INVISIBLE);
-        slideView.setY(1200);
         slideViewIsUp = false;
 
         // slide view can be swiped down to dismiss and swiped up for more info
@@ -359,7 +356,7 @@ public class MapFragment extends Fragment {
                                             @Override
                                             public void run() {
                                                 map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
-
+                                                setList(snapshot);
                                                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                                     @Override
                                                     public boolean onMarkerClick(Marker marker) {
@@ -511,4 +508,20 @@ public class MapFragment extends Fragment {
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
     }
+
+    public ArrayList<Event> getNearbyEvents() {
+        return mNearbyEvents;
+    }
+
+    public JSONArray getRestaurantsNearbyJSON() {
+        return restaurantsNearbyJSON;
+    }
+
+    private void setList(DataSnapshot snapshot) {
+        if(!mCurrentUser.isOrg) {
+            Event newEvent = snapshot.getValue(Event.class);
+            mNearbyEvents.add(newEvent);
+        }
+    }
+
 }
