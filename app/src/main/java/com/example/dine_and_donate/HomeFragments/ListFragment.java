@@ -42,11 +42,11 @@ public class ListFragment extends Fragment {
 
     }
 
-    public void setmNearbyEvents(ArrayList<Event> mNearbyEvents) {
+    public void setNearbyEvents(ArrayList<Event> mNearbyEvents) {
         this.mNearbyEvents = mNearbyEvents;
     }
 
-    public void setmRestaurantsJSON(JSONArray mRestaurantsJSON) {
+    public void setRestaurantsJSON(JSONArray mRestaurantsJSON) {
         this.mRestaurantsJSON = mRestaurantsJSON;
     }
 }

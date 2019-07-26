@@ -149,8 +149,8 @@ public class HomeActivity extends AppCompatActivity {
     private void setExploreTab() {
         if(mShowButton) {
             if(mIsOnMapView) {
-                mListFragment.setmNearbyEvents(mMapFragment.getmNearbyEvents());
-                mListFragment.setmRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
+                mListFragment.setNearbyEvents(mMapFragment.getNearbyEvents());
+                mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, mListFragment)
                         .addToBackStack(null)

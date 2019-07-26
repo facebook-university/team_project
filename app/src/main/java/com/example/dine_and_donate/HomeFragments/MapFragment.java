@@ -509,7 +509,7 @@ public class MapFragment extends Fragment {
         return formatter.format(calendar.getTime());
     }
 
-    public ArrayList<Event> getmNearbyEvents() {
+    public ArrayList<Event> getNearbyEvents() {
         return mNearbyEvents;
     }
 
