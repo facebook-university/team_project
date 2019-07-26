@@ -27,10 +27,6 @@
         android:theme="@style/AppTheme">
         <activity android:name=".Activities.HomeActivity"></activity>
 
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,12 +34,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".NotificationsActivity"
-            android:theme="@style/noAnimTheme" />
-        <activity
-            android:name=".MapActivity"
-            android:theme="@style/noAnimTheme" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
         <activity android:name=".SignUpActivity" />
         <activity android:name=".ShareEventActivity" />

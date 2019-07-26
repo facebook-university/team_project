@@ -15,16 +15,18 @@ public class Event {
     public long startTime;
     public long endTime;
     public String info;
+    public String imageUrl;
 
     public Event() {}
 
-    public Event(String orgId, String locationString, String yelpID, String info, long startTime, long endTime) {
+    public Event(String orgId, String yelpID, String locationString, long startTime, long endTime, String info, String imageUrl) {
         this.orgId = orgId;
         this.yelpID = yelpID;
         this.locationString = locationString;
         this.startTime = startTime;
         this.endTime = endTime;
         this.info = info;
+        this.imageUrl = imageUrl;
     }
 
     public String getOrgId() {
@@ -74,4 +76,8 @@ public class Event {
     public void setInfo(String info) {
         this.info = info;
     }
+
+    public String getImageUrl() { return imageUrl; }
+
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
