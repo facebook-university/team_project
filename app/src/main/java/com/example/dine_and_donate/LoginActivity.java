@@ -27,6 +27,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText mEmail;
@@ -90,7 +94,8 @@ public class LoginActivity extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     if (task.isSuccessful()) {
                         Log.d("signIn", "signInWithEmail:success");
-                        goToProfile();
+                        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+                        createUserModel();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("signIn", "signInWithEmail:failure", task.getException());
@@ -111,6 +116,13 @@ public class LoginActivity extends AppCompatActivity {
                 if(mCurrentUserModel.getIsOrg()) {
                     mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
+
+                // initiate saved events dictionary
+                Map<String, String> events = mCurrentUserModel.getSavedEventsIDs();
+                for (DataSnapshot eventChild : dataSnapshot.child("Events").getChildren()) {
+                    events.put(eventChild.getKey(), eventChild.getValue().toString());
+                }
+                mCurrentUserModel.addSavedEventID(events);
                 goToProfile();
             }
             @Override
