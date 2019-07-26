@@ -67,7 +67,9 @@ import org.json.JSONObject;
 import org.parceler.Parcels;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +89,7 @@ public class MapFragment extends Fragment {
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private LocationRequest mLocationRequest;
-    Location mCurrentLocation;
+    private Location mCurrentLocation;
     private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(6000);  /* 60 secs */
     private long FASTEST_INTERVAL = 50000; /* 5 secs */
     private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
@@ -453,7 +455,9 @@ public class MapFragment extends Fragment {
         List<CarouselPicker.PickerItem> mixItems = new ArrayList<>();
 
         for (DataSnapshot eventChild : snapshot.getChildren()) {
-            mixItems.add(new CarouselPicker.TextItem(eventChild.getKey(), 5));
+            mixItems.add(new CarouselPicker.TextItem(getDate((long) eventChild.child("startTime").getValue(),
+                    "MMM dd, yyyy \n hh:mm"),
+                    5));
             eventIDs.add(eventChild.getKey());
         }
 
@@ -495,5 +499,16 @@ public class MapFragment extends Fragment {
 
             }
         });
+    }
+
+    public static String getDate(long milliSeconds, String dateFormat)
+    {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
     }
 }
