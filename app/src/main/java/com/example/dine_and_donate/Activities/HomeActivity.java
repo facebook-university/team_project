@@ -22,9 +22,7 @@ import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.ShareEventActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-
 import org.parceler.Parcels;
-
 
 public class HomeActivity extends AppCompatActivity {
 

@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class UpcomingVouchersFragment extends Fragment {
 
-    private RecyclerView recyclerView;
+    private RecyclerView mRecyclerView;
     private ArrayList<String> mImageUrls = new ArrayList<>();
     private ArrayList<String> mNames = new ArrayList<>();
     private Map<String, String> mSavedEventsIDs;
@@ -34,7 +34,6 @@ public class UpcomingVouchersFragment extends Fragment {
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForEvent;
-
 
     //create view based on data in array lists, inflates the layout of the fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -70,11 +69,11 @@ public class UpcomingVouchersFragment extends Fragment {
             }
         });
 
-        recyclerView = view.findViewById(R.id.rv_vouchers);
+        mRecyclerView = view.findViewById(R.id.rv_vouchers);
         StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        recyclerView.setAdapter(staggeredRecyclerViewAdapter);
+        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+        mRecyclerView.setAdapter(staggeredRecyclerViewAdapter);
     }
 
     //add images and descriptions to respective arrayLists

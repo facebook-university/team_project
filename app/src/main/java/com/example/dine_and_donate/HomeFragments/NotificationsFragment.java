@@ -88,37 +88,6 @@ public class NotificationsFragment extends Fragment {
         mNotificationList = new ArrayList<>();
         mNotificationsAdapter = new NotificationsAdapter(mNotificationList);
         mRecyclerView.setAdapter(mNotificationsAdapter);
-
-//        mRefForEvent.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//
-//                JSONArray JSONRestaurants = generateMarkers(Double.toString(mCurrentLocation.getLongitude()), Double.toString(mCurrentLocation.getLatitude()));
-//
-//                for(int i = 0; i < JSONRestaurants.length(); i++) {
-//                    try {
-//                        Log.d("events", JSONRestaurants.getJSONObject(i).toString());
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//                try {
-//                    allEvents = nearbyRestaurants(JSONRestaurants, dataSnapshot);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                Log.d("events", "canceled");
-//            }
-//        });
-//
-//        for(int i = 0; i < allEvents.size(); i++) {
-//            Log.d("events", allEvents.get(i).toString());
-//        }
         mNotificationList.clear();
         Collections.reverse(mNotificationList);
         mNotificationsAdapter.notifyDataSetChanged();
