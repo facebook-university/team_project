@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
-import com.google.firebase.FirebaseError;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -59,6 +58,30 @@ public class EditProfileActivity extends AppCompatActivity {
         mRef = mDatabase.getReference(); //need an instance of database reference
         mRefForUser = mRef.child("users").child(mFbUser.getUid());
 
+
+        mClearName.setVisibility(View.INVISIBLE);
+
+        //retrieve values from database
+        mRefForUser.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mEditName.setText(dataSnapshot.child("name").getValue().toString());
+                mEditNumber.setVisibility(View.INVISIBLE);
+                mClearNumber.setVisibility(View.INVISIBLE);
+                mNumberTextView.setVisibility(View.INVISIBLE);
+                if ((Boolean) dataSnapshot.child("isOrg").getValue()) {
+                    mEditNumber.setVisibility(View.VISIBLE);
+                    mClearNumber.setVisibility(View.VISIBLE);
+                    mNumberTextView.setVisibility(View.VISIBLE);
+                    mEditNumber.setText(dataSnapshot.child("phoneNumber").getValue().toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         //retrieve User object
         mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
         populateFields();
@@ -112,5 +135,22 @@ public class EditProfileActivity extends AppCompatActivity {
                 });
             }
         });
+
+        mEditName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setState(mEditName, mClearName);
+            }
+        });
+    }
+
+    private void setState(EditText etField, ImageButton clearField) {
+        if(etField.getText().toString().isEmpty()) {
+            clearField.setVisibility(View.INVISIBLE);
+        } else {
+            clearField.setVisibility(View.VISIBLE);
+        }
     }
 }
+
+

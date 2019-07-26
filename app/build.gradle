@@ -79,7 +79,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:18.1.0'
 
     implementation 'de.hdodenhof:circleimageview:2.1.0'
-
+    implementation 'com.google.firebase:firebase-messaging:19.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

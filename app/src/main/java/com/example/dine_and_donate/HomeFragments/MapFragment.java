@@ -111,6 +111,8 @@ public class MapFragment extends Fragment {
     private User mCurrentUser;
     private ArrayList<Event> mNearbyEvents;
 
+    private ArrayList<Event> nearbyEvents = new ArrayList<>();
+
     /*
      * Define a request code to send to Google Play services This code is
      * returned in Activity.onActivityResult
@@ -351,7 +353,10 @@ public class MapFragment extends Fragment {
                             ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(final DataSnapshot snapshot) {
+                                    //checks if there is an event with the same id
                                     if (snapshot.exists() || mCurrentUser.isOrg) {
+                                        Event newEvent = snapshot.getValue(Event.class);
+                                        nearbyEvents.add(newEvent);
                                         getActivity().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
@@ -444,6 +449,11 @@ public class MapFragment extends Fragment {
         animate.setDuration(500);
         animate.setFillAfter(true);
         slideView.startAnimation(animate);
+    }
+
+
+    public Location getmCurrentLocation() {
+        return mCurrentLocation;
     }
 
     private void setUpCarousel(final DataSnapshot snapshot) {
