@@ -158,7 +158,7 @@
                 android:id="@+id/tvVoucherUpload"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Uploader Voucher Image"
+                android:text="@string/upload_voucher_image"
                 android:background="@color/greyBackground"
                 android:gravity="center"/>
 
@@ -179,7 +179,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Choose photo" />
+                    android:text="@string/choose_photo" />
             </LinearLayout>
 
             <Button

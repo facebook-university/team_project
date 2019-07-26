@@ -31,11 +31,11 @@ public class HomeActivity extends AppCompatActivity {
     private DrawerLayout mDrawerNav;
     private ImageButton mBtnSwap;
     private boolean mShowButton = false;
-    private boolean isOnMapView;
-    private Fragment mNotificationsFragment = new NotificationsFragment();
-    private Fragment mMapFragment = new MapFragment();
-    private Fragment mProfileFragment = new ProfileFragment();
-    private Fragment mListFragment = new ListFragment();
+    private boolean mIsOnMapView;
+    private NotificationsFragment mNotificationsFragment = new NotificationsFragment();
+    private MapFragment mMapFragment = new MapFragment();
+    private ProfileFragment mProfileFragment = new ProfileFragment();
+    private ListFragment mListFragment = new ListFragment();
     public User mCurrentUser;
 
     @Override
@@ -47,7 +47,7 @@ public class HomeActivity extends AppCompatActivity {
         mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
         mBtnSwap = findViewById(R.id.btnSwap);
         mBtnSwap.setVisibility(View.INVISIBLE);
-        isOnMapView = true;
+        mIsOnMapView = true;
 
         mBtnSwap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,7 +87,7 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
-                        fragment = isOnMapView ? mMapFragment : mListFragment;
+                        fragment = mIsOnMapView ? mMapFragment : mListFragment;
                         mShowButton = true;
                         break;
                     case R.id.action_profile:
@@ -148,18 +148,20 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setExploreTab() {
         if(mShowButton) {
-            if(isOnMapView) {
+            if(mIsOnMapView) {
+                mListFragment.setmNearbyEvents(mMapFragment.getmNearbyEvents());
+                mListFragment.setmRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, mListFragment)
                         .addToBackStack(null)
                         .commit();
-                isOnMapView = false;
+                mIsOnMapView = false;
             } else {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, mMapFragment)
                         .addToBackStack(null)
                         .commit();
-                isOnMapView = true;
+                mIsOnMapView = true;
             }
         }
     }

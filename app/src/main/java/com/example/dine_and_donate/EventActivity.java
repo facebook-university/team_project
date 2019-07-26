@@ -61,8 +61,6 @@ public class EventActivity extends AppCompatActivity {
     private Button mChooseImage;
     private ImageView mVoucherImageView;
 
-    private User mCurrentUser; // this may be necessary in the future to access info from user class
-
     private Uri mSelectedImage;
     private FirebaseUser mFirebaseCurrentUser;
 
@@ -70,8 +68,6 @@ public class EventActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.event_activity);
-
-        mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
         mAuth = FirebaseAuth.getInstance();
         mFirebaseCurrentUser = mAuth.getCurrentUser();

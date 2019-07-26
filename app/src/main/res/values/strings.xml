@@ -33,5 +33,7 @@
     <string name="save">Save</string>
     <string name="saved">Saved!</string>
     <string name="errorMsg">Sorry, something went wrong!</string>
+    <string name="choose_photo">Choose photo</string>
+    <string name="upload_voucher_image">Upload Voucher Image</string>
 
 </resources>
