@@ -1,4 +1,4 @@
-package com.example.dine_and_donate;
+package com.example.dine_and_donate.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,8 +11,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
+import com.example.dine_and_donate.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -27,8 +27,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {

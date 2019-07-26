@@ -27,7 +27,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".Activities.HomeActivity"></activity>
 
-        <activity android:name=".LoginActivity">
+        <activity android:name=".Activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,11 +39,11 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity android:name=".SignUpActivity" />
-        <activity android:name=".ShareEventActivity" />
+        <activity android:name=".Activities.SignUpActivity" />
+        <activity android:name=".Activities.ShareEventActivity" />
         <activity android:name="com.facebook.FacebookActivity" />
-        <activity android:name=".EditProfileActivity" />
-        <activity android:name=".EventActivity" />
+        <activity android:name=".Activities.EditProfileActivity" />
+        <activity android:name=".Activities.EventActivity" />
 
         <uses-library
             android:name="com.google.android.maps"

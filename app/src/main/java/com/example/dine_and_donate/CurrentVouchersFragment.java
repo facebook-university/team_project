@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.example.dine_and_donate.Adapters.StaggeredRecyclerViewAdapter;
+
 import java.util.ArrayList;
 
 public class CurrentVouchersFragment extends Fragment {

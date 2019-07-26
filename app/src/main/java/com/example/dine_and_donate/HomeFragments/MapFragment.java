@@ -26,7 +26,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
-import com.example.dine_and_donate.EventActivity;
+import com.example.dine_and_donate.Activities.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
