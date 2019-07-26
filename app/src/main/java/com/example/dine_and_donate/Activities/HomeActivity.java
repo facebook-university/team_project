@@ -3,7 +3,9 @@ package com.example.dine_and_donate.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.dine_and_donate.EditProfileActivity;
+import com.example.dine_and_donate.HomeFragments.ListFragment;
 import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.HomeFragments.NotificationsFragment;
 import com.example.dine_and_donate.HomeFragments.ProfileFragment;
@@ -26,9 +29,13 @@ public class HomeActivity extends AppCompatActivity {
 
     private BottomNavigationView mBottomNavigationView;
     private DrawerLayout mDrawerNav;
+    private ImageButton mBtnSwap;
+    private boolean mShowButton = false;
+    private boolean isOnMapView;
     private Fragment mNotificationsFragment = new NotificationsFragment();
     private Fragment mMapFragment = new MapFragment();
     private Fragment mProfileFragment = new ProfileFragment();
+    private Fragment mListFragment = new ListFragment();
     public User mCurrentUser;
 
     @Override
@@ -38,6 +45,16 @@ public class HomeActivity extends AppCompatActivity {
 
         mDrawerNav = findViewById(R.id.drawerNav);
         mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
+        mBtnSwap = findViewById(R.id.btnSwap);
+        mBtnSwap.setVisibility(View.INVISIBLE);
+        isOnMapView = true;
+
+        mBtnSwap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setExploreTab();
+            }
+        });
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.flContainer, mProfileFragment)
@@ -54,6 +71,7 @@ public class HomeActivity extends AppCompatActivity {
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
@@ -62,13 +80,15 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mNotificationsFragment;
+                        mShowButton = false;
                         break;
                     case R.id.action_map:
                         lockDrawer();
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
-                        fragment = mMapFragment;
+                        fragment = isOnMapView ? mMapFragment : mListFragment;
+                        mShowButton = true;
                         break;
                     case R.id.action_profile:
                         mDrawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -76,12 +96,18 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
                         fragment = mProfileFragment;
+                        mShowButton = false;
                         break;
                 }
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, fragment)
                         .addToBackStack(null) // TODO: look into if this can cause mem problem
                         .commit();
+                if(mShowButton) {
+                    mBtnSwap.setVisibility(View.VISIBLE);
+                } else {
+                    mBtnSwap.setVisibility(View.INVISIBLE);
+                }
                 return true;
             }
         });
@@ -118,5 +144,23 @@ public class HomeActivity extends AppCompatActivity {
         Intent intent = new Intent(HomeActivity.this, navigateToClass);
         intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
         startActivity(intent);
+    }
+
+    private void setExploreTab() {
+        if(mShowButton) {
+            if(isOnMapView) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.flContainer, mListFragment)
+                        .addToBackStack(null)
+                        .commit();
+                isOnMapView = false;
+            } else {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.flContainer, mMapFragment)
+                        .addToBackStack(null)
+                        .commit();
+                isOnMapView = true;
+            }
+        }
     }
 }

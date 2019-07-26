@@ -154,6 +154,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         mUser = mAuth.getCurrentUser();
+                        // Todo: change this
                         User userInfo = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
                         // TODO: parcel to pass through intent
                         Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);

@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
+import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.YelpService;
@@ -61,6 +62,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -99,6 +101,8 @@ public class MapFragment extends Fragment {
     private FirebaseUser mCurrentUser;
     private FirebaseAuth mAuth;
 
+    private ArrayList<Event> mNearbyEvents;
+
     /*
      * Define a request code to send to Google Play services This code is
      * returned in Activity.onActivityResult
@@ -115,6 +119,7 @@ public class MapFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLoaded = false;
+        mNearbyEvents = new ArrayList<>();
     }
 
     @Override
@@ -156,7 +161,7 @@ public class MapFragment extends Fragment {
         // setting up slide view with restaurant info
         mSlideView = view.findViewById(R.id.slide_menu);
         mSlideView.setVisibility(View.INVISIBLE);
-        mSlideView.setY(1200);
+        //mSlideView.setY(1200);
         mSlideViewIsUp = false;
 
         // slide view can be swiped down to dismiss and swiped up for more info
@@ -166,6 +171,7 @@ public class MapFragment extends Fragment {
                 super.onSwipeBottom();
                 if(mSlideViewIsUp) {
                     slideDownMenu();
+                    mSlideViewIsUp = false;
                 }
             }
 
@@ -337,6 +343,8 @@ public class MapFragment extends Fragment {
                                 @Override
                                 public void onDataChange(DataSnapshot snapshot) {
                                     if (snapshot.exists() || mIsOrg) {
+                                        Event newEvent = snapshot.getValue(Event.class);
+                                        mNearbyEvents.add(newEvent);
                                         getActivity().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
@@ -346,7 +354,6 @@ public class MapFragment extends Fragment {
                                                     public boolean onMarkerClick(Marker marker) {
                                                         try {
                                                             slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
-                                                            mSlideViewIsUp = true;
                                                         } catch (JSONException e) {
                                                             e.printStackTrace();
                                                         }
@@ -375,6 +382,7 @@ public class MapFragment extends Fragment {
     }
 
     private void slideUpMenu(final JSONObject restaurant) throws JSONException {
+        mSlideViewIsUp = true;
         TextView restName = mSlideView.findViewById(R.id.tv_restaurant_name);
         restName.setText(restaurant.getString("name"));
         mSlideView.setVisibility(View.VISIBLE);
@@ -391,16 +399,18 @@ public class MapFragment extends Fragment {
         mBtnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, EventActivity.class);
-                try {
-                    intent.putExtra("location", Restaurant.format(restaurant));
-                    JSONObject restLocation = restaurant.getJSONObject("coordinates");
-                    intent.putExtra("yelpID", restaurant.getString("id"));
-                    intent.putExtra("mIsOrg", mIsOrg);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if(mSlideViewIsUp) {
+                    Intent intent = new Intent(mContext, EventActivity.class);
+                    try {
+                        intent.putExtra("location", Restaurant.format(restaurant));
+                        JSONObject restLocation = restaurant.getJSONObject("coordinates");
+                        intent.putExtra("yelpID", restaurant.getString("id"));
+                        intent.putExtra("mIsOrg", mIsOrg);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    startActivity(intent);
                 }
-                startActivity(intent);
             }
         });
     }
