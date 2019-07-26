@@ -42,11 +42,12 @@ public class OldVouchersFragment extends Fragment {
     //initial creation of fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initBitmaps();
+        initBitmapsPastEvents();
     }
 
+
     //add images and descriptions to respective arrayLists
-    private void initBitmaps() {
+    private void initBitmapsPastEvents() {
         //image URL
         for(int i = 0; i < 20; i++) {
             mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");

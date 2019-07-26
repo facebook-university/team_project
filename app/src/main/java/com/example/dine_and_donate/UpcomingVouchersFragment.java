@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import java.util.ArrayList;
 
-public class CurrentVouchersFragment extends Fragment {
+public class UpcomingVouchersFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private ArrayList<String> mImageUrls = new ArrayList<>();
@@ -28,7 +28,7 @@ public class CurrentVouchersFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initBitmaps();
+        initBitmapsUpcomingEvents();
         recyclerView = view.findViewById(R.id.rv_vouchers);
         StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
@@ -36,15 +36,17 @@ public class CurrentVouchersFragment extends Fragment {
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);
     }
 
-    //add images and descriptions to arrayLists
-    private void initBitmaps() {
+    //add images and descriptions to respective arrayLists
+    private void initBitmapsUpcomingEvents() {
+        //image URL
         for(int i = 0; i < 20; i++) {
             mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
         }
 
+        //voucher descriptions
         for(int i = 0; i < 10; i++) {
-            mNames.add("Tree");
-            mNames.add("fjcutcnerdfdluvhbuegnecgvlkclbidjvnlvfubjrbeugtfdrtnikledvtbhguvuhrtjcvcfguekrfrihjfehbjllfdutbg");
+            mNames.add("udblrjtkbtecidtijijhbfitduvgdnvbtlujberlvuubtdbkfhdfihgudjbvnbbjhgejvdefhcturgucfnenhjdfffijrkiftbenjrjijhugvfujncndrftftglgelkc");
+            mNames.add("dogs");
         }
     }
 }
