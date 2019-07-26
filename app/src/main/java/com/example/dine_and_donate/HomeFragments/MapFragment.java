@@ -359,6 +359,7 @@ public class MapFragment extends Fragment {
                                             @Override
                                             public void run() {
                                                 map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
+
                                                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                                     @Override
                                                     public boolean onMarkerClick(Marker marker) {
@@ -433,7 +434,7 @@ public class MapFragment extends Fragment {
     private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) throws JSONException {
         slideUpAnimation(restaurant);
         setUpCarousel(snapshot);
-        btnCreate.setText("Save");
+        btnCreate.setText(getString(R.string.save));
     }
 
     private void slideDownMenu() {
@@ -473,9 +474,9 @@ public class MapFragment extends Fragment {
                     @Override
                     public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                         if (databaseError != null) {
-                            Toast.makeText(getContext(), "Error Saving Data To Database", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), getString(R.string.errorMsg), Toast.LENGTH_LONG).show();
                         } else {
-                            btnCreate.setText("Saved!");
+                            btnCreate.setText(getString(R.string.saved));
                             mCurrentUser.addSavedEventID(savedEvents);
                         }
                     }
@@ -486,7 +487,7 @@ public class MapFragment extends Fragment {
         carouselPicker.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                btnCreate.setText("Save");
+                btnCreate.setText(getString(R.string.save));
             }
 
             @Override
@@ -501,8 +502,7 @@ public class MapFragment extends Fragment {
         });
     }
 
-    public static String getDate(long milliSeconds, String dateFormat)
-    {
+    public static String getDate(long milliSeconds, String dateFormat) {
         // Create a DateFormatter object for displaying date in specified format.
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 

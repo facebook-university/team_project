@@ -119,12 +119,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 // initiate saved events dictionary
                 Map<String, String> events = mCurrentUserModel.getSavedEventsIDs();
-                if (events != null) {
-                    for (DataSnapshot eventChild : dataSnapshot.child("Events").getChildren()) {
-                        events.put(eventChild.getKey(), eventChild.getValue().toString());
-                    }
-                } else {
-                    events = new HashMap<String, String>();
+                for (DataSnapshot eventChild : dataSnapshot.child("Events").getChildren()) {
+                    events.put(eventChild.getKey(), eventChild.getValue().toString());
                 }
                 mCurrentUserModel.addSavedEventID(events);
                 goToProfile();

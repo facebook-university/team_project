@@ -21,7 +21,7 @@ public class User {
     public File profileImage;
     public String bio;
     public Boolean prefersPhoneContact;
-    Map<String, String> savedEventsIDs = new HashMap<String, String>();
+    public Map<String, String> savedEventsIDs = new HashMap<String, String>();
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)

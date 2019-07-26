@@ -158,7 +158,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                         mUser = mAuth.getCurrentUser();
                         mCreatedUser.name = mName.getText().toString();
                         mCreatedUser.isOrg = mSpinner.getSelectedItem().toString() == "Organization";
-                        mCreatedUser.addSavedEventID(new HashMap<String, String>());
                         Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
                         writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
                         navigationHelper(HomeActivity.class);
