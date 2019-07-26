@@ -68,7 +68,9 @@ import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import in.goodiebag.carouselpicker.CarouselPicker;
@@ -93,6 +95,7 @@ public class MapFragment extends Fragment {
 
     public JSONArray restaurantsNearbyJSON = new JSONArray();
     private boolean loaded;
+    private int position = 0;
     private boolean cameraSet;
     private Double cameraLatitude;
     private Double cameraLongitude;
@@ -427,11 +430,7 @@ public class MapFragment extends Fragment {
 
     private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) throws JSONException {
         slideUpAnimation(restaurant);
-        ArrayList<String> eventIDs = new ArrayList<String>();
-        for (DataSnapshot eventChild : snapshot.getChildren()) {
-            eventIDs.add(eventChild.getKey());
-        }
-        setUpCarousel(eventIDs);
+        setUpCarousel(snapshot);
         btnCreate.setText("Save");
     }
 
@@ -447,42 +446,48 @@ public class MapFragment extends Fragment {
         slideView.startAnimation(animate);
     }
 
-    private void setUpCarousel(final ArrayList<String> eventIDs) {
+    private void setUpCarousel(final DataSnapshot snapshot) {
         CarouselPicker carouselPicker = (CarouselPicker) slideView.findViewById(R.id.carousel);
 
+        final ArrayList<String> eventIDs = new ArrayList<String>();
         List<CarouselPicker.PickerItem> mixItems = new ArrayList<>();
-        for (int i = 0; i < eventIDs.size(); i++) {
-            mixItems.add(new CarouselPicker.TextItem(eventIDs.get(i), 5));
+
+        for (DataSnapshot eventChild : snapshot.getChildren()) {
+            mixItems.add(new CarouselPicker.TextItem(eventChild.getKey(), 5));
+            eventIDs.add(eventChild.getKey());
         }
+
         CarouselPicker.CarouselViewAdapter mixAdapter = new CarouselPicker.CarouselViewAdapter(slideView.getContext(), mixItems, 0);
         carouselPicker.setAdapter(mixAdapter);
+
+        btnCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Map<String, String> savedEvents = mCurrentUser.getSavedEventsIDs();
+                savedEvents.put(eventIDs.get(position), snapshot.getKey());
+                mRef.child("users").child(mFbUser.getUid()).child("Events").setValue(savedEvents, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        if (databaseError != null) {
+                            Toast.makeText(getContext(), "Error Saving Data To Database", Toast.LENGTH_LONG).show();
+                        } else {
+                            btnCreate.setText("Saved!");
+                            mCurrentUser.addSavedEventID(savedEvents);
+                        }
+                    }
+                });
+            }
+        });
 
         carouselPicker.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+                btnCreate.setText("Save");
             }
 
             @Override
-            public void onPageSelected(final int position) {
-                btnCreate.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final ArrayList<String> savedEvents = mCurrentUser.savedEventsIDs;
-                        savedEvents.add(eventIDs.get(position));
-                        mRef.child("users").child(mFbUser.getUid()).child("Events").setValue(mCurrentUser.getSavedEventsIDs(), new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                                if (databaseError != null) {
-                                    Toast.makeText(getContext(), "Error Saving Data To Database", Toast.LENGTH_LONG).show();
-                                } else {
-                                    btnCreate.setText("Saved!");
-                                    mCurrentUser.addSavedEventID(savedEvents);
-                                }
-                            }
-                        });
-                    }
-                });
+            public void onPageSelected(final int i) {
+                position = i;
             }
 
             @Override

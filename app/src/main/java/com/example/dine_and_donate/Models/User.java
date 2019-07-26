@@ -7,6 +7,8 @@ import org.parceler.Parcel;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Parcel
 @IgnoreExtraProperties
@@ -19,7 +21,7 @@ public class User {
     public File profileImage;
     public String bio;
     public Boolean prefersPhoneContact;
-    public ArrayList<String> savedEventsIDs;
+    Map<String, String> savedEventsIDs = new HashMap<String, String>();
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -70,7 +72,7 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public ArrayList<String> getSavedEventsIDs() { return savedEventsIDs; }
+    public Map<String, String> getSavedEventsIDs() { return savedEventsIDs; }
 
-    public void addSavedEventID(ArrayList<String> ids) { this.savedEventsIDs = ids; }
+    public void addSavedEventID(Map<String, String> ids) { this.savedEventsIDs = ids; }
 }

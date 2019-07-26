@@ -28,6 +28,8 @@ import com.google.firebase.database.ValueEventListener;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -114,16 +116,17 @@ public class LoginActivity extends AppCompatActivity {
                 if(mCurrentUserModel.getIsOrg()) {
                     mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
-                Iterable<DataSnapshot> events = dataSnapshot.child("Events").getChildren();
+
+                // initiate saved events dictionary
+                Map<String, String> events = mCurrentUserModel.getSavedEventsIDs();
                 if (events != null) {
-                    ArrayList<String> arrayEvents = new ArrayList<String>();
-                    for (int i = 0; i < dataSnapshot.child("Events").getChildrenCount(); i++) {
-                        arrayEvents.add(events.iterator().next().getValue().toString());
+                    for (DataSnapshot eventChild : dataSnapshot.child("Events").getChildren()) {
+                        events.put(eventChild.getKey(), eventChild.getValue().toString());
                     }
-                    mCurrentUserModel.addSavedEventID(arrayEvents);
                 } else {
-                    mCurrentUserModel.addSavedEventID(new ArrayList<String>());
+                    events = new HashMap<String, String>();
                 }
+                mCurrentUserModel.addSavedEventID(events);
                 goToProfile();
             }
             @Override
