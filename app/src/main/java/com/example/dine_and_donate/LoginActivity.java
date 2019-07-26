@@ -27,6 +27,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText mEmail;
@@ -112,6 +116,13 @@ public class LoginActivity extends AppCompatActivity {
                 if(mCurrentUserModel.getIsOrg()) {
                     mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
+
+                // initiate saved events dictionary
+                Map<String, String> events = mCurrentUserModel.getSavedEventsIDs();
+                for (DataSnapshot eventChild : dataSnapshot.child("Events").getChildren()) {
+                    events.put(eventChild.getKey(), eventChild.getValue().toString());
+                }
+                mCurrentUserModel.addSavedEventID(events);
                 goToProfile();
             }
             @Override

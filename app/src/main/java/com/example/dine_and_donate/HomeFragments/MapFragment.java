@@ -23,12 +23,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
-import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
+import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.YelpService;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -62,9 +63,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import in.goodiebag.carouselpicker.CarouselPicker;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -75,33 +81,33 @@ import permissions.dispatcher.RuntimePermissions;
 @RuntimePermissions
 public class MapFragment extends Fragment {
 
+    private SupportMapFragment mapFragment;
+    private GoogleMap map;
+    private LocationRequest mLocationRequest;
+    private Location mCurrentLocation;
     private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(6000);  /* 60 secs */
     private long FASTEST_INTERVAL = 50000; /* 5 secs */
     private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
     private final static String KEY_LOCATION = "location";
-    public static final String TAG = MapFragment.class.getSimpleName();
+
     public JSONArray restaurantsNearbyJSON = new JSONArray();
+    private boolean loaded;
+    private int position = 0;
+    private boolean cameraSet;
+    private Double cameraLatitude;
+    private Double cameraLongitude;
 
-    private SupportMapFragment mMapFragment;
-    private GoogleMap mMap;
-    private LocationRequest mLocationRequest;
-    Location mCurrentLocation;
-    private boolean mLoaded;
-    private boolean mCameraSet;
-    private Double mCameraLatitude;
-    private Double mCameraLongitude;
-
-    private View mSlideView;
-    private boolean mSlideViewIsUp;
-    private Button mBtnCreate;
-    private boolean mIsOrg;
+    private View slideView;
+    private boolean slideViewIsUp;
+    private Button btnCreate;
 
     private Context mContext;
 
-    private FirebaseUser mCurrentUser;
-    private FirebaseAuth mAuth;
-
-    private ArrayList<Event> mNearbyEvents;
+    private FirebaseDatabase mDatabase;
+    private FirebaseUser mFbUser;
+    private DatabaseReference mRef;
+    private DatabaseReference mRefForUser;
+    private User mCurrentUser;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -118,8 +124,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLoaded = false;
-        mNearbyEvents = new ArrayList<>();
+        loaded = false;
     }
 
     @Override
@@ -127,26 +132,29 @@ public class MapFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         HomeActivity homeActivity = (HomeActivity) getActivity();
-        mIsOrg = homeActivity.mCurrentUser.isOrg;
+        mCurrentUser = homeActivity.mCurrentUser;
 
-        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance();
+        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+        mRef = mDatabase.getReference(); //need an instance of database reference
+        mRefForUser = mRef.child("users").child(mFbUser.getUid());
         mContext = view.getContext();
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
         }
 
-        if (!mLoaded) {
-            mMapFragment = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map));
-            if (mMapFragment != null) {
-                mMapFragment.getMapAsync(new OnMapReadyCallback() {
+        if (!loaded) {
+            mapFragment = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map));
+            if (mapFragment != null) {
+                mapFragment.getMapAsync(new OnMapReadyCallback() {
                     @RequiresApi(api = Build.VERSION_CODES.M)
                     @Override
                     public void onMapReady(GoogleMap map) {
                         loadMap(map);
                     }
                 });
-                mLoaded = true;
+                loaded = true;
             } else {
                 Toast.makeText(mContext, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
             }
@@ -159,74 +167,73 @@ public class MapFragment extends Fragment {
         PlacesClient placesClient = Places.createClient(mContext);
 
         // setting up slide view with restaurant info
-        mSlideView = view.findViewById(R.id.slide_menu);
-        mSlideView.setVisibility(View.INVISIBLE);
-        //mSlideView.setY(1200);
-        mSlideViewIsUp = false;
+        slideView = view.findViewById(R.id.slide_menu);
+        slideView.setVisibility(View.INVISIBLE);
+        //slideView.setY(1200);
+        slideViewIsUp = false;
 
         // slide view can be swiped down to dismiss and swiped up for more info
-        mSlideView.setOnTouchListener(new OnSwipeTouchListener(mContext) {
+        slideView.setOnTouchListener(new OnSwipeTouchListener(mContext) {
             @Override
             public void onSwipeBottom() {
                 super.onSwipeBottom();
-                if(mSlideViewIsUp) {
+                if(slideViewIsUp) {
                     slideDownMenu();
-                    mSlideViewIsUp = false;
                 }
             }
 
             @Override
             public void onSwipeTop() {
                 super.onSwipeTop();
-                if(mSlideViewIsUp) {
+                if(slideViewIsUp) {
                     //TODO: show more detail in view
 
                 }
             }
         });
 
-        mSlideView.setOnClickListener(new View.OnClickListener() {
+        slideView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO: same as swipe up
             }
         });
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     protected void loadMap(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+        map = googleMap;
+        map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
-                Double newLongitude = mMap.getCameraPosition().target.longitude;
-                Double newLatitude = mMap.getCameraPosition().target.latitude;
-                if (mCameraLatitude == null || mCameraLongitude == null) {
-                    mCameraLatitude = newLatitude;
-                    mCameraLongitude = newLongitude;
+                Double newLongitude = map.getCameraPosition().target.longitude;
+                Double newLatitude = map.getCameraPosition().target.latitude;
+                if (cameraLatitude == null || cameraLongitude == null) {
+                    cameraLatitude = newLatitude;
+                    cameraLongitude = newLongitude;
                 }
 
-                if (((Math.abs(newLongitude - mCameraLongitude) > 0.03)
-                        || (Math.abs(newLatitude - mCameraLatitude) > 0.03))
-                        && (mMap.getCameraPosition().zoom > 10)) {
-                    mCameraLongitude = newLongitude;
-                    mCameraLatitude = newLatitude;
+                if (((Math.abs(newLongitude - cameraLongitude) > 0.03)
+                        || (Math.abs(newLatitude - cameraLatitude) > 0.03))
+                        && (map.getCameraPosition().zoom > 10)) {
+                    cameraLongitude = newLongitude;
+                    cameraLatitude = newLatitude;
                 }
 
-                generateMarkers(Double.toString(mCameraLongitude), Double.toString(mCameraLatitude));
+                generateMarkers(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
             }
         });
 
-        if (mMap != null) {
+        if (map != null) {
             // Map is ready
-            Toast.makeText(mContext, "Map Fragment was mLoaded properly!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapDemoFragmentPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
             MapDemoFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
 
-            mMap.setInfoWindowAdapter(new CustomWindowAdapter(getLayoutInflater()));
+            //map.setOnMapLongClickListener(this);
+            map.setInfoWindowAdapter(new CustomWindowAdapter(getLayoutInflater()));
 
-            mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+            map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         } else {
             Toast.makeText(mContext, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
@@ -243,7 +250,7 @@ public class MapFragment extends Fragment {
     @SuppressWarnings({"MissingPermission"})
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     void getMyLocation() {
-        mMap.setMyLocationEnabled(true);
+        map.setMyLocationEnabled(true);
 
         FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(mContext);
         locationClient.getLastLocation()
@@ -288,11 +295,11 @@ public class MapFragment extends Fragment {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
                         onLocationChanged(locationResult.getLastLocation());
-                        if(!mCameraSet) {
+                        if(!cameraSet) {
                             LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
-                            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-                            mCameraSet = true;
+                            map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
+                            map.animateCamera(CameraUpdateFactory.zoomTo(15));
+                            cameraSet = true;
                         }
                     }
                 },
@@ -329,7 +336,7 @@ public class MapFragment extends Fragment {
                         //add marker to each restaurant nearby
                         for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
                             final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
-                            String yelpID = restaurantJSON.getString("id");
+                            final String yelpID = restaurantJSON.getString("id");
                             System.out.println("ID: " + yelpID + " " + restaurantJSON.getString("name") + "\n");
                             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
                             DatabaseReference mRef = mDatabase.getReference();
@@ -341,19 +348,23 @@ public class MapFragment extends Fragment {
 
                             ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onDataChange(DataSnapshot snapshot) {
-                                    if (snapshot.exists() || mIsOrg) {
-                                        Event newEvent = snapshot.getValue(Event.class);
-                                        mNearbyEvents.add(newEvent);
+                                public void onDataChange(final DataSnapshot snapshot) {
+                                    if (snapshot.exists() || mCurrentUser.isOrg) {
                                         getActivity().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                mMap.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
-                                                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                                map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
+
+                                                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                                     @Override
                                                     public boolean onMarkerClick(Marker marker) {
                                                         try {
-                                                            slideUpMenu(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                            if (mCurrentUser.isOrg) {
+                                                                slideUpMenuCreate(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                            } else {
+                                                                slideUpMenuSave(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()), snapshot);
+                                                            }
+                                                            slideViewIsUp = true;
                                                         } catch (JSONException e) {
                                                             e.printStackTrace();
                                                         }
@@ -381,50 +392,118 @@ public class MapFragment extends Fragment {
         });
     }
 
-    private void slideUpMenu(final JSONObject restaurant) throws JSONException {
-        mSlideViewIsUp = true;
-        TextView restName = mSlideView.findViewById(R.id.tv_restaurant_name);
+    private void slideUpAnimation(final JSONObject restaurant) throws JSONException {
+        TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
         restName.setText(restaurant.getString("name"));
-        mSlideView.setVisibility(View.VISIBLE);
+        slideView.setVisibility(View.VISIBLE);
         TranslateAnimation animate = new TranslateAnimation(
                 0,
                 0,
-                mSlideView.getY(),
+                slideView.getY(),
                 0);
         animate.setDuration(500);
         animate.setFillAfter(true);
-        mSlideView.startAnimation(animate);
+        slideView.startAnimation(animate);
+        btnCreate = slideView.findViewById(R.id.btn_create_event);
+    }
 
-        mBtnCreate = mSlideView.findViewById(R.id.btn_create_event);
-        mBtnCreate.setOnClickListener(new View.OnClickListener() {
+    private void slideUpMenuCreate(final JSONObject restaurant) throws JSONException {
+        slideUpAnimation(restaurant);
+        btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mSlideViewIsUp) {
-                    Intent intent = new Intent(mContext, EventActivity.class);
-                    try {
-                        intent.putExtra("location", Restaurant.format(restaurant));
-                        JSONObject restLocation = restaurant.getJSONObject("coordinates");
-                        intent.putExtra("yelpID", restaurant.getString("id"));
-                        intent.putExtra("mIsOrg", mIsOrg);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    startActivity(intent);
+                Intent intent = new Intent(mContext, EventActivity.class);
+                try {
+                    intent.putExtra("location", Restaurant.format(restaurant));
+                    JSONObject restLocation = restaurant.getJSONObject("coordinates");
+                    intent.putExtra("yelpID", restaurant.getString("id"));
+                    intent.putExtra("isOrg", mCurrentUser.isOrg);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+                startActivity(intent);
             }
         });
     }
 
+    private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) throws JSONException {
+        slideUpAnimation(restaurant);
+        setUpCarousel(snapshot);
+        btnCreate.setText(getString(R.string.save));
+    }
+
     private void slideDownMenu() {
-        mSlideView.setVisibility(View.INVISIBLE);
+        slideView.setVisibility(View.INVISIBLE);
         TranslateAnimation animate = new TranslateAnimation(
                 0,
                 0,
                 0,
-                mSlideView.getY());
+                slideView.getY());
         animate.setDuration(500);
         animate.setFillAfter(true);
-        mSlideView.startAnimation(animate);
+        slideView.startAnimation(animate);
     }
 
+    private void setUpCarousel(final DataSnapshot snapshot) {
+        CarouselPicker carouselPicker = (CarouselPicker) slideView.findViewById(R.id.carousel);
+
+        final ArrayList<String> eventIDs = new ArrayList<String>();
+        List<CarouselPicker.PickerItem> mixItems = new ArrayList<>();
+
+        for (DataSnapshot eventChild : snapshot.getChildren()) {
+            mixItems.add(new CarouselPicker.TextItem(getDate((long) eventChild.child("startTime").getValue(),
+                    "MMM dd, yyyy \n hh:mm"),
+                    5));
+            eventIDs.add(eventChild.getKey());
+        }
+
+        CarouselPicker.CarouselViewAdapter mixAdapter = new CarouselPicker.CarouselViewAdapter(slideView.getContext(), mixItems, 0);
+        carouselPicker.setAdapter(mixAdapter);
+
+        btnCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Map<String, String> savedEvents = mCurrentUser.getSavedEventsIDs();
+                savedEvents.put(eventIDs.get(position), snapshot.getKey());
+                mRef.child("users").child(mFbUser.getUid()).child("Events").setValue(savedEvents, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        if (databaseError != null) {
+                            Toast.makeText(getContext(), getString(R.string.errorMsg), Toast.LENGTH_LONG).show();
+                        } else {
+                            btnCreate.setText(getString(R.string.saved));
+                            mCurrentUser.addSavedEventID(savedEvents);
+                        }
+                    }
+                });
+            }
+        });
+
+        carouselPicker.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                btnCreate.setText(getString(R.string.save));
+            }
+
+            @Override
+            public void onPageSelected(final int i) {
+                position = i;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+    public static String getDate(long milliSeconds, String dateFormat) {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
+    }
 }

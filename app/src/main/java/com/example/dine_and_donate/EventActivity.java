@@ -59,12 +59,12 @@ public class EventActivity extends AppCompatActivity {
     private EditText mEtEventInfo;
     private Button mBtnCreate;
     private Button mChooseImage;
-    private ImageView ivVoucher;
+    private ImageView mVoucherImageView;
 
-    private User mCurrentUser;
+    private User mCurrentUser; // this may be necessary in the future to access info from user class
 
     private Uri mSelectedImage;
-    private FirebaseUser currentUser;
+    private FirebaseUser mFirebaseCurrentUser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,7 +74,7 @@ public class EventActivity extends AppCompatActivity {
         mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
         mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
+        mFirebaseCurrentUser = mAuth.getCurrentUser();
 
         mDatabase = FirebaseDatabase.getInstance();
         mRef = mDatabase.getReference();
@@ -92,7 +92,7 @@ public class EventActivity extends AppCompatActivity {
         mEtEventInfo = findViewById(R.id.etEventInfo);
         mBtnCreate = findViewById(R.id.create_event);
         mChooseImage = findViewById(R.id.btnChoosePhoto);
-        ivVoucher = findViewById(R.id.ivVoucherImage);
+        mVoucherImageView = findViewById(R.id.ivVoucherImage);
 
         final Intent intent = getIntent();
         final String location = intent.getStringExtra("location");
@@ -144,17 +144,6 @@ public class EventActivity extends AppCompatActivity {
                 if(mSelectedImage != null) {
                     final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
                     UploadTask uploadTask = ref.putFile(mSelectedImage);
-                    uploadTask.addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-                        }
-                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                        }
-                    });
 
                     Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                         @Override
@@ -187,7 +176,7 @@ public class EventActivity extends AppCompatActivity {
     }
 
     private void writeEvent(Intent intent, String url, String location) {
-        String orgId = currentUser.getUid();
+        String orgId = mFirebaseCurrentUser.getUid();
         String yelpId = intent.getStringExtra("yelpID");
         long eventDate = mCalendarView.getDate();
         long startTime = convert(eventDate, mStartHour.getSelectedItemPosition()+1, mStartMin.getSelectedItemPosition(), mStartHalf.getSelectedItem().equals("PM"));
@@ -206,7 +195,7 @@ public class EventActivity extends AppCompatActivity {
                 case GALLERY_REQUEST_CODE:
                     //data.getData returns the content URI for the selected Image
                     mSelectedImage = data.getData();
-                    ivVoucher.setImageURI(mSelectedImage);
+                    mVoucherImageView.setImageURI(mSelectedImage);
                     break;
             }
     }
@@ -215,7 +204,7 @@ public class EventActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         String[] mimeTypes = {"image/jpeg", "image/png"};
-        intent.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         startActivityForResult(intent, GALLERY_REQUEST_CODE);
     }
 

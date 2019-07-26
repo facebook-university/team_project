@@ -27,6 +27,9 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.parceler.Parcels;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SignUpActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private Spinner mSpinner;
@@ -64,7 +67,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mPassword.setVisibility(View.GONE);
         mOrgPhone.setVisibility(View.GONE);
         mSignUpBtn.setVisibility(View.GONE);
-
 
         //display specific text views depending on user type selected
         mSpinner = findViewById(R.id.user_options);
@@ -154,6 +156,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         mUser = mAuth.getCurrentUser();
+
                         // Todo: change this
                         User userInfo = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
                         // TODO: parcel to pass through intent
@@ -162,11 +165,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                         finish();
                         // Sign in success, update UI with the signed-in user's information
                         Log.d("create", "createUserWithEmail:success");
-                        mCreatedUser.name = mName.getText().toString();
-                        mCreatedUser.isOrg = mSpinner.getSelectedItem().toString() == "Organization";
-                        Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
-                        writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
-                        navigationHelper(HomeActivity.class);
+
                     } else {
                         // If sign in fails, display a message to the user.
                         //Log.w("create", "createUserWithEmail:failure", task.getException());
