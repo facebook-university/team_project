@@ -20,6 +20,7 @@ import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.parceler.Parcels;
 
@@ -35,6 +36,7 @@ public class HomeActivity extends AppCompatActivity {
     private ProfileFragment mProfileFragment = new ProfileFragment();
     private ListFragment mListFragment = new ListFragment();
     public User mCurrentUser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +114,18 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void createDrawerNav() {
-        Button mLogOutBtn = findViewById(R.id.logout);
+        Button logOutBtn = findViewById(R.id.logout);
+
+        logOutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
         NavigationView mNavigationView = findViewById(R.id.settings_navigation);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override

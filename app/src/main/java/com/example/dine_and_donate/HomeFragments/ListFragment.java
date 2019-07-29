@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 
 public class ListFragment extends Fragment {
 
-    private RestaurantListViewAdapter mAdapter;
+    private RestaurantListViewAdapter mOrgAdapter;
     private ArrayList<Event> mNearbyEvents;
     private JSONArray mRestaurantsJSON;
     private RecyclerView mRvNearbyList;
@@ -36,12 +35,12 @@ public class ListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mAdapter = new RestaurantListViewAdapter(mRestaurantsJSON);
+        mOrgAdapter = new RestaurantListViewAdapter(mRestaurantsJSON);
         mRvNearbyList = view.findViewById(R.id.rvNearbyList);
         mRvNearbyList.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
         if(mNearbyEvents.size() == 0) {
-            mRvNearbyList.setAdapter(mAdapter);
+            mRvNearbyList.setAdapter(mOrgAdapter);
         } else {
             // todo: fill rv with event info
         }
