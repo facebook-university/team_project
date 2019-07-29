@@ -74,6 +74,9 @@ dependencies {
     implementation 'com.github.GoodieBag:CarouselPicker:v1.1'
 
     implementation 'de.hdodenhof:circleimageview:2.1.0'
+
+    // WorkManager
+    implementation "androidx.work:work-runtime:2.1.0"
 }
 
 apply plugin: 'com.google.gms.google-services'

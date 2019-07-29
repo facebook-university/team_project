@@ -89,7 +89,7 @@ public class MapFragment extends Fragment {
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private LocationRequest mLocationRequest;
-    private Location mCurrentLocation;
+    public Location mCurrentLocation;
     private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(6000);  /* 60 secs */
     private long FASTEST_INTERVAL = 50000; /* 5 secs */
     private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
@@ -114,6 +114,8 @@ public class MapFragment extends Fragment {
     private DatabaseReference mRefForUser;
     private User mCurrentUser;
 
+    private HomeActivity homeActivity;
+
     /*
      * Define a request code to send to Google Play services This code is
      * returned in Activity.onActivityResult
@@ -136,7 +138,7 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        HomeActivity homeActivity = (HomeActivity) getActivity();
+        homeActivity = (HomeActivity) getActivity();
         mCurrentUser = homeActivity.mCurrentUser;
 
         mDatabase = FirebaseDatabase.getInstance();
@@ -206,7 +208,7 @@ public class MapFragment extends Fragment {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    protected void loadMap(GoogleMap googleMap) {
+    public void loadMap(GoogleMap googleMap) {
         map = googleMap;
         map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
@@ -254,7 +256,7 @@ public class MapFragment extends Fragment {
 
     @SuppressWarnings({"MissingPermission"})
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    void getMyLocation() {
+    public void getMyLocation() {
         map.setMyLocationEnabled(true);
 
         FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(mContext);
@@ -342,11 +344,10 @@ public class MapFragment extends Fragment {
                         for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
                             final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
                             final String yelpID = restaurantJSON.getString("id");
-                            System.out.println("ID: " + yelpID + " " + restaurantJSON.getString("name") + "\n");
                             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
                             DatabaseReference mRef = mDatabase.getReference();
                             DatabaseReference ref = mRef.child("events");
-                            JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
+                            final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                             final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
                             final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
                             final int finalI = i;
@@ -359,7 +360,6 @@ public class MapFragment extends Fragment {
                                             @Override
                                             public void run() {
                                                 map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
-
                                                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                                     @Override
                                                     public boolean onMarkerClick(Marker marker) {
@@ -376,6 +376,15 @@ public class MapFragment extends Fragment {
                                                         return false;
                                                     }
                                                 });
+                                                if (homeActivity.markerLatLng != null) {
+                                                    map.animateCamera(CameraUpdateFactory.newLatLng(homeActivity.markerLatLng), 250, null);
+                                                    homeActivity.markerLatLng = null;
+                                                    try {
+                                                        slideUpMenuSave(restaurantsNearbyJSON.getJSONObject(finalI), snapshot);
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
                                             }
                                         });
                                     }
