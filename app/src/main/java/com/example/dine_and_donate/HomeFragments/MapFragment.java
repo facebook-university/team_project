@@ -435,7 +435,8 @@ public class MapFragment extends Fragment {
     }
 
     private void slideDownMenu() {
-        slideView.setVisibility(View.INVISIBLE);
+        // todo: make not clickable when it goes away
+        slideView.setVisibility(View.GONE);
         TranslateAnimation animate = new TranslateAnimation(
                 0,
                 0,

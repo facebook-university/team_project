@@ -158,6 +158,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                         User userInfo = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
                         // TODO: parcel to pass through intent
                         Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+                        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(userInfo));
                         startActivity(intent);
                         finish();
                         // Sign in success, update UI with the signed-in user's information
