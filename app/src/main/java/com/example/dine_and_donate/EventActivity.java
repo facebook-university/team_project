@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -114,7 +115,7 @@ public class EventActivity extends AppCompatActivity {
                 String info = mEtEventInfo.getText().toString();
                 Event newEvent = new Event(orgId, location, yelpId, info, startTime, endTime);
                 mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
-                Intent newIntent = new Intent(EventActivity.this, MapActivity.class);
+                Intent newIntent = new Intent(EventActivity.this, HomeActivity.class);
                 newIntent.putExtra("isOrg", intent.getBooleanExtra("isOrg", false));
                 startActivity(newIntent);
             }

@@ -26,10 +26,8 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
-import com.example.dine_and_donate.EditProfileActivity;
 import com.example.dine_and_donate.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
-import com.example.dine_and_donate.MapActivity;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
@@ -41,7 +39,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -64,13 +61,11 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -227,7 +222,11 @@ public class MapFragment extends Fragment {
                     cameraLatitude = newLatitude;
                 }
 
-                generateMarkers(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                if (mCurrentUser.isOrg) {
+                    generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                } else {
+                    generateMarkersEvents();
+                }
             }
         });
 
@@ -326,7 +325,7 @@ public class MapFragment extends Fragment {
         savedInstanceState.putParcelable(KEY_LOCATION, mCurrentLocation);
     }
 
-    private void generateMarkers(String longitude, String latitude) {
+    private void generateMarkersRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
         yelpService.findRestaurants(longitude, latitude, new Callback() {
             @Override
@@ -343,56 +342,27 @@ public class MapFragment extends Fragment {
                         //add marker to each restaurant nearby
                         for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
                             final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
-                            final String yelpID = restaurantJSON.getString("id");
-                            FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-                            DatabaseReference mRef = mDatabase.getReference();
-                            DatabaseReference ref = mRef.child("events");
                             final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                             final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
                             final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
                             final int finalI = i;
 
-                            ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
+                            getActivity().runOnUiThread(new Runnable() {
                                 @Override
-                                public void onDataChange(final DataSnapshot snapshot) {
-                                    if (snapshot.exists() || mCurrentUser.isOrg) {
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
-                                                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                                                    @Override
-                                                    public boolean onMarkerClick(Marker marker) {
-                                                        try {
-                                                            if (mCurrentUser.isOrg) {
-                                                                slideUpMenuCreate(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
-                                                            } else {
-                                                                slideUpMenuSave(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()), snapshot);
-                                                            }
-                                                            slideViewIsUp = true;
-                                                        } catch (JSONException e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                        return false;
-                                                    }
-                                                });
-                                                if (homeActivity.markerLatLng != null) {
-                                                    map.animateCamera(CameraUpdateFactory.newLatLng(homeActivity.markerLatLng), 250, null);
-                                                    homeActivity.markerLatLng = null;
-                                                    try {
-                                                        slideUpMenuSave(restaurantsNearbyJSON.getJSONObject(finalI), snapshot);
-                                                    } catch (JSONException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
+                                public void run() {
+                                    map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
+                                    map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                        @Override
+                                        public boolean onMarkerClick(Marker marker) {
+                                            try {
+                                                slideUpMenuCreate(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                slideViewIsUp = true;
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
                                             }
-                                        });
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                            return false;
+                                        }
+                                    });
                                 }
                             });
                         }
@@ -402,6 +372,72 @@ public class MapFragment extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+    }
+
+    private void generateMarkersEvents() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference mRef = mDatabase.getReference();
+        DatabaseReference ref = mRef.child("events");
+        final YelpService yelpService = new YelpService();
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    yelpService.findRestaurants(snapshot.getKey(), new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String jsonData = response.body().string();
+                            try {
+                                final JSONObject restaurantJSON = new JSONObject(jsonData);
+                                final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
+
+                                final String restaurantName = restaurantJSON.getString("name");
+                                final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName));
+                                        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                            @Override
+                                            public boolean onMarkerClick(Marker marker) {
+                                                try {
+                                                    slideUpMenuSave(restaurantJSON, snapshot);
+                                                    slideViewIsUp = true;
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                return false;
+                                            }
+                                        });
+                                        if (homeActivity.markerLatLng != null) {
+                                            map.animateCamera(CameraUpdateFactory.newLatLng(homeActivity.markerLatLng), 250, null);
+                                            homeActivity.markerLatLng = null;
+                                            try {
+                                                slideUpMenuSave(restaurantJSON, snapshot);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                });
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
             }
         });
     }
