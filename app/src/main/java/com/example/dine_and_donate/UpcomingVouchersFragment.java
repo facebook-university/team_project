@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,7 +30,6 @@ public class UpcomingVouchersFragment extends Fragment {
     private ArrayList<String> mNames = new ArrayList<>();
     private Map<String, String> mSavedEventsIDs;
     private User mCurrUser;
-    private FirebaseUser mFbUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForEvent;
 

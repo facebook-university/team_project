@@ -12,20 +12,21 @@ import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -36,6 +37,7 @@ import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class EventActivity extends AppCompatActivity {
@@ -46,6 +48,7 @@ public class EventActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mRef;
     private StorageReference mStorageRef;
+    private Event newEvent;
 
     private CalendarView mCalendarView;
 
@@ -60,9 +63,10 @@ public class EventActivity extends AppCompatActivity {
     private Button mBtnCreate;
     private Button mChooseImage;
     private ImageView mVoucherImageView;
-
+    private User mCurrUser;
     private Uri mSelectedImage;
     private FirebaseUser mFirebaseCurrentUser;
+    private Map<String, String> mCreatedEvents;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,6 +75,7 @@ public class EventActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mFirebaseCurrentUser = mAuth.getCurrentUser();
+
 
         mDatabase = FirebaseDatabase.getInstance();
         mRef = mDatabase.getReference();
@@ -89,6 +94,10 @@ public class EventActivity extends AppCompatActivity {
         mBtnCreate = findViewById(R.id.create_event);
         mChooseImage = findViewById(R.id.btnChoosePhoto);
         mVoucherImageView = findViewById(R.id.ivVoucherImage);
+
+
+        mCurrUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
+        mCreatedEvents = mCurrUser.getSavedEventsIDs();
 
         final Intent intent = getIntent();
         final String location = intent.getStringExtra("location");
@@ -133,10 +142,10 @@ public class EventActivity extends AppCompatActivity {
         });
 
         mBtnCreate.setOnClickListener(new View.OnClickListener() {
+
             final Uri[] downloadUri = new Uri[1];
             @Override
             public void onClick(View v) {
-
                 if(mSelectedImage != null) {
                     final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
                     UploadTask uploadTask = ref.putFile(mSelectedImage);
@@ -163,25 +172,37 @@ public class EventActivity extends AppCompatActivity {
                             }
                         }
                     });
-
                 }
-
-
             }
         });
     }
 
     private void writeEvent(Intent intent, String url, String location) {
         String orgId = mFirebaseCurrentUser.getUid();
-        String yelpId = intent.getStringExtra("yelpID");
+        final String yelpId = intent.getStringExtra("yelpID");
         long eventDate = mCalendarView.getDate();
         long startTime = convert(eventDate, mStartHour.getSelectedItemPosition()+1, mStartMin.getSelectedItemPosition(), mStartHalf.getSelectedItem().equals("PM"));
         long endTime = convert(eventDate, mEndHour.getSelectedItemPosition()+1, mEndMin.getSelectedItemPosition(), mEndHalf.getSelectedItem().equals("PM"));
         String info = mEtEventInfo.getText().toString();
-        Event newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
-        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
+        newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
+        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Toast.makeText(EventActivity.this, "Error Saving Data To Database", Toast.LENGTH_LONG).show();
+                } else {
+                    mCreatedEvents.put(databaseReference.getKey(), yelpId);
+                    mRef.child("users").child(mFirebaseCurrentUser.getUid()).child("Events").setValue(mCreatedEvents);
+                    Toast.makeText(EventActivity.this, "Saved Data To Database", Toast.LENGTH_LONG).show();
+                }
+                Intent intent = new Intent(EventActivity.this, HomeActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
+                startActivity(intent);
+            }
+        }); //add under events
         finish();
     }
+
 
     public void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode, resultCode, data);

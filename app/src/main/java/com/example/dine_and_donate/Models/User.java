@@ -5,8 +5,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import org.parceler.Parcel;
 
 import java.io.File;
-import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +21,9 @@ public class User {
     public String bio;
     public Boolean prefersPhoneContact;
     public Map<String, String> savedEventsIDs = new HashMap<String, String>();
+    public Map<String, String> pastEvents = new HashMap<String, String>();
+    private Calendar mDate;
+    public String imageUrl;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -75,4 +77,12 @@ public class User {
     public Map<String, String> getSavedEventsIDs() { return savedEventsIDs; }
 
     public void addSavedEventID(Map<String, String> ids) { this.savedEventsIDs = ids; }
+
+    public Map<String, String> getPastEvents(long eventTime) {
+        return pastEvents;
+    }
+
+    public String getImageUrl() { return imageUrl; }
+
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

@@ -27,8 +27,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
