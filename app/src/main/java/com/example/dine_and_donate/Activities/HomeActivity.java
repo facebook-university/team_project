@@ -74,7 +74,9 @@ public class HomeActivity extends AppCompatActivity {
 
         createDrawerNav();
         createBottomNav();
-        setUpNotificationWorker();
+        if (!mCurrentUser.isOrg) {
+            setUpNotificationWorker();
+        }
     }
 
     private void createBottomNav() {
