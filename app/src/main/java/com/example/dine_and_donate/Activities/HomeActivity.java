@@ -152,8 +152,8 @@ public class HomeActivity extends AppCompatActivity {
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
         // 8.00 (8 AM)
-        calendar.set(Calendar.HOUR_OF_DAY, 14);
-        calendar.set(Calendar.MINUTE, 11);
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
         Intent myIntent = new Intent(HomeActivity.this, MyReceiver.class);
