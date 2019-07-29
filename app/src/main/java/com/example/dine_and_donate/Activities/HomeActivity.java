@@ -20,6 +20,7 @@ import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.parceler.Parcels;
