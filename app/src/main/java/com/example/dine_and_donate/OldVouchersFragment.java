@@ -1,7 +1,6 @@
 package com.example.dine_and_donate;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +34,6 @@ public class OldVouchersFragment extends Fragment {
     private User mCurrUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForEvent;
-   // private Date mDate;
-
 
     //inflates layout of fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,13 +52,9 @@ public class OldVouchersFragment extends Fragment {
         mRef = FirebaseDatabase.getInstance().getReference();
         mRefForEvent = mRef.child("events");
 
-        //Date c = Calendar.getInstance().getTime();
-
-
         HomeActivity homeActivity = (HomeActivity) getActivity();
         mCurrUser = homeActivity.mCurrentUser;
         pastEvents = mCurrUser.getSavedEventsIDs();
-
         final long dateMillis = Calendar.getInstance().getTimeInMillis();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -72,8 +65,8 @@ public class OldVouchersFragment extends Fragment {
                     for(DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
                         if(pastEvents.containsKey(dsEvent.getKey())) {
+                            //if event date is older than today's date, it is a past event
                             if (Long.toString(dateMillis).compareTo(dsEvent.child("startTime").toString()) < 0) {
-                                Log.d("Return","getMyTime older than getCurrentDateTime ");
                                 initBitmapsPastEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
                             }
                         }

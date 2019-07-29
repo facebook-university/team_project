@@ -5,7 +5,6 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import org.parceler.Parcel;
 
 import java.io.File;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +20,6 @@ public class User {
     public String bio;
     public Boolean prefersPhoneContact;
     public Map<String, String> savedEventsIDs = new HashMap<String, String>();
-    public Map<String, String> pastEvents = new HashMap<String, String>();
-    private Calendar mDate;
     public String imageUrl;
 
     public User() {
@@ -77,10 +74,6 @@ public class User {
     public Map<String, String> getSavedEventsIDs() { return savedEventsIDs; }
 
     public void addSavedEventID(Map<String, String> ids) { this.savedEventsIDs = ids; }
-
-    public Map<String, String> getPastEvents(long eventTime) {
-        return pastEvents;
-    }
 
     public String getImageUrl() { return imageUrl; }
 

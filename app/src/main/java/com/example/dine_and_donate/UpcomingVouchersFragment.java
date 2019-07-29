@@ -66,7 +66,6 @@ public class UpcomingVouchersFragment extends Fragment {
 
             }
         });
-
         mRecyclerView = view.findViewById(R.id.rv_vouchers);
         StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);

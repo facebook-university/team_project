@@ -53,7 +53,6 @@ public class EditProfileActivity extends AppCompatActivity {
     private DatabaseReference mRef;
     private DatabaseReference mRefForUser;
     private StorageReference mStorageRef;
-
     private User mCurrentUser;
 
     @Override
@@ -187,8 +186,6 @@ public class EditProfileActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 downloadUri[0] = task.getResult();
                                 String s = downloadUri[0].toString();
-                            } else {
-                                // Handle failures
                             }
                         }
                     });

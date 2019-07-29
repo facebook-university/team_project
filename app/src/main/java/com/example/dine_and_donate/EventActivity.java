@@ -156,7 +156,6 @@ public class EventActivity extends AppCompatActivity {
                             if (!task.isSuccessful()) {
                                 throw task.getException();
                             }
-
                             // Continue with the task to get the download URL
                             return ref.getDownloadUrl();
                         }
@@ -167,8 +166,6 @@ public class EventActivity extends AppCompatActivity {
                                 downloadUri[0] = task.getResult();
                                 String s = downloadUri[0].toString();
                                 writeEvent(intent, s, location);
-                            } else {
-                                // Handle failures
                             }
                         }
                     });
@@ -188,6 +185,7 @@ public class EventActivity extends AppCompatActivity {
         mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                //there is an error, can not add event to database
                 if (databaseError != null) {
                     Toast.makeText(EventActivity.this, "Error Saving Data To Database", Toast.LENGTH_LONG).show();
                 } else {
@@ -199,7 +197,7 @@ public class EventActivity extends AppCompatActivity {
                 intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
                 startActivity(intent);
             }
-        }); //add under events
+        });
         finish();
     }
 
