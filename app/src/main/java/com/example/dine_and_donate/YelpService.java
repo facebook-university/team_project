@@ -48,7 +48,6 @@ public class YelpService {
         urlBuilder.addPathSegment(id);
 
         String url = urlBuilder.build().toString();
-        System.out.println("HERE" + url);
 
         Request request= new Request.Builder()
                 .url(url)

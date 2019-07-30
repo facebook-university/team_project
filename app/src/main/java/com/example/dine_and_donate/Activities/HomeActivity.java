@@ -48,12 +48,10 @@ public class HomeActivity extends AppCompatActivity {
     private Fragment mNotificationsFragment = new NotificationsFragment();
     private Fragment mMapFragment = new MapFragment();
     private Fragment mProfileFragment = new ProfileFragment();
+    private PendingIntent mPendingIntent;
+
     public User mCurrentUser;
-
-    private Fragment mDefaultFragment;
     public LatLng markerLatLng;
-
-    private PendingIntent pendingIntentam;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +60,10 @@ public class HomeActivity extends AppCompatActivity {
 
         mDrawerNav = findViewById(R.id.drawerNav);
         mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
-        mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
+        Fragment mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
         String latitude = getIntent().getStringExtra("latitude");
         String longitude = getIntent().getStringExtra("longitude");
-        markerLatLng = (latitude != null || longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : markerLatLng;
+        markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.flContainer, mDefaultFragment)
@@ -153,27 +151,25 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        // 8.00 (8 AM)
         calendar.set(Calendar.HOUR_OF_DAY, 12);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
         Intent myIntent = new Intent(HomeActivity.this, MyReceiver.class);
-        pendingIntentam = PendingIntent.getBroadcast(HomeActivity.this, 0,myIntent,0);
+        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, myIntent, 0);
         AlarmManager alarmManageram = (AlarmManager)getSystemService(ALARM_SERVICE);
 
         alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, pendingIntentam);
+                AlarmManager.INTERVAL_DAY, mPendingIntent);
     }
 
     public static class MyReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
-            WorkManager mWorkManager;
-            mWorkManager = WorkManager.getInstance(context);
+            WorkManager workManager;
+            workManager = WorkManager.getInstance(context);
             // Enqueue our work to manager
-            mWorkManager.enqueue(OneTimeWorkRequest.from(NotifyWorker.class));
+            workManager.enqueue(OneTimeWorkRequest.from(NotifyWorker.class));
         }
     }
 }
