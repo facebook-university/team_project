@@ -1,14 +1,18 @@
 package com.example.dine_and_donate.Models;
 
-public class Notification {
+public class Notifications {
 
     private String eventId; //event has to take place on that day
     private String createdAt;
     private String yelpId;
 
-    public Notification(String eventId, String createdAt, String yelpId) {
+    public Notifications() {
+
+    }
+
+    public Notifications(String eventId, String yelpId) {
         this.eventId = eventId;
-        this.createdAt = createdAt;
+//        this.createdAt = createdAt;
         this.yelpId = yelpId;
     }
 

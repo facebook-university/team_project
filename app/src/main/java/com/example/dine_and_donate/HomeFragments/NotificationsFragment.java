@@ -11,8 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.dine_and_donate.Models.Notification;
-import com.example.dine_and_donate.NotificationsAdapter;
+import com.example.dine_and_donate.Models.Notifications;
 import com.example.dine_and_donate.R;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -25,7 +24,7 @@ public class NotificationsFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private NotificationsAdapter mNotificationsAdapter;
-    private List<Notification> mNotificationList;
+    private List<Notifications> mNotificationList;
 
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;

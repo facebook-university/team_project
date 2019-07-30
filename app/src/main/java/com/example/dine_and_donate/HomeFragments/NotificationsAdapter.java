@@ -10,18 +10,18 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.dine_and_donate.Models.Notification;
+import com.example.dine_and_donate.Models.Notifications;
 import com.example.dine_and_donate.R;
 
 import java.util.List;
 
 public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.ViewHolder> {
 
-    private List<Notification> mNotifications;
+    private List<Notifications> mNotifications;
     private Context mContext;
 
     //pass in posts array in the constructor
-    public NotificationsAdapter(List<Notification> notifications) {
+    public NotificationsAdapter(List<Notifications> notifications) {
         mNotifications = notifications;
     }
 
@@ -39,7 +39,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     //bind the values based on the position of the element, called as a user scrolls down
     public void onBindViewHolder(ViewHolder holder, int position) {
         //get data according to position
-        Notification notification= mNotifications.get(position);
+        Notifications notification= mNotifications.get(position);
 
         //populate view according to this data
 //        holder.tvUsername.setText(post.getUser().getUsername());
@@ -101,7 +101,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     }
 
     // Add a list of items -- change to type used
-    public void addAll(List<Notification> list) {
+    public void addAll(List<Notifications> list) {
         mNotifications.addAll(list);
         notifyDataSetChanged();
     }

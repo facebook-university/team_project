@@ -1,6 +1,5 @@
 package com.example.dine_and_donate;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -8,12 +7,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -21,14 +18,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.example.dine_and_donate.Activities.HomeActivity;
-import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.Models.Event;
-import com.example.dine_and_donate.Models.User;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.example.dine_and_donate.Models.Notifications;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -40,10 +31,8 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.parceler.Parcels;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Random;
 
 import okhttp3.Call;
@@ -52,6 +41,10 @@ import okhttp3.Response;
 
 public class NotifyWorker extends Worker {
     private Event mEventToday = null;
+    private Notifications mNewNotification;
+    private DatabaseReference mRef;
+    private FirebaseUser mFbUser;
+    private DatabaseReference trialRef;
 
     public NotifyWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -92,7 +85,7 @@ public class NotifyWorker extends Worker {
                             final String longitude = restaurantJSON.getJSONObject("coordinates").getString("longitude");
 
                             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-                            DatabaseReference mRef = mDatabase.getReference();
+                            mRef = mDatabase.getReference();
                             DatabaseReference ref = mRef.child("events");
 
                             ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -110,7 +103,7 @@ public class NotifyWorker extends Worker {
                                                 Long startTime = (long) eventChild.child("startTime").getValue();
                                                 String imageURL = eventChild.child("imageUrl").getValue().toString();
                                                 mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL);
-                                                displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude);
+                                                displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude, snapshot.getKey());
                                                 break;
                                             }
                                         }
@@ -133,7 +126,7 @@ public class NotifyWorker extends Worker {
         });
     }
 
-    private void displayNotification(String title, String body, String latitude, String longitude) {
+    private void displayNotification(String title, String body, String latitude, String longitude, String eventKey) {
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "com.example.dine_and_donate";
 
@@ -169,5 +162,21 @@ public class NotifyWorker extends Worker {
                 .setContentText(body);
 
         notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
+
+        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+        //add notification to database here; event id, yelp id
+        mNewNotification = new Notifications(eventKey, mEventToday.getYelpID());
+//        trialRef = mRef.child("users");
+//        mRef.child("users").child(mFbUser.getUid()).child("Notifications").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                trialRef.child(mFbUser.getUid()).child("Notifications").setValue(mNewNotification);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 }

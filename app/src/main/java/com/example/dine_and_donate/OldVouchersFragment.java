@@ -65,8 +65,8 @@ public class OldVouchersFragment extends Fragment {
                     for(DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
                         if(pastEvents.containsKey(dsEvent.getKey())) {
-                            //if event date is older than today's date, it is a past event
-                            if (Long.toString(dateMillis).compareTo(dsEvent.child("startTime").toString()) < 0) {
+                            //if event end date is older than today's date, it is a past event
+                            if(Long.toString(dateMillis).compareTo(dsEvent.child("endTime").toString()) > 0) {
                                 initBitmapsPastEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
                             }
                         }
