@@ -118,9 +118,7 @@ public class NotifyWorker extends Worker {
                                 }
 
                                 @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
+                                public void onCancelled(@NonNull DatabaseError databaseError) { }
                             });
                         }
                     } catch (JSONException e) {

@@ -65,6 +65,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -107,6 +108,7 @@ public class MapFragment extends Fragment {
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForUser;
+    private DatabaseReference mRefForEvents;
     private User mCurrentUser;
     private ArrayList<Event> mNearbyEvents;
 
@@ -147,6 +149,7 @@ public class MapFragment extends Fragment {
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference(); //need an instance of database reference
         mRefForUser = mRef.child("users").child(mFbUser.getUid());
+        mRefForEvents = mRef.child("events");
         mContext = view.getContext();
         mNearbyEvents = new ArrayList<>();
 
@@ -308,8 +311,9 @@ public class MapFragment extends Fragment {
                     public void onLocationResult(LocationResult locationResult) {
                         onLocationChanged(locationResult.getLastLocation());
                         if(!cameraSet) {
-                            LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-                            map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
+                            LatLng initialLatLng = homeActivity.markerLatLng != null ? homeActivity.markerLatLng
+                                    : new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+                            map.moveCamera(CameraUpdateFactory.newLatLng(initialLatLng));
                             map.animateCamera(CameraUpdateFactory.zoomTo(15));
                             cameraSet = true;
                         }
@@ -359,12 +363,8 @@ public class MapFragment extends Fragment {
                                     map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                         @Override
                                         public boolean onMarkerClick(Marker marker) {
-                                            try {
-                                                slideUpMenuCreate((JSONObject) marker.getTag());
-                                                slideViewIsUp = true;
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
+                                            slideUpMenuCreate((JSONObject) marker.getTag());
+                                            slideViewIsUp = true;
                                             return false;
                                         }
                                     });
@@ -382,12 +382,9 @@ public class MapFragment extends Fragment {
     }
 
     private void generateMarkersEvents() {
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference mRef = mDatabase.getReference();
-        DatabaseReference ref = mRef.child("events");
         final YelpService yelpService = new YelpService();
 
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        mRefForEvents.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -403,7 +400,6 @@ public class MapFragment extends Fragment {
                             try {
                                 final JSONObject restaurantJSON = new JSONObject(jsonData);
                                 eventsNearby.add(restaurantJSON);
-
                                 final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                                 final String restaurantName = restaurantJSON.getString("name");
                                 final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
@@ -411,27 +407,17 @@ public class MapFragment extends Fragment {
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(restaurantJSON);
+                                        Marker marker = map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName));
+                                        marker.setTag(restaurantJSON);
                                         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                             @Override
                                             public boolean onMarkerClick(Marker marker) {
-                                                try {
-                                                    slideUpMenuSave((JSONObject) marker.getTag(), snapshot);
-                                                    slideViewIsUp = true;
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                return false;
+                                                return clickMarker(marker);
                                             }
                                         });
-                                        if (homeActivity.markerLatLng != null) {
-                                            map.animateCamera(CameraUpdateFactory.newLatLng(homeActivity.markerLatLng), 250, null);
+                                        if (homeActivity.markerLatLng == restaurantPosition) {
+                                            clickMarker(marker);
                                             homeActivity.markerLatLng = null;
-                                            try {
-                                                slideUpMenuSave(restaurantJSON, snapshot);
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
                                         }
                                     }
                                 });
@@ -448,22 +434,48 @@ public class MapFragment extends Fragment {
         });
     }
 
-    private void slideUpAnimation(final JSONObject restaurant) throws JSONException {
-        TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
-        restName.setText(restaurant.getString("name"));
-        slideView.setVisibility(View.VISIBLE);
-        TranslateAnimation animate = new TranslateAnimation(
-                0,
-                0,
-                slideView.getY(),
-                0);
-        animate.setDuration(500);
-        animate.setFillAfter(true);
-        slideView.startAnimation(animate);
-        btnCreate = slideView.findViewById(R.id.btn_create_event);
+    private boolean clickMarker(Marker marker) {
+        try {
+            final JSONObject restaurantOfMarker = (JSONObject) marker.getTag();
+            System.out.println(restaurantOfMarker);
+            // Need to make new reference on UI thread to make sure that
+            mRefForEvents.child(restaurantOfMarker.getString("id"))
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            slideUpMenuSave(restaurantOfMarker, dataSnapshot);
+                            slideViewIsUp = true;
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) { }
+                    });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
-    private void slideUpMenuCreate(final JSONObject restaurant) throws JSONException {
+    private void slideUpAnimation(final JSONObject restaurant) {
+        try {
+            TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
+            restName.setText(restaurant.getString("name"));
+            slideView.setVisibility(View.VISIBLE);
+            TranslateAnimation animate = new TranslateAnimation(
+                    0,
+                    0,
+                    slideView.getY(),
+                    0);
+            animate.setDuration(500);
+            animate.setFillAfter(true);
+            slideView.startAnimation(animate);
+            btnCreate = slideView.findViewById(R.id.btn_create_event);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void slideUpMenuCreate(final JSONObject restaurant) {
         slideUpAnimation(restaurant);
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -482,7 +494,7 @@ public class MapFragment extends Fragment {
         });
     }
 
-    private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) throws JSONException {
+    private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) {
         slideUpAnimation(restaurant);
         setUpCarousel(snapshot);
         btnCreate.setText(getString(R.string.save));
@@ -541,7 +553,7 @@ public class MapFragment extends Fragment {
             public void onClick(View v) {
                 final Map<String, String> savedEvents = mCurrentUser.getSavedEventsIDs();
                 savedEvents.put(eventIDs.get(position), snapshot.getKey());
-                mRef.child("users").child(mFbUser.getUid()).child("Events").setValue(savedEvents, new DatabaseReference.CompletionListener() {
+                mRefForUser.child("Events").setValue(savedEvents, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                         if (databaseError != null) {
