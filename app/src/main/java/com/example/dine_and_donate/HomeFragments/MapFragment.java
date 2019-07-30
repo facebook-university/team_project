@@ -437,8 +437,6 @@ public class MapFragment extends Fragment {
     private boolean clickMarker(Marker marker) {
         try {
             final JSONObject restaurantOfMarker = (JSONObject) marker.getTag();
-            System.out.println(restaurantOfMarker);
-            // Need to make new reference on UI thread to make sure that
             mRefForEvents.child(restaurantOfMarker.getString("id"))
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
