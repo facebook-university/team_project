@@ -413,7 +413,6 @@ public class MapFragment extends Fragment {
                                                 return clickMarker(marker);
                                             }
                                         });
-                                        System.out.println("CALLEd");
                                         if (marker.getPosition().equals(homeActivity.getMarkerLatLng())) {
                                             clickMarker(marker);
                                             homeActivity.setMarkerLatLngToNull();
