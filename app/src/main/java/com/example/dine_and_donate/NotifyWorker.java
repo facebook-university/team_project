@@ -112,16 +112,14 @@ public class NotifyWorker extends Worker {
                                                 String imageURL = eventChild.child("imageUrl").getValue().toString();
                                                 mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL);
                                                 displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude);
-                                                break;
+                                                return;
                                             }
                                         }
                                     }
                                 }
 
                                 @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
+                                public void onCancelled(@NonNull DatabaseError databaseError) { }
                             });
                         }
                     } catch (JSONException e) {
