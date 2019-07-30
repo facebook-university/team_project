@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -50,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
     private MapFragment mMapFragment = new MapFragment();
     private ProfileFragment mProfileFragment = new ProfileFragment();
     private ListFragment mListFragment = new ListFragment();
+    private Fragment mDefaultFragment;
 
     private ImageButton mBtnSwap;
     private boolean mShowButton = false;
@@ -66,7 +68,7 @@ public class HomeActivity extends AppCompatActivity {
         mDrawerNav = findViewById(R.id.drawerNav);
         mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
-        Fragment mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
+        mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
         String latitude = getIntent().getStringExtra("latitude");
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
@@ -96,7 +98,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private void createBottomNav() {
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
-        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
+        Integer iconFilledDefault = (mDefaultFragment.equals(mMapFragment)) ? R.drawable.icons8_map_filled_50
+                : R.drawable.instagram_user_filled_24;
+        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(iconFilledDefault);
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -207,6 +211,14 @@ public class HomeActivity extends AppCompatActivity {
 
         alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, mPendingIntent);
+    }
+
+    public void setMarkerLatLngToNull() {
+        markerLatLng = null;
+    }
+
+    public LatLng getMarkerLatLng() {
+        return markerLatLng;
     }
 
     public static class MyReceiver extends BroadcastReceiver {
