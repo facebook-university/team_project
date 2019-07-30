@@ -108,7 +108,8 @@ public class NotifyWorker extends Worker {
                                                 String locationString = eventChild.child("locationString").getValue().toString();
                                                 String info = eventChild.child("info").getValue().toString();
                                                 Long endTime = (long) eventChild.child("endTime").getValue();
-                                                mEventToday = new Event(orgId, locationString, yelpID, info, dateOfEvent, endTime);
+                                                String imageURL = eventChild.child("imageUrl").getValue().toString();
+                                                mEventToday = new Event(orgId, locationString, yelpID, dateOfEvent, endTime, info, imageURL);
                                                 displayNotification(mEventToday.locationString, mEventToday.orgId, latitude, longitude);
                                                 break;
                                             }

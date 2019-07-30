@@ -4,9 +4,7 @@
     android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvNearbyList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/notifications_rv">
-
-    </androidx.recyclerview.widget.RecyclerView>
+        android:layout_height="match_parent" />
 </LinearLayout>
