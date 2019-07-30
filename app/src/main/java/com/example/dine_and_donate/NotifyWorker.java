@@ -22,6 +22,7 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
+import com.example.dine_and_donate.Activities.LoginActivity;
 import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
