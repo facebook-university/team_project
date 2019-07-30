@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
@@ -137,7 +138,6 @@ public class EventActivity extends AppCompatActivity {
             final Uri[] downloadUri = new Uri[1];
             @Override
             public void onClick(View v) {
-
                 if(mSelectedImage != null) {
                     final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
                     UploadTask uploadTask = ref.putFile(mSelectedImage);
@@ -166,8 +166,6 @@ public class EventActivity extends AppCompatActivity {
                     });
 
                 }
-
-
             }
         });
     }

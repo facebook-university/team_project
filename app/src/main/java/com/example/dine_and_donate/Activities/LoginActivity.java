@@ -131,8 +131,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToProfile() {
+        String latitude = getIntent().getStringExtra("latitude");
+        String longitude = getIntent().getStringExtra("longitude");
+        String defaultFragment = getIntent().getStringExtra("defaultFragment");
+
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUserModel));
+        if (defaultFragment != null) {
+            intent.putExtra("latitude", latitude);
+            intent.putExtra("longitude", longitude);
+            intent.putExtra("defaultFragment", defaultFragment);
+        }
         startActivity(intent);
         finish();
     }
