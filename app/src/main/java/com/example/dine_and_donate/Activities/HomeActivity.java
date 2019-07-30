@@ -36,7 +36,7 @@ public class HomeActivity extends AppCompatActivity {
     private MapFragment mMapFragment = new MapFragment();
     private ProfileFragment mProfileFragment = new ProfileFragment();
     private ListFragment mListFragment = new ListFragment();
-    public User mCurrentUser;
+    public User currentUser;
 
 
     @Override
@@ -45,7 +45,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         mDrawerNav = findViewById(R.id.drawerNav);
-        mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
+        currentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
         mBtnSwap = findViewById(R.id.btnSwap);
         mBtnSwap.setVisibility(View.INVISIBLE);
         mIsOnMapView = true;
@@ -154,7 +154,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void navigationHelper(Class navigateToClass) {
         Intent intent = new Intent(HomeActivity.this, navigateToClass);
-        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
+        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(currentUser));
         startActivity(intent);
     }
 

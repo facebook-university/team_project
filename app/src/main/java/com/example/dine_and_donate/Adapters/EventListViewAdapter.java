@@ -1,6 +1,7 @@
 package com.example.dine_and_donate.Adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,8 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
+        Event event = events.get(position);
+        Log.d("orgId", event.orgId);
     }
 
     @Override
@@ -43,9 +45,10 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        TextView tvName;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
         }
     }
 

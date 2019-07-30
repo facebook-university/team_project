@@ -136,7 +136,7 @@ public class MapFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         HomeActivity homeActivity = (HomeActivity) getActivity();
-        mCurrentUser = homeActivity.mCurrentUser;
+        mCurrentUser = homeActivity.currentUser;
 
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -530,8 +530,9 @@ public class MapFragment extends Fragment {
 
     private void setList(DataSnapshot snapshot) {
         if(!mCurrentUser.isOrg) {
-            Event newEvent = snapshot.getValue(Event.class);
-            mNearbyEvents.add(newEvent);
+//            Event newEvent = snapshot.getValue(Event.class);
+//            mNearbyEvents.add(newEvent);
+            mNearbyEvents.addAll(Event.eventsHappeningAtRestaurant(snapshot));
         }
     }
 
