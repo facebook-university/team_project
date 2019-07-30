@@ -44,7 +44,7 @@ public class NotifyWorker extends Worker {
     private Notifications mNewNotification;
     private DatabaseReference mRef;
     private FirebaseUser mFbUser;
-    private DatabaseReference trialRef;
+    private DatabaseReference mNotificationRef;
 
     public NotifyWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -87,7 +87,6 @@ public class NotifyWorker extends Worker {
                             FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
                             mRef = mDatabase.getReference();
                             DatabaseReference ref = mRef.child("events");
-
                             ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(final DataSnapshot snapshot) {
@@ -103,7 +102,7 @@ public class NotifyWorker extends Worker {
                                                 Long startTime = (long) eventChild.child("startTime").getValue();
                                                 String imageURL = eventChild.child("imageUrl").getValue().toString();
                                                 mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL);
-                                                displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude, snapshot.getKey());
+                                                displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude, eventChild.getKey(), timeNow.toString());
                                                 break;
                                             }
                                         }
@@ -126,7 +125,7 @@ public class NotifyWorker extends Worker {
         });
     }
 
-    private void displayNotification(String title, String body, String latitude, String longitude, String eventKey) {
+    private void displayNotification(String title, String body, String latitude, String longitude, String eventKey, String createdAt) {
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "com.example.dine_and_donate";
 
@@ -162,21 +161,20 @@ public class NotifyWorker extends Worker {
                 .setContentText(body);
 
         notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
-
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
-        //add notification to database here; event id, yelp id
-        mNewNotification = new Notifications(eventKey, mEventToday.getYelpID());
-//        trialRef = mRef.child("users");
-//        mRef.child("users").child(mFbUser.getUid()).child("Notifications").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                trialRef.child(mFbUser.getUid()).child("Notifications").setValue(mNewNotification);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
+        //add notification to database here; event id, yelp id and createdAt
+        mNewNotification = new Notifications(eventKey, mEventToday.getYelpID(), createdAt);
+        mNotificationRef = mRef.child("users").child(mFbUser.getUid()).getRef().child("Notifications").push();
+        mRef.child("users").child(mFbUser.getUid()).child("Notifications").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mNotificationRef.setValue(mNewNotification);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

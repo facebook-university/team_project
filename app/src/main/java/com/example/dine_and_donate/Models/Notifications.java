@@ -6,13 +6,14 @@ public class Notifications {
     private String createdAt;
     private String yelpId;
 
+
     public Notifications() {
 
     }
 
-    public Notifications(String eventId, String yelpId) {
+    public Notifications(String eventId, String yelpId, String createdAt) {
         this.eventId = eventId;
-//        this.createdAt = createdAt;
+        this.createdAt = createdAt;
         this.yelpId = yelpId;
     }
 
