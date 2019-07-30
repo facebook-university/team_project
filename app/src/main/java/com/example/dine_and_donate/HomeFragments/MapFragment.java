@@ -28,6 +28,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.EventActivity;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
+
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
@@ -85,13 +86,11 @@ public class MapFragment extends Fragment {
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private LocationRequest mLocationRequest;
-    private Location mCurrentLocation;
     private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(6000);  /* 60 secs */
     private long FASTEST_INTERVAL = 50000; /* 5 secs */
     private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
     private final static String KEY_LOCATION = "location";
 
-    public JSONArray restaurantsNearbyJSON = new JSONArray();
     private boolean loaded;
     private int position = 0;
     private boolean cameraSet;
@@ -112,6 +111,12 @@ public class MapFragment extends Fragment {
     private ArrayList<Event> mNearbyEvents;
 
     private ArrayList<Event> nearbyEvents = new ArrayList<>();
+
+    private HomeActivity homeActivity;
+
+    public Location mCurrentLocation;
+    public JSONArray restaurantsNearbyJSON = new JSONArray();
+    public ArrayList<JSONObject> eventsNearby = new ArrayList<JSONObject>();
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -135,7 +140,7 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        HomeActivity homeActivity = (HomeActivity) getActivity();
+        homeActivity = (HomeActivity) getActivity();
         mCurrentUser = homeActivity.mCurrentUser;
 
         mDatabase = FirebaseDatabase.getInstance();
@@ -205,7 +210,7 @@ public class MapFragment extends Fragment {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    protected void loadMap(GoogleMap googleMap) {
+    public void loadMap(GoogleMap googleMap) {
         map = googleMap;
         map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
@@ -224,7 +229,11 @@ public class MapFragment extends Fragment {
                     cameraLatitude = newLatitude;
                 }
 
-                generateMarkers(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                if (mCurrentUser.isOrg) {
+                    generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                } else {
+                    generateMarkersEvents();
+                }
             }
         });
 
@@ -253,7 +262,7 @@ public class MapFragment extends Fragment {
 
     @SuppressWarnings({"MissingPermission"})
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    void getMyLocation() {
+    public void getMyLocation() {
         map.setMyLocationEnabled(true);
 
         FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(mContext);
@@ -274,7 +283,6 @@ public class MapFragment extends Fragment {
                     }
                 });
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
@@ -323,7 +331,7 @@ public class MapFragment extends Fragment {
         savedInstanceState.putParcelable(KEY_LOCATION, mCurrentLocation);
     }
 
-    private void generateMarkers(String longitude, String latitude) {
+    private void generateMarkersRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
         yelpService.findRestaurants(longitude, latitude, new Callback() {
             @Override
@@ -340,52 +348,26 @@ public class MapFragment extends Fragment {
                         //add marker to each restaurant nearby
                         for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
                             final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
-                            final String yelpID = restaurantJSON.getString("id");
-                            System.out.println("ID: " + yelpID + " " + restaurantJSON.getString("name") + "\n");
-                            FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-                            DatabaseReference mRef = mDatabase.getReference();
-                            DatabaseReference ref = mRef.child("events");
-                            JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
+                            final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                             final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
                             final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
-                            final int finalI = i;
 
-                            ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
+                            getActivity().runOnUiThread(new Runnable() {
                                 @Override
-                                public void onDataChange(final DataSnapshot snapshot) {
-                                    //checks if there is an event with the same id
-                                    if (snapshot.exists() || mCurrentUser.isOrg) {
-                                        Event newEvent = snapshot.getValue(Event.class);
-                                        nearbyEvents.add(newEvent);
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
-                                                setList(snapshot);
-                                                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                                                    @Override
-                                                    public boolean onMarkerClick(Marker marker) {
-                                                        try {
-                                                            if (mCurrentUser.isOrg) {
-                                                                slideUpMenuCreate(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
-                                                            } else {
-                                                                slideUpMenuSave(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()), snapshot);
-                                                            }
-                                                            slideViewIsUp = true;
-                                                        } catch (JSONException e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                        return false;
-                                                    }
-                                                });
+                                public void run() {
+                                    map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(restaurantJSON);
+                                    map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                        @Override
+                                        public boolean onMarkerClick(Marker marker) {
+                                            try {
+                                                slideUpMenuCreate((JSONObject) marker.getTag());
+                                                slideViewIsUp = true;
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
                                             }
-                                        });
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                            return false;
+                                        }
+                                    });
                                 }
                             });
                         }
@@ -395,6 +377,73 @@ public class MapFragment extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+    }
+
+    private void generateMarkersEvents() {
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference mRef = mDatabase.getReference();
+        DatabaseReference ref = mRef.child("events");
+        final YelpService yelpService = new YelpService();
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    yelpService.findRestaurants(snapshot.getKey(), new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String jsonData = response.body().string();
+                            try {
+                                final JSONObject restaurantJSON = new JSONObject(jsonData);
+                                eventsNearby.add(restaurantJSON);
+
+                                final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
+                                final String restaurantName = restaurantJSON.getString("name");
+                                final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(restaurantJSON);
+                                        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                            @Override
+                                            public boolean onMarkerClick(Marker marker) {
+                                                try {
+                                                    slideUpMenuSave((JSONObject) marker.getTag(), snapshot);
+                                                    slideViewIsUp = true;
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                return false;
+                                            }
+                                        });
+                                        if (homeActivity.markerLatLng != null) {
+                                            map.animateCamera(CameraUpdateFactory.newLatLng(homeActivity.markerLatLng), 250, null);
+                                            homeActivity.markerLatLng = null;
+                                            try {
+                                                slideUpMenuSave(restaurantJSON, snapshot);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                });
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
             }
         });
     }
@@ -454,6 +503,21 @@ public class MapFragment extends Fragment {
 
     public Location getmCurrentLocation() {
         return mCurrentLocation;
+    }
+
+    public ArrayList<Event> getNearbyEvents() {
+        return mNearbyEvents;
+    }
+
+    public JSONArray getRestaurantsNearbyJSON() {
+        return restaurantsNearbyJSON;
+    }
+
+    private void setList(DataSnapshot snapshot) {
+        if(!mCurrentUser.isOrg) {
+            Event newEvent = snapshot.getValue(Event.class);
+            mNearbyEvents.add(newEvent);
+        }
     }
 
     private void setUpCarousel(final DataSnapshot snapshot) {
@@ -518,20 +582,4 @@ public class MapFragment extends Fragment {
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
     }
-
-    public ArrayList<Event> getNearbyEvents() {
-        return mNearbyEvents;
-    }
-
-    public JSONArray getRestaurantsNearbyJSON() {
-        return restaurantsNearbyJSON;
-    }
-
-    private void setList(DataSnapshot snapshot) {
-        if(!mCurrentUser.isOrg) {
-            Event newEvent = snapshot.getValue(Event.class);
-            mNearbyEvents.add(newEvent);
-        }
-    }
-
 }

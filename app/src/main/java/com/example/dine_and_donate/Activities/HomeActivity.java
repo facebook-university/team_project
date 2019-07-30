@@ -1,6 +1,12 @@
 package com.example.dine_and_donate.Activities;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,30 +18,45 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import androidx.fragment.app.FragmentManager;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
 import com.example.dine_and_donate.EditProfileActivity;
 import com.example.dine_and_donate.HomeFragments.ListFragment;
 import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.HomeFragments.NotificationsFragment;
 import com.example.dine_and_donate.HomeFragments.ProfileFragment;
 import com.example.dine_and_donate.Models.User;
+import com.example.dine_and_donate.NotifyWorker;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.ShareEventActivity;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import org.parceler.Parcels;
+
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class HomeActivity extends AppCompatActivity {
 
     private BottomNavigationView mBottomNavigationView;
     private DrawerLayout mDrawerNav;
-    private ImageButton mBtnSwap;
-    private boolean mShowButton = false;
-    private boolean mIsOnMapView;
+
     private NotificationsFragment mNotificationsFragment = new NotificationsFragment();
     private MapFragment mMapFragment = new MapFragment();
     private ProfileFragment mProfileFragment = new ProfileFragment();
     private ListFragment mListFragment = new ListFragment();
+
+    private ImageButton mBtnSwap;
+    private boolean mShowButton = false;
+    private boolean mIsOnMapView;
     public User mCurrentUser;
+    private PendingIntent mPendingIntent;
+    public LatLng markerLatLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +65,12 @@ public class HomeActivity extends AppCompatActivity {
 
         mDrawerNav = findViewById(R.id.drawerNav);
         mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
+
+        Fragment mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
+        String latitude = getIntent().getStringExtra("latitude");
+        String longitude = getIntent().getStringExtra("longitude");
+        markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
+
         mBtnSwap = findViewById(R.id.btnSwap);
         mBtnSwap.setVisibility(View.INVISIBLE);
         mIsOnMapView = true;
@@ -56,12 +83,15 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.flContainer, mProfileFragment)
+                .replace(R.id.flContainer, mDefaultFragment)
                 .addToBackStack(null) // TODO: look into if this can cause mem problem
                 .commit();
 
         createDrawerNav();
         createBottomNav();
+        if (!mCurrentUser.isOrg) {
+            setUpNotificationWorker();
+        }
     }
 
     private void createBottomNav() {
@@ -146,8 +176,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setExploreTab() {
-        if(mShowButton) {
-            if(mIsOnMapView) {
+        if (mShowButton) {
+            if (mIsOnMapView) {
                 mListFragment.setNearbyEvents(mMapFragment.getNearbyEvents());
                 mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
                 getSupportFragmentManager().beginTransaction()
@@ -162,6 +192,30 @@ public class HomeActivity extends AppCompatActivity {
                         .commit();
                 mIsOnMapView = true;
             }
+        }
+    }
+
+    private void setUpNotificationWorker() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        Intent myIntent = new Intent(HomeActivity.this, MyReceiver.class);
+        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, myIntent, 0);
+        AlarmManager alarmManageram = (AlarmManager)getSystemService(ALARM_SERVICE);
+
+        alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, mPendingIntent);
+    }
+
+    public static class MyReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            WorkManager workManager;
+            workManager = WorkManager.getInstance(context);
+            // Enqueue our work to manager
+            workManager.enqueue(OneTimeWorkRequest.from(NotifyWorker.class));
         }
     }
 }

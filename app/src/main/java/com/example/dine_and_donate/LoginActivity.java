@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -133,8 +134,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToProfile() {
+        String latitude = getIntent().getStringExtra("latitude");
+        String longitude = getIntent().getStringExtra("longitude");
+        String defaultFragment = getIntent().getStringExtra("defaultFragment");
+
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUserModel));
+        if (defaultFragment != null) {
+            intent.putExtra("latitude", latitude);
+            intent.putExtra("longitude", longitude);
+            intent.putExtra("defaultFragment", defaultFragment);
+        }
         startActivity(intent);
         finish();
     }
