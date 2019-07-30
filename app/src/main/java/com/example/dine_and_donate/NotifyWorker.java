@@ -100,17 +100,17 @@ public class NotifyWorker extends Worker {
                                 public void onDataChange(final DataSnapshot snapshot) {
                                     if (snapshot.exists()) {
                                         for (DataSnapshot eventChild : snapshot.getChildren()) {
-                                            Long dateOfEvent = (long) eventChild.child("startTime").getValue();
+                                            Long dateOfEvent = (long) eventChild.child("endTime").getValue();
                                             Long timeNow = System.currentTimeMillis();
                                             Long millisecondsToCheck = timeNow + (long) 60000 * 60 * 12;
                                             if (dateOfEvent >= timeNow && dateOfEvent <= millisecondsToCheck) {
                                                 String orgId = eventChild.child("orgId").getValue().toString();
                                                 String locationString = eventChild.child("locationString").getValue().toString();
                                                 String info = eventChild.child("info").getValue().toString();
-                                                Long endTime = (long) eventChild.child("endTime").getValue();
+                                                Long startTime = (long) eventChild.child("startTime").getValue();
                                                 String imageURL = eventChild.child("imageUrl").getValue().toString();
-                                                mEventToday = new Event(orgId, locationString, yelpID, dateOfEvent, endTime, info, imageURL);
-                                                displayNotification(mEventToday.locationString, mEventToday.orgId, latitude, longitude);
+                                                mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL);
+                                                displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude);
                                                 break;
                                             }
                                         }
