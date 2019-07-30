@@ -197,8 +197,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 11);
-        calendar.set(Calendar.MINUTE, 26);
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
