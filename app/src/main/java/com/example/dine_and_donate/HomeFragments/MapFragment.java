@@ -84,13 +84,11 @@ public class MapFragment extends Fragment {
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private LocationRequest mLocationRequest;
-    public Location mCurrentLocation;
     private long UPDATE_INTERVAL = TimeUnit.SECONDS.toSeconds(6000);  /* 60 secs */
     private long FASTEST_INTERVAL = 50000; /* 5 secs */
     private String API_KEY = "AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg";
     private final static String KEY_LOCATION = "location";
 
-    public JSONArray restaurantsNearbyJSON = new JSONArray();
     private boolean loaded;
     private int position = 0;
     private boolean cameraSet;
@@ -110,6 +108,10 @@ public class MapFragment extends Fragment {
     private User mCurrentUser;
 
     private HomeActivity homeActivity;
+
+    public Location mCurrentLocation;
+    public JSONArray restaurantsNearbyJSON = new JSONArray();
+    public ArrayList<JSONObject> eventsNearby = new ArrayList<JSONObject>();
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -277,7 +279,6 @@ public class MapFragment extends Fragment {
                 });
     }
 
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     protected void startLocationUpdates() {
@@ -345,17 +346,16 @@ public class MapFragment extends Fragment {
                             final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                             final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
                             final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
-                            final int finalI = i;
 
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(finalI);
+                                    map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(restaurantJSON);
                                     map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                         @Override
                                         public boolean onMarkerClick(Marker marker) {
                                             try {
-                                                slideUpMenuCreate(restaurantsNearbyJSON.getJSONObject((Integer) marker.getTag()));
+                                                slideUpMenuCreate((JSONObject) marker.getTag());
                                                 slideViewIsUp = true;
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -397,20 +397,21 @@ public class MapFragment extends Fragment {
                             String jsonData = response.body().string();
                             try {
                                 final JSONObject restaurantJSON = new JSONObject(jsonData);
-                                final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
+                                eventsNearby.add(restaurantJSON);
 
+                                final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                                 final String restaurantName = restaurantJSON.getString("name");
                                 final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
 
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName));
+                                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(restaurantJSON);
                                         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                             @Override
                                             public boolean onMarkerClick(Marker marker) {
                                                 try {
-                                                    slideUpMenuSave(restaurantJSON, snapshot);
+                                                    slideUpMenuSave((JSONObject) marker.getTag(), snapshot);
                                                     slideViewIsUp = true;
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
