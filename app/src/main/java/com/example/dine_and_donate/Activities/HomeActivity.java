@@ -147,7 +147,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void createDrawerNav() {
-        Button mLogOutBtn = findViewById(R.id.logout);
+        Button logOutBtn = findViewById(R.id.logout);
         logOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
