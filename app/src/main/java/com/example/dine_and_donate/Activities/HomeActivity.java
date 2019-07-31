@@ -191,6 +191,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setExploreTab() {
         if (mShowButton) {
             if (mIsOnMapView) {
+                mListFragment = new ListFragment();
                 mListFragment.setAllEvents(mMapFragment.getAllEvents());
                 mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
                 mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());

@@ -1,6 +1,7 @@
 package com.example.dine_and_donate.Adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
@@ -21,6 +26,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 
 public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdapter.ViewHolder> {
 
@@ -59,8 +65,9 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
             e.printStackTrace();
         }
         Glide.with(context)
-                // Todo : change this to real image
+                // Todo: change this to real image, need to add imageUrl field in edit profile
                 .load("https://firebasestorage.googleapis.com/v0/b/dine-and-donate.appspot.com/o/images%2F158765210?alt=media&token=be40174f-ed03-4299-8431-410b036a9037")
+                .transform(new MultiTransformation<>(new CenterCrop(), new CircleCrop()))
                 .into(holder.ivOrgPic);
     }
 

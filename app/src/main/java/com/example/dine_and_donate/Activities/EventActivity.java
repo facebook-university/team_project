@@ -52,12 +52,6 @@ public class EventActivity extends AppCompatActivity {
     private CalendarView mCalendarView;
 
     private AutoCompleteTextView mAcSearch;
-    private Spinner mStartHour;
-    private Spinner mStartMin;
-    private Spinner mStartHalf;
-    private Spinner mEndHour;
-    private Spinner mEndMin;
-    private Spinner mEndHalf;
     private EditText mEtEventInfo;
     private Button mBtnCreate;
     private Button mChooseImage;
@@ -81,12 +75,6 @@ public class EventActivity extends AppCompatActivity {
         mCalendarView = findViewById(R.id.cvChooseDate);
 
         mAcSearch = findViewById(R.id.acSearch);
-        mStartHour = findViewById(R.id.startHour);
-        mStartMin = findViewById(R.id.startMin);
-        mStartHalf = findViewById(R.id.startHalf);
-        mEndHour = findViewById(R.id.endHour);
-        mEndMin = findViewById(R.id.endMin);
-        mEndHalf = findViewById(R.id.endHalf);
         mEtEventInfo = findViewById(R.id.etEventInfo);
         mBtnCreate = findViewById(R.id.create_event);
         mChooseImage = findViewById(R.id.btnChoosePhoto);
@@ -115,17 +103,17 @@ public class EventActivity extends AppCompatActivity {
         }
 
         //Todo: make time selection better
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, hoursArray);
-        mStartHour.setAdapter(adapter);
-        mEndHour.setAdapter(adapter);
-
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, minsArray);
-        mStartMin.setAdapter(adapter);
-        mEndMin.setAdapter(adapter);
-
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, halfsArray);
-        mStartHalf.setAdapter(adapter);
-        mEndHalf.setAdapter(adapter);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, hoursArray);
+//        mStartHour.setAdapter(adapter);
+//        mEndHour.setAdapter(adapter);
+//
+//        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, minsArray);
+//        mStartMin.setAdapter(adapter);
+//        mEndMin.setAdapter(adapter);
+//
+//        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, halfsArray);
+//        mStartHalf.setAdapter(adapter);
+//        mEndHalf.setAdapter(adapter);
 
         mChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -174,11 +162,10 @@ public class EventActivity extends AppCompatActivity {
         String orgId = mFirebaseCurrentUser.getUid();
         String yelpId = intent.getStringExtra("yelpID");
         long eventDate = mCalendarView.getDate();
-        long startTime = convert(eventDate, mStartHour.getSelectedItemPosition()+1, mStartMin.getSelectedItemPosition(), mStartHalf.getSelectedItem().equals("PM"));
-        long endTime = convert(eventDate, mEndHour.getSelectedItemPosition()+1, mEndMin.getSelectedItemPosition(), mEndHalf.getSelectedItem().equals("PM"));
+        //todo: get times here
         String info = mEtEventInfo.getText().toString();
-        Event newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
-        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
+        //Event newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
+        //mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
         finish();
     }
 
