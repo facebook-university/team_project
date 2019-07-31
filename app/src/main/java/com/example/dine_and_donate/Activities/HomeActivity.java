@@ -204,6 +204,9 @@ public class HomeActivity extends AppCompatActivity {
         calendar.set(Calendar.HOUR_OF_DAY, 12);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            calendar.add(Calendar.DATE, 1);
+        }
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, 0);
