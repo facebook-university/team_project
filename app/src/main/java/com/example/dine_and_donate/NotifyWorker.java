@@ -53,6 +53,7 @@ import okhttp3.Response;
 
 public class NotifyWorker extends Worker {
     private Event mEventToday = null;
+    private Integer mCounter = 0;
 
     public NotifyWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -73,7 +74,7 @@ public class NotifyWorker extends Worker {
 
     private void getEvent(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
-        yelpService.findRestaurants(longitude, latitude, new Callback() {
+        yelpService.findRestaurants(longitude, latitude, "distance", "50", new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -81,51 +82,50 @@ public class NotifyWorker extends Worker {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                String jsonData = response.body().string();
                 try {
-                    String jsonData = response.body().string();
-                    try {
-                        JSONArray restaurantsNearbyJSON = new JSONObject(jsonData).getJSONArray("businesses");
-                        //add marker to each restaurant nearby
-                        for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
-                            final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
-                            final String yelpID = restaurantJSON.getString("id");
-                            final String latitude = restaurantJSON.getJSONObject("coordinates").getString("latitude");
-                            final String longitude = restaurantJSON.getJSONObject("coordinates").getString("longitude");
+                    final JSONArray restaurantsNearbyJSON = new JSONObject(jsonData).getJSONArray("businesses");
+                    //add marker to each restaurant nearby
+                    while (mCounter < restaurantsNearbyJSON.length()) {
+                        final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(mCounter);
+                        final String yelpID = restaurantJSON.getString("id");
+                        final String latitude = restaurantJSON.getJSONObject("coordinates").getString("latitude");
+                        final String longitude = restaurantJSON.getJSONObject("coordinates").getString("longitude");
 
-                            FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-                            DatabaseReference mRef = mDatabase.getReference();
-                            DatabaseReference ref = mRef.child("events");
+                        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+                        DatabaseReference mRef = mDatabase.getReference();
+                        DatabaseReference ref = mRef.child("events");
 
-                            ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(final DataSnapshot snapshot) {
-                                    if (snapshot.exists()) {
-                                        for (DataSnapshot eventChild : snapshot.getChildren()) {
-                                            Long dateOfEvent = (long) eventChild.child("endTime").getValue();
-                                            Long timeNow = System.currentTimeMillis();
-                                            Long millisecondsToCheck = timeNow + (long) 60000 * 60 * 12;
-                                            if (dateOfEvent >= timeNow && dateOfEvent <= millisecondsToCheck) {
-                                                String orgId = eventChild.child("orgId").getValue().toString();
-                                                String locationString = eventChild.child("locationString").getValue().toString();
-                                                String info = eventChild.child("info").getValue().toString();
-                                                Long startTime = (long) eventChild.child("startTime").getValue();
-                                                String imageURL = eventChild.child("imageUrl").getValue().toString();
-                                                mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL);
-                                                displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude);
-                                                return;
-                                            }
+                        ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(final DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    for (DataSnapshot eventChild : snapshot.getChildren()) {
+                                        Long dateOfEvent = (long) eventChild.child("endTime").getValue();
+                                        Long timeNow = System.currentTimeMillis();
+                                        Long millisecondsToCheck = timeNow + (long) 60000 * 60 * 12;
+                                        if (dateOfEvent >= timeNow && dateOfEvent <= millisecondsToCheck) {
+                                            String orgId = eventChild.child("orgId").getValue().toString();
+                                            String locationString = eventChild.child("locationString").getValue().toString();
+                                            String info = eventChild.child("info").getValue().toString();
+                                            Long startTime = (long) eventChild.child("startTime").getValue();
+                                            String imageURL = eventChild.child("imageUrl").getValue().toString();
+                                            mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL);
+                                            displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude);
+                                            mCounter = restaurantsNearbyJSON.length();
+                                            return;
                                         }
                                     }
                                 }
+                            }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) { }
-                            });
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) { }
+                        });
+
+                        mCounter++;
                     }
-                } catch (IOException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }

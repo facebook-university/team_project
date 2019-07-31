@@ -5,6 +5,10 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
+
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,6 +47,7 @@ public class HomeActivity extends AppCompatActivity {
     private MapFragment mMapFragment = new MapFragment();
     private ProfileFragment mProfileFragment = new ProfileFragment();
     private ListFragment mListFragment = new ListFragment();
+    private Fragment mDefaultFragment;
 
     public User currentUser;
 
@@ -61,7 +66,7 @@ public class HomeActivity extends AppCompatActivity {
 
         currentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
-        Fragment mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
+        mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
         String latitude = getIntent().getStringExtra("latitude");
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
@@ -91,7 +96,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private void createBottomNav() {
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
-        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
+        Integer iconFilledDefault = (mDefaultFragment.equals(mMapFragment)) ? R.drawable.icons8_map_filled_50
+                : R.drawable.instagram_user_filled_24;
+        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(iconFilledDefault);
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -208,6 +215,9 @@ public class HomeActivity extends AppCompatActivity {
         calendar.set(Calendar.HOUR_OF_DAY, 12);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            calendar.add(Calendar.DATE, 1);
+        }
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, 0);
@@ -215,6 +225,14 @@ public class HomeActivity extends AppCompatActivity {
 
         alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, mPendingIntent);
+    }
+
+    public void setMarkerLatLngToNull() {
+        markerLatLng = null;
+    }
+
+    public LatLng getMarkerLatLng() {
+        return markerLatLng;
     }
 
     public static class MyReceiver extends BroadcastReceiver {

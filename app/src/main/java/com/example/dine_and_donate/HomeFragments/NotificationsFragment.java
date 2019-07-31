@@ -94,7 +94,7 @@ public class NotificationsFragment extends Fragment {
     }
 
     private JSONArray generateMarkers(String longitude, String latitude) {
-        YelpService.findRestaurants(longitude, latitude, new Callback() {
+        YelpService.findRestaurants(longitude, latitude, "best_match", "30", new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
