@@ -22,7 +22,6 @@ import com.google.android.material.tabs.TabLayout;
 
 public class ProfileFragment extends Fragment {
 
-    //elements in layout
     private TabLayout mTabLayout;
     private ViewPagerAdapter mVoucherPagerAdapter;
     private ViewPager mVoucherView;
@@ -32,10 +31,8 @@ public class ProfileFragment extends Fragment {
     private ImageView mProfPic;
     private ImageView mBlurredPic;
     private Button mLogOutBtn;
-
     private ConstraintLayout mLayoutForOrg;
     private ConstraintLayout mLayoutForConsumer;
-
     private User mCurrentUserModel;
 
     @Nullable
@@ -61,7 +58,6 @@ public class ProfileFragment extends Fragment {
         mTabLayout.setupWithViewPager(mVoucherView);
         mOrgName = view.findViewById(R.id.org_name);
         mConsumerName = view.findViewById(R.id.cons_name);
-
         setUpTopProfile(mCurrentUserModel.name);
     }
 

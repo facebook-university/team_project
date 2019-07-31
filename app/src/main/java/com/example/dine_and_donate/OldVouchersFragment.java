@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class OldVouchersFragment extends Fragment {
 
-    private View v;
+    private View mView;
     private RecyclerView mRecyclerView;
     private ArrayList<String> mImageUrls = new ArrayList<>();
     private ArrayList<String> mNames = new ArrayList<>();
@@ -37,13 +37,13 @@ public class OldVouchersFragment extends Fragment {
 
     //inflates layout of fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.tab_fragment, container, false);
-        mRecyclerView = v.findViewById(R.id.rv_vouchers);
+        mView = inflater.inflate(R.layout.tab_fragment, container, false);
+        mRecyclerView = mView.findViewById(R.id.rv_vouchers);
         StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mRecyclerView.setAdapter(staggeredRecyclerViewAdapter);
-        return v;
+        return mView;
     }
 
     @Override
@@ -78,7 +78,6 @@ public class OldVouchersFragment extends Fragment {
 
             }
         });
-
         mRecyclerView = view.findViewById(R.id.rv_vouchers);
         StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);

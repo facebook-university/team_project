@@ -8,10 +8,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.dine_and_donate.Models.Notifications;
 import com.example.dine_and_donate.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -19,6 +25,9 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     private List<Notifications> mNotifications;
     private Context mContext;
+    private DatabaseReference mRef;
+    private DatabaseReference mNotificationsRef;
+    private FirebaseDatabase mDatabase;
 
     //pass in posts array in the constructor
     public NotificationsAdapter(List<Notifications> notifications) {
@@ -30,6 +39,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mContext = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(mContext);
+        mDatabase = FirebaseDatabase.getInstance();
+        mRef = mDatabase.getReference();
 
         View feedView = inflater.inflate(R.layout.item_notification, parent, false);
         ViewHolder holder = new ViewHolder((feedView));
@@ -37,25 +48,24 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     }
 
     //bind the values based on the position of the element, called as a user scrolls down
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         //get data according to position
-        Notifications notification= mNotifications.get(position);
+        Notifications notification = mNotifications.get(position);
+        String eventId = notification.getEventId();
+        String yelpId = notification.getYelpId();
+        mNotificationsRef = mRef.child("events").child(yelpId).child(eventId);
+        mNotificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                holder.mEventName.setText(dataSnapshot.child("info").getValue().toString());
+                holder.mStartDate.setText(dataSnapshot.child("startTime").getValue().toString());
+                holder.mPartner.setText(dataSnapshot.child("locationString").getValue().toString());
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-        //populate view according to this data
-//        holder.tvUsername.setText(post.getUser().getUsername());
-//        holder.tvBody.setText(post.getDescription());
-//        holder.date.setText(post.getRelativeTimeAgo());
-
-//        ParseFile image = post.getImage();
-//        if(image != null) {
-//            String imageUrl = image.getUrl();
-//            //Log.d("[debug]", "imageUrl = " + imageUrl);
-//            Glide.with(context).load(imageUrl).into(holder.ivImage);
-//            //show image view
-//            holder.ivImage.isShown(); } else {
-//            //hide image view
-//            //holder.ivImage.set
-//        }
+            }
+        });
     }
 
     @Override
@@ -65,8 +75,19 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         return mNotifications.size();
     }
 
+    // Clean all elements of the recycler
+    public void clear() {
+        mNotifications.clear();
+        notifyDataSetChanged();
+    }
+
+    // Add a list of items -- change to type used
+    public void addAll(List<Notifications> list) {
+        mNotifications.addAll(list);
+        notifyDataSetChanged();
+    }
+
     //create ViewHolder pattern that will contain all the fine view by ID lookups
-    //inner class
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView mOrgPic;
         public TextView mEventName;
@@ -78,7 +99,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         public ViewHolder(View itemView) {
             //call the superclass
             super(itemView);
-
             //perform findViewById lookups
             mOrgPic = (ImageView) itemView.findViewById(R.id.org_iv);
             mEventName = (TextView) itemView.findViewById(R.id.event_name_tv);
@@ -92,17 +112,5 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         public void onClick(View v) {
 
         }
-    }
-
-    // Clean all elements of the recycler
-    public void clear() {
-        mNotifications.clear();
-        notifyDataSetChanged();
-    }
-
-    // Add a list of items -- change to type used
-    public void addAll(List<Notifications> list) {
-        mNotifications.addAll(list);
-        notifyDataSetChanged();
     }
 }
