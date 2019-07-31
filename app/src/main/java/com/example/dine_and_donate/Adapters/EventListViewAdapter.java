@@ -1,7 +1,6 @@
 package com.example.dine_and_donate.Adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,17 +10,32 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.dine_and_donate.Models.Event;
+import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
+import com.google.firebase.database.DataSnapshot;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdapter.ViewHolder> {
 
     static Context context;
-    public static ArrayList<Event> events;
+    private ArrayList<Event> mEvents = new ArrayList<>();
+    private HashMap<String, JSONObject> mIdToRestaurant;
+    private HashMap<String, User> mIdToOrg;
 
-    public EventListViewAdapter(ArrayList<Event> events) { this.events = events; }
+    public EventListViewAdapter(DataSnapshot allEvents, HashMap<String, JSONObject> mIdToRestaurant, HashMap<String, User> mIdToOrg) {
+        for(DataSnapshot ds : allEvents.getChildren()) {
+            mEvents.addAll(Event.eventsHappeningAtRestaurant(ds));
+        }
+        this.mIdToRestaurant = mIdToRestaurant;
+        this.mIdToOrg = mIdToOrg;
+    }
 
     @NonNull
     @Override
@@ -36,19 +50,37 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Event event = events.get(position);
-        Log.d("orgId", event.orgId);
+        Event event = mEvents.get(position);
+        holder.tvOrgName.setText(mIdToOrg.get(event.orgId).name);
+        holder.tvOrgInfo.setText(event.info);
+        try {
+            holder.tvRestaurantName.setText(mIdToRestaurant.get(event.yelpID).getString("name"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Glide.with(context)
+                .load("https://firebasestorage.googleapis.com/v0/b/dine-and-donate.appspot.com/o/images%2F158765210?alt=media&token=be40174f-ed03-4299-8431-410b036a9037")
+                //.bitmapTransform(new RoundedCornersTransformation(context, 30, 0))
+                //.placeholder(placeHolderId)
+                .into(holder.ivOrgPic);
     }
 
     @Override
-    public int getItemCount() { return events.size(); }
+    public int getItemCount() { return mEvents.size(); }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvName;
+        TextView tvRestaurantName;
+        TextView tvOrgName;
+        TextView tvOrgInfo;
+        ImageView ivOrgPic;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            tvRestaurantName = itemView.findViewById(R.id.tvRestaurantName);
+            ivOrgPic = itemView.findViewById(R.id.ivOrgImage);
+            tvOrgName = itemView.findViewById(R.id.tvOrgName);
+            tvOrgInfo = itemView.findViewById(R.id.tvEventInfo);
         }
     }
 

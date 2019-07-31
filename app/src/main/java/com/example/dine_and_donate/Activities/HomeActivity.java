@@ -46,14 +46,11 @@ public class HomeActivity extends AppCompatActivity {
 
     public User currentUser;
 
-
-
     private ImageButton mBtnSwap;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +61,10 @@ public class HomeActivity extends AppCompatActivity {
 
         currentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
-
         Fragment mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
         String latitude = getIntent().getStringExtra("latitude");
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
-
 
         mBtnSwap = findViewById(R.id.btnSwap);
         mBtnSwap.setVisibility(View.INVISIBLE);
@@ -189,8 +184,10 @@ public class HomeActivity extends AppCompatActivity {
     private void setExploreTab() {
         if (mShowButton) {
             if (mIsOnMapView) {
-                mListFragment.setNearbyEvents(mMapFragment.getNearbyEvents());
+                mListFragment.setAllEvents(mMapFragment.getAllEvents());
                 mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
+                mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
+                mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, mListFragment)
                         .addToBackStack(null)

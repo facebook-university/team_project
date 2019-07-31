@@ -43,14 +43,10 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
             holder.tvInfo.setText(restaurant.getJSONArray("categories").getJSONObject(0).getString("title"));
             Glide.with(context)
                     .load(restaurant.getString("image_url"))
-                    //.bitmapTransform(new RoundedCornersTransformation(context, 30, 0))
-                    //.placeholder(placeHolderId)
                     .into(holder.ivPicture);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Override

@@ -65,10 +65,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -109,16 +109,21 @@ public class MapFragment extends Fragment {
     private DatabaseReference mRef;
     private DatabaseReference mRefForUser;
     private DatabaseReference mRefForEvents;
+    private DatabaseReference mRefForOrgs;
     private User mCurrentUser;
-    private ArrayList<Event> mNearbyEvents;
-
-    private ArrayList<Event> nearbyEvents = new ArrayList<>();
 
     private HomeActivity homeActivity;
 
     public Location mCurrentLocation;
+
+    // These 3 fields are passed to list fragment
     public JSONArray restaurantsNearbyJSON = new JSONArray();
-    public ArrayList<JSONObject> eventsNearby = new ArrayList<JSONObject>();
+    private DataSnapshot mAllEvents;
+    private HashMap<String, JSONObject> mIdToRestaurant = new HashMap<>();
+    private HashMap<String, User> mIdToOrg = new HashMap<>();
+
+
+
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -152,8 +157,8 @@ public class MapFragment extends Fragment {
         mRef = mDatabase.getReference(); //need an instance of database reference
         mRefForUser = mRef.child("users").child(mFbUser.getUid());
         mRefForEvents = mRef.child("events");
+        mRefForOrgs = mRef.child("users");
         mContext = view.getContext();
-        mNearbyEvents = new ArrayList<>();
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -388,8 +393,12 @@ public class MapFragment extends Fragment {
 
         mRefForEvents.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                mAllEvents = dataSnapshot;
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    for(DataSnapshot event : snapshot.getChildren()) {
+                        saveOrg(event.child("orgId").getValue().toString());
+                    }
                     yelpService.findRestaurants(snapshot.getKey(), new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
@@ -401,7 +410,9 @@ public class MapFragment extends Fragment {
                             String jsonData = response.body().string();
                             try {
                                 final JSONObject restaurantJSON = new JSONObject(jsonData);
-                                eventsNearby.add(restaurantJSON);
+
+                                mIdToRestaurant.put(restaurantJSON.getString("id"), restaurantJSON);
+
                                 final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                                 final String restaurantName = restaurantJSON.getString("name");
                                 final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
@@ -518,19 +529,21 @@ public class MapFragment extends Fragment {
         return mCurrentLocation;
     }
 
-    public ArrayList<Event> getNearbyEvents() {
-        return mNearbyEvents;
-    }
 
     public JSONArray getRestaurantsNearbyJSON() {
         return restaurantsNearbyJSON;
     }
 
-    private void setList(DataSnapshot snapshot) {
-        if(!mCurrentUser.isOrg) {
-            Event newEvent = snapshot.getValue(Event.class);
-            mNearbyEvents.add(newEvent);
-        }
+    public DataSnapshot getAllEvents() {
+        return mAllEvents;
+    }
+
+    public HashMap<String, JSONObject> getIdToRestaurant() {
+        return mIdToRestaurant;
+    }
+
+    public HashMap<String, User> getIdToOrg() {
+        return mIdToOrg;
     }
 
     private void setUpCarousel(final DataSnapshot snapshot) {
@@ -595,5 +608,20 @@ public class MapFragment extends Fragment {
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
     }
+
+    private void saveOrg(final String id) {
+        mRefForOrgs.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mIdToOrg.put(id, dataSnapshot.child(id).getValue(User.class));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
 }
