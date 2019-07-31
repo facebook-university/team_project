@@ -148,6 +148,15 @@ public class HomeActivity extends AppCompatActivity {
 
     private void createDrawerNav() {
         Button mLogOutBtn = findViewById(R.id.logout);
+        logOutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
         NavigationView mNavigationView = findViewById(R.id.settings_navigation);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
