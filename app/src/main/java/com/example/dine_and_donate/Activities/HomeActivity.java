@@ -1,13 +1,14 @@
 package com.example.dine_and_donate.Activities;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,14 +19,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-
-import androidx.fragment.app.FragmentManager;
-import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import com.example.dine_and_donate.EditProfileActivity;
 import com.example.dine_and_donate.HomeFragments.ListFragment;
 import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.HomeFragments.NotificationsFragment;
@@ -33,14 +29,14 @@ import com.example.dine_and_donate.HomeFragments.ProfileFragment;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.NotifyWorker;
 import com.example.dine_and_donate.R;
-import com.example.dine_and_donate.ShareEventActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.parceler.Parcels;
 
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -53,10 +49,11 @@ public class HomeActivity extends AppCompatActivity {
     private ListFragment mListFragment = new ListFragment();
     private Fragment mDefaultFragment;
 
+    public User currentUser;
+
     private ImageButton mBtnSwap;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
-    public User mCurrentUser;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
 
@@ -66,7 +63,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         mDrawerNav = findViewById(R.id.drawerNav);
-        mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
+
+        currentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
         mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
         String latitude = getIntent().getStringExtra("latitude");
@@ -91,7 +89,7 @@ public class HomeActivity extends AppCompatActivity {
 
         createDrawerNav();
         createBottomNav();
-        if (!mCurrentUser.isOrg) {
+        if (!currentUser.isOrg) {
             setUpNotificationWorker();
         }
     }
@@ -148,6 +146,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void createDrawerNav() {
         Button logOutBtn = findViewById(R.id.logout);
+
         logOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -157,6 +156,7 @@ public class HomeActivity extends AppCompatActivity {
                 finish();
             }
         });
+
         NavigationView mNavigationView = findViewById(R.id.settings_navigation);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -184,15 +184,17 @@ public class HomeActivity extends AppCompatActivity {
 
     private void navigationHelper(Class navigateToClass) {
         Intent intent = new Intent(HomeActivity.this, navigateToClass);
-        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
+        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(currentUser));
         startActivity(intent);
     }
 
     private void setExploreTab() {
         if (mShowButton) {
             if (mIsOnMapView) {
-                mListFragment.setNearbyEvents(mMapFragment.getNearbyEvents());
+                mListFragment.setAllEvents(mMapFragment.getAllEvents());
                 mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
+                mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
+                mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, mListFragment)
                         .addToBackStack(null)

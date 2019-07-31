@@ -49,15 +49,6 @@
         tools:layout_editor_absoluteY="16dp" />
 
     <TextView
-        android:id="@+id/textView9"
-        android:layout_width="105dp"
-        android:layout_height="22dp"
-        android:text="$24,000 raised"
-        android:textSize="15dp"
-        tools:layout_editor_absoluteX="114dp"
-        tools:layout_editor_absoluteY="36dp" />
-
-    <TextView
         android:id="@+id/textView10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -65,5 +56,14 @@
         android:textSize="8dp"
         tools:layout_editor_absoluteX="114dp"
         tools:layout_editor_absoluteY="93dp" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="105dp"
+        android:layout_height="22dp"
+        android:text="$24,000 raised"
+        android:textSize="15dp"
+        tools:layout_editor_absoluteX="114dp"
+        tools:layout_editor_absoluteY="36dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

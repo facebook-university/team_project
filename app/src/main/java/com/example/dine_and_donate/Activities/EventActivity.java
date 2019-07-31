@@ -1,4 +1,4 @@
-package com.example.dine_and_donate;
+package com.example.dine_and_donate.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
+import com.example.dine_and_donate.R;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;

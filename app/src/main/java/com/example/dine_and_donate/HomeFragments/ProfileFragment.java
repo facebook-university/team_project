@@ -17,7 +17,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
-import com.example.dine_and_donate.ViewPagerAdapter;
+import com.example.dine_and_donate.Adapters.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 public class ProfileFragment extends Fragment {
@@ -53,7 +53,7 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         HomeActivity homeActivity = (HomeActivity) getActivity();
-        mCurrentUserModel = homeActivity.mCurrentUser;
+        mCurrentUserModel = homeActivity.currentUser;
 
         mLayoutForConsumer = view.findViewById(R.id.forConsumer);
         mLayoutForOrg = view.findViewById(R.id.forOrg);
