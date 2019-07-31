@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
-import com.example.dine_and_donate.CurrentVouchersFragment;
 import com.example.dine_and_donate.OldVouchersFragment;
 import com.example.dine_and_donate.UpcomingVouchersFragment;
 

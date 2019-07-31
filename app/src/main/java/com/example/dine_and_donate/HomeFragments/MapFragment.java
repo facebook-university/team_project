@@ -122,9 +122,6 @@ public class MapFragment extends Fragment {
     private HashMap<String, JSONObject> mIdToRestaurant = new HashMap<>();
     private HashMap<String, User> mIdToOrg = new HashMap<>();
 
-
-
-
     /*
      * Define a request code to send to Google Play services This code is
      * returned in Activity.onActivityResult

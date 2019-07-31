@@ -59,9 +59,8 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
             e.printStackTrace();
         }
         Glide.with(context)
+                // Todo : change this to real image
                 .load("https://firebasestorage.googleapis.com/v0/b/dine-and-donate.appspot.com/o/images%2F158765210?alt=media&token=be40174f-ed03-4299-8431-410b036a9037")
-                //.bitmapTransform(new RoundedCornersTransformation(context, 30, 0))
-                //.placeholder(placeHolderId)
                 .into(holder.ivOrgPic);
     }
 
