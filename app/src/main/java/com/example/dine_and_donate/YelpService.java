@@ -16,8 +16,9 @@ public class YelpService {
     public static final String YELP_LATITUDE_QUERY_PARAMETER = "latitude";
     public static final String YELP_LONGITUDE_QUERY_PARAMETER = "longitude";
     public static final String YELP_LIMIT = "limit";
+    public static final String YELP_SORT_BY = "sort_by";
 
-    public static void findRestaurants(String longitude, String latitude, Callback callback) {
+    public static void findRestaurants(String longitude, String latitude, String sort, String limit, Callback callback) {
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
@@ -25,7 +26,8 @@ public class YelpService {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(YELP_BASE_URL_RADIUS).newBuilder();
         urlBuilder.addQueryParameter(YELP_LATITUDE_QUERY_PARAMETER, latitude);
         urlBuilder.addQueryParameter(YELP_LONGITUDE_QUERY_PARAMETER, longitude);
-        urlBuilder.addQueryParameter(YELP_LIMIT, "30");
+        urlBuilder.addQueryParameter(YELP_LIMIT, limit);
+        urlBuilder.addQueryParameter(YELP_SORT_BY, sort);
 
         String url = urlBuilder.build().toString();
 

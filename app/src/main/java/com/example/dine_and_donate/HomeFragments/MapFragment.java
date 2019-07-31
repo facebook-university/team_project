@@ -66,6 +66,7 @@ import org.json.JSONObject;
 import org.parceler.Parcels;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -108,6 +109,7 @@ public class MapFragment extends Fragment {
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForUser;
+    private DatabaseReference mRefForEvents;
     private User mCurrentUser;
     private ArrayList<Event> mNearbyEvents;
 
@@ -148,6 +150,7 @@ public class MapFragment extends Fragment {
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference(); //need an instance of database reference
         mRefForUser = mRef.child("users").child(mFbUser.getUid());
+        mRefForEvents = mRef.child("events");
         mContext = view.getContext();
         mNearbyEvents = new ArrayList<>();
 
@@ -221,19 +224,13 @@ public class MapFragment extends Fragment {
                 if (cameraLatitude == null || cameraLongitude == null) {
                     cameraLatitude = newLatitude;
                     cameraLongitude = newLongitude;
+                    generateMarkers();
                 }
 
-                if (((Math.abs(newLongitude - cameraLongitude) > 0.03)
-                        || (Math.abs(newLatitude - cameraLatitude) > 0.03))
-                        && (map.getCameraPosition().zoom > 10)) {
+                if (map.getCameraPosition().zoom > 10) {
                     cameraLongitude = newLongitude;
                     cameraLatitude = newLatitude;
-                }
-
-                if (mCurrentUser.isOrg) {
-                    generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
-                } else {
-                    generateMarkersEvents();
+                    generateMarkers();
                 }
             }
         });
@@ -250,6 +247,14 @@ public class MapFragment extends Fragment {
             map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         } else {
             Toast.makeText(mContext, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void generateMarkers() {
+        if (mCurrentUser.isOrg) {
+            generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+        } else {
+            generateMarkersEvents();
         }
     }
 
@@ -309,8 +314,9 @@ public class MapFragment extends Fragment {
                     public void onLocationResult(LocationResult locationResult) {
                         onLocationChanged(locationResult.getLastLocation());
                         if(!cameraSet) {
-                            LatLng currLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-                            map.moveCamera(CameraUpdateFactory.newLatLng(currLatLng));
+                            LatLng initialLatLng = homeActivity.getMarkerLatLng() != null ? homeActivity.markerLatLng
+                                    : new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+                            map.moveCamera(CameraUpdateFactory.newLatLng(initialLatLng));
                             map.animateCamera(CameraUpdateFactory.zoomTo(15));
                             cameraSet = true;
                         }
@@ -334,7 +340,7 @@ public class MapFragment extends Fragment {
 
     private void generateMarkersRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
-        yelpService.findRestaurants(longitude, latitude, new Callback() {
+        yelpService.findRestaurants(longitude, latitude, "best_match", "30", new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -342,40 +348,32 @@ public class MapFragment extends Fragment {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                String jsonData = response.body().string();
                 try {
-                    String jsonData = response.body().string();
-                    try {
-                        restaurantsNearbyJSON = new JSONObject(jsonData).getJSONArray("businesses");
-                        //add marker to each restaurant nearby
-                        for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
-                            final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
-                            final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
-                            final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
-                            final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
+                    restaurantsNearbyJSON = new JSONObject(jsonData).getJSONArray("businesses");
+                    //add marker to each restaurant nearby
+                    for (int i = 0; i < restaurantsNearbyJSON.length(); i++) {
+                        final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(i);
+                        final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
+                        final String restaurantName = restaurantsNearbyJSON.getJSONObject(i).getString("name");
+                        final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
 
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(restaurantJSON);
-                                    map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                                        @Override
-                                        public boolean onMarkerClick(Marker marker) {
-                                            try {
-                                                slideUpMenuCreate((JSONObject) marker.getTag());
-                                                slideViewIsUp = true;
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-                                            return false;
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(restaurantJSON);
+                                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                    @Override
+                                    public boolean onMarkerClick(Marker marker) {
+                                        slideUpMenuCreate((JSONObject) marker.getTag());
+                                        slideViewIsUp = true;
+                                        return false;
+                                    }
+                                });
+                            }
+                        });
                     }
-                } catch (IOException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -383,12 +381,9 @@ public class MapFragment extends Fragment {
     }
 
     private void generateMarkersEvents() {
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference mRef = mDatabase.getReference();
-        DatabaseReference ref = mRef.child("events");
         final YelpService yelpService = new YelpService();
 
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        mRefForEvents.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -404,7 +399,6 @@ public class MapFragment extends Fragment {
                             try {
                                 final JSONObject restaurantJSON = new JSONObject(jsonData);
                                 eventsNearby.add(restaurantJSON);
-
                                 final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                                 final String restaurantName = restaurantJSON.getString("name");
                                 final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
@@ -412,27 +406,17 @@ public class MapFragment extends Fragment {
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(restaurantJSON);
+                                        Marker marker = map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName));
+                                        marker.setTag(restaurantJSON);
                                         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                             @Override
                                             public boolean onMarkerClick(Marker marker) {
-                                                try {
-                                                    slideUpMenuSave((JSONObject) marker.getTag(), snapshot);
-                                                    slideViewIsUp = true;
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                return false;
+                                                return clickMarker(marker);
                                             }
                                         });
-                                        if (homeActivity.markerLatLng != null) {
-                                            map.animateCamera(CameraUpdateFactory.newLatLng(homeActivity.markerLatLng), 250, null);
-                                            homeActivity.markerLatLng = null;
-                                            try {
-                                                slideUpMenuSave(restaurantJSON, snapshot);
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
+                                        if (marker.getPosition().equals(homeActivity.getMarkerLatLng())) {
+                                            clickMarker(marker);
+                                            homeActivity.setMarkerLatLngToNull();
                                         }
                                     }
                                 });
@@ -444,27 +428,51 @@ public class MapFragment extends Fragment {
                 }
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
     }
 
-    private void slideUpAnimation(final JSONObject restaurant) throws JSONException {
-        TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
-        restName.setText(restaurant.getString("name"));
-        slideView.setVisibility(View.VISIBLE);
-        TranslateAnimation animate = new TranslateAnimation(
-                0,
-                0,
-                slideView.getY(),
-                0);
-        animate.setDuration(500);
-        animate.setFillAfter(true);
-        slideView.startAnimation(animate);
-        btnCreate = slideView.findViewById(R.id.btn_create_event);
+    private boolean clickMarker(final Marker marker) {
+        try {
+            final JSONObject restaurantOfMarker = (JSONObject) marker.getTag();
+            mRefForEvents.child(restaurantOfMarker.getString("id"))
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            slideUpMenuSave(restaurantOfMarker, dataSnapshot);
+                            marker.showInfoWindow();
+                            slideViewIsUp = true;
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) { }
+                    });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
-    private void slideUpMenuCreate(final JSONObject restaurant) throws JSONException {
+    private void slideUpAnimation(final JSONObject restaurant) {
+        try {
+            TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
+            restName.setText(restaurant.getString("name"));
+            slideView.setVisibility(View.VISIBLE);
+            TranslateAnimation animate = new TranslateAnimation(
+                    0,
+                    0,
+                    slideView.getY(),
+                    0);
+            animate.setDuration(500);
+            animate.setFillAfter(true);
+            slideView.startAnimation(animate);
+            btnCreate = slideView.findViewById(R.id.btn_create_event);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void slideUpMenuCreate(final JSONObject restaurant) {
         slideUpAnimation(restaurant);
         btnCreate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -484,7 +492,7 @@ public class MapFragment extends Fragment {
         });
     }
 
-    private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) throws JSONException {
+    private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) {
         slideUpAnimation(restaurant);
         setUpCarousel(snapshot);
         btnCreate.setText(getString(R.string.save));
@@ -543,7 +551,7 @@ public class MapFragment extends Fragment {
             public void onClick(View v) {
                 final Map<String, String> savedEvents = mCurrentUser.getSavedEventsIDs();
                 savedEvents.put(eventIDs.get(position), snapshot.getKey());
-                mRef.child("users").child(mFbUser.getUid()).child("Events").setValue(savedEvents, new DatabaseReference.CompletionListener() {
+                mRefForUser.child("Events").setValue(savedEvents, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                         if (databaseError != null) {
