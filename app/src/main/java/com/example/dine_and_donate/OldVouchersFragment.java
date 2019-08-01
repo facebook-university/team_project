@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.dine_and_donate.Adapters.StaggeredRecyclerViewAdapter;
+import com.example.dine_and_donate.Models.Event;
 
 import java.util.ArrayList;
 
@@ -20,21 +21,19 @@ public class OldVouchersFragment extends Fragment {
 
     private View v;
     private RecyclerView mRecyclerView;
-    private ArrayList<String> mImageUrls;
-    private ArrayList<String> mNames;
     private Context mContext;
+    private ArrayList<Event> mEvents;
 
     //default constructor
     public OldVouchersFragment() {
-        mImageUrls = new ArrayList<>();
-        mNames = new ArrayList<>();
+        mEvents = new ArrayList<>();
     }
 
     //inflates layout of fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.tab_fragment, container, false);
         mRecyclerView = v.findViewById(R.id.rv_vouchers);
-        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
+        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mRecyclerView.setAdapter(staggeredRecyclerViewAdapter);
@@ -49,15 +48,13 @@ public class OldVouchersFragment extends Fragment {
 
     //add images and descriptions to respective arrayLists
     private void initBitmapsPastEvents() {
-        //image URL
-        for(int i = 0; i < 20; i++) {
-            mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
-        }
 
-        //voucher descriptions
+        //test events
         for(int i = 0; i < 10; i++) {
-            mNames.add("udblrjtkbtecidtijijhbfitduvgdnvbtlujberlvuubtdbkfhdfihgudjbvnbbjhgejvdefhcturgucfnenhjdfffijrkiftbenjrjijhugvfujncndrftftglgelkc");
-            mNames.add("dogs");
+            Event newEvent = new Event();
+            newEvent.locationString = "test";
+            newEvent.imageUrl = "https://i.redd.it/tpsnoz5bzo501.jpg";
+            mEvents.add(newEvent);
         }
     }
 }

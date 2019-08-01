@@ -57,13 +57,14 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = mEvents.get(position);
-        holder.tvOrgName.setText(mIdToOrg.get(event.orgId).name);
-        holder.tvOrgInfo.setText(event.info);
         try {
-            holder.tvRestaurantName.setText(mIdToRestaurant.get(event.yelpID).getString("name"));
+            String orgName = mIdToOrg.get(event.orgId).name;
+            String restaurantName = mIdToRestaurant.get(event.yelpID).getString("name");
+            holder.tvEventText.setText(orgName + " is having a Dine and Donate event at " + restaurantName);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         Glide.with(context)
                 // Todo: change this to real image, need to add imageUrl field in edit profile
                 .load("https://firebasestorage.googleapis.com/v0/b/dine-and-donate.appspot.com/o/images%2F158765210?alt=media&token=be40174f-ed03-4299-8431-410b036a9037")
@@ -76,17 +77,13 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvRestaurantName;
-        TextView tvOrgName;
-        TextView tvOrgInfo;
+        TextView tvEventText;
         ImageView ivOrgPic;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvRestaurantName = itemView.findViewById(R.id.tvRestaurantName);
             ivOrgPic = itemView.findViewById(R.id.ivOrgImage);
-            tvOrgName = itemView.findViewById(R.id.tvOrgName);
-            tvOrgInfo = itemView.findViewById(R.id.tvEventInfo);
+            tvEventText = itemView.findViewById(R.id.tvEventInfo);
         }
     }
 
