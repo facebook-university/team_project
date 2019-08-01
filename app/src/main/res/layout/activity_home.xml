@@ -15,6 +15,7 @@
             android:id="@+id/flContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="1dp"
             app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
             app:layout_constraintEnd_toEndOf="parent"
@@ -39,8 +40,8 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@android:color/white"
-            app:itemIconTint="#6200EA"
-            app:itemTextColor="#6200EA"
+            app:itemIconTint="@color/colorAccent"
+            app:itemTextColor="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:menu="@menu/menu_bottom_navigation"
             tools:layout_editor_absoluteX="0dp" />

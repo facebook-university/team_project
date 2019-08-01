@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
+import com.example.dine_and_donate.Adapters.StaggeredRecyclerViewAdapter;
 import com.example.dine_and_donate.Models.User;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,7 +31,6 @@ public class UpcomingVouchersFragment extends Fragment {
     private ArrayList<String> mNames = new ArrayList<>();
     private Map<String, String> mSavedEventsIDs;
     private User mCurrUser;
-    private FirebaseUser mFbUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForEvent;
 
@@ -47,7 +46,7 @@ public class UpcomingVouchersFragment extends Fragment {
         mRefForEvent = mRef.child("events");
 
         HomeActivity homeActivity = (HomeActivity) getActivity();
-        mCurrUser = homeActivity.mCurrentUser;
+        mCurrUser = homeActivity.currentUser;
         mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -68,7 +67,6 @@ public class UpcomingVouchersFragment extends Fragment {
 
             }
         });
-
         mRecyclerView = view.findViewById(R.id.rv_vouchers);
         StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);

@@ -1,19 +1,15 @@
 package com.example.dine_and_donate;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -21,14 +17,9 @@ import androidx.core.app.NotificationCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.example.dine_and_donate.Activities.HomeActivity;
-import com.example.dine_and_donate.HomeFragments.MapFragment;
+import com.example.dine_and_donate.Activities.LoginActivity;
 import com.example.dine_and_donate.Models.Event;
-import com.example.dine_and_donate.Models.User;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.example.dine_and_donate.Models.Notification;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -40,10 +31,8 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.parceler.Parcels;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Random;
 
 import okhttp3.Call;
@@ -51,8 +40,14 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class NotifyWorker extends Worker {
+
     private Event mEventToday = null;
+    private Notification mNewNotification;
+    private DatabaseReference mRef;
+    private FirebaseUser mFbUser;
+    private DatabaseReference mNotificationRef;
     private Integer mCounter = 0;
+
 
     public NotifyWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -110,7 +105,7 @@ public class NotifyWorker extends Worker {
                                             Long startTime = (long) eventChild.child("startTime").getValue();
                                             String imageURL = eventChild.child("imageUrl").getValue().toString();
                                             mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL);
-                                            displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude);
+                                            displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude, eventChild.getKey(), timeNow.toString());
                                             mCounter = restaurantsNearbyJSON.length();
                                             return;
                                         }
@@ -131,7 +126,7 @@ public class NotifyWorker extends Worker {
         });
     }
 
-    private void displayNotification(String title, String body, String latitude, String longitude) {
+    private void displayNotification(String title, String body, String latitude, String longitude, String eventKey, String createdAt) {
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "com.example.dine_and_donate";
 
@@ -158,7 +153,7 @@ public class NotifyWorker extends Worker {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
 
         notificationBuilder
-                .setDefaults(Notification.DEFAULT_ALL)
+                .setDefaults(android.app.Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.drawable.baker)
                 .setContentIntent(pendingIntentEvents)
@@ -167,5 +162,21 @@ public class NotifyWorker extends Worker {
                 .setContentText(body);
 
         notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
+        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+        mRef =  FirebaseDatabase.getInstance().getReference();
+        //add notification to database here; event id, yelp id and createdAt
+        mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt);
+        mNotificationRef = mRef.child("users").child(mFbUser.getUid()).getRef().child("Notifications").push();
+        mRef.child("users").child(mFbUser.getUid()).child("Notifications").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mNotificationRef.setValue(mNewNotification);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout2"
-    android:layout_marginTop="30dp"
-    android:layout_marginBottom="30dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="30dp">
 
     <fragment
         android:id="@+id/map"
@@ -27,10 +27,10 @@
 
         <ViewStub
             android:id="@+id/slide_up_stub"
-            android:inflatedId="@+id/message_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.75" />
+            android:layout_weight="0.75"
+            android:inflatedId="@+id/message_layout" />
 
     </LinearLayout>
 

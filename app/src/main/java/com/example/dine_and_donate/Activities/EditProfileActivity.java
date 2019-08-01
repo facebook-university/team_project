@@ -1,6 +1,9 @@
-package com.example.dine_and_donate;
+package com.example.dine_and_donate.Activities;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,8 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
+import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.UploadUtil;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -22,8 +27,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.parceler.Parcels;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
+import static com.example.dine_and_donate.UploadUtil.GALLERY_REQUEST_CODE;
 
 public class EditProfileActivity extends AppCompatActivity {
 
@@ -33,13 +44,19 @@ public class EditProfileActivity extends AppCompatActivity {
     private ImageButton mClearNumber;
     private Button mSaveBtn;
     private TextView mNumberTextView;
-
+    private Button mChangeProfPic;
+    private CircleImageView mProfPic;
+    private Uri mSelectedImage;
     private FirebaseDatabase mDatabase;
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForUser;
-
+    private StorageReference mStorageRef;
     private User mCurrentUser;
+    private Context mContext;
+    private UploadUtil uploadUtil;
+    private Intent mIntent;
+    private Task<Uri> urlTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +69,8 @@ public class EditProfileActivity extends AppCompatActivity {
         mClearNumber = findViewById(R.id.edit_number_btn);
         mSaveBtn = findViewById(R.id.save_btn);
         mNumberTextView = findViewById(R.id.edit_number_tv);
+        mChangeProfPic = findViewById(R.id.change_prof_pic_btn);
+        mProfPic = findViewById(R.id.circular_edit_prof_pic);
 
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -59,7 +78,10 @@ public class EditProfileActivity extends AppCompatActivity {
         mRefForUser = mRef.child("users").child(mFbUser.getUid());
 
 
+        mIntent = new Intent(Intent.ACTION_PICK);
         mClearName.setVisibility(View.INVISIBLE);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
 
         //retrieve values from database
         mRefForUser.addValueEventListener(new ValueEventListener() {
@@ -142,6 +164,17 @@ public class EditProfileActivity extends AppCompatActivity {
                 setState(mEditName, mClearName);
             }
         });
+
+        mChangeProfPic.setOnClickListener(new View.OnClickListener() {
+            final Uri[] downloadUri = new Uri[1];
+
+            @Override
+            public void onClick(View v) {
+                uploadUtil = new UploadUtil(EditProfileActivity.this);
+                uploadUtil.pickFromGallery(mIntent);
+                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask);
+            }
+        });
     }
 
     private void setState(EditText etField, ImageButton clearField) {
@@ -149,6 +182,20 @@ public class EditProfileActivity extends AppCompatActivity {
             clearField.setVisibility(View.INVISIBLE);
         } else {
             clearField.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void onActivityResult(int requestCode,int resultCode,Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        // Result code is RESULT_OK only if the user selects an Image
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode){
+                case GALLERY_REQUEST_CODE:
+                    //data.getData returns the content URI for the selected Image
+                    mSelectedImage = data.getData();
+                    mProfPic.setImageURI(mSelectedImage);
+                    break;
+            }
         }
     }
 }

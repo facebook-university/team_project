@@ -17,12 +17,11 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
-import com.example.dine_and_donate.ViewPagerAdapter;
+import com.example.dine_and_donate.Adapters.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 public class ProfileFragment extends Fragment {
 
-    //elements in layout
     private TabLayout mTabLayout;
     private ViewPagerAdapter mVoucherPagerAdapter;
     private ViewPager mVoucherView;
@@ -32,10 +31,8 @@ public class ProfileFragment extends Fragment {
     private ImageView mProfPic;
     private ImageView mBlurredPic;
     private Button mLogOutBtn;
-
     private ConstraintLayout mLayoutForOrg;
     private ConstraintLayout mLayoutForConsumer;
-
     private User mCurrentUserModel;
 
     @Nullable
@@ -53,7 +50,7 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         HomeActivity homeActivity = (HomeActivity) getActivity();
-        mCurrentUserModel = homeActivity.mCurrentUser;
+        mCurrentUserModel = homeActivity.currentUser;
 
         mLayoutForConsumer = view.findViewById(R.id.forConsumer);
         mLayoutForOrg = view.findViewById(R.id.forOrg);
@@ -61,7 +58,6 @@ public class ProfileFragment extends Fragment {
         mTabLayout.setupWithViewPager(mVoucherView);
         mOrgName = view.findViewById(R.id.org_name);
         mConsumerName = view.findViewById(R.id.cons_name);
-
         setUpTopProfile(mCurrentUserModel.name);
     }
 
