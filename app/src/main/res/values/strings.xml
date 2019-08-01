@@ -17,7 +17,7 @@
     <string name="eventDescriptionTextView">Event Description</string>
     <string name="findAutocompleteHint">Find Restaurant</string>
     <string name="eventDescriptionHint">The proceeds for this event will...</string>
-    <string name="createEvent">Create Event</string>
+    <string name="createEvent">Post Fundraiser</string>
     <string name="resturantName">Restaurant Name Here</string>
     <string name="launchFundraiser">Launch a Fundraiser</string>
     <string name="savedButton">Save</string>
@@ -30,10 +30,11 @@
     <string name="callRestaurant">Call Restaurant</string>
     <string name="userTypeIntro">I am looking to...</string>
     <string name="haveAcct">Already have an account?.</string>
-    <string name="save">Save</string>
-    <string name="saved">Saved!</string>
+    <string name="save">Save Event</string>
+    <string name="saved">Event Saved</string>
     <string name="errorMsg">Sorry, something went wrong!</string>
     <string name="choose_photo">Choose photo</string>
     <string name="upload_voucher_image">Upload Voucher Image</string>
+    <string name="main_info_event">%1$s is having a Dine &amp; Donate here on %2$s from %3$s to %4$s</string>
 
 </resources>
