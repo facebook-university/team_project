@@ -110,7 +110,7 @@ public class MapFragment extends Fragment {
     private View slideView;
     private View slideViewContent;
     private boolean slideViewIsUp;
-    private Button btn_event;
+    private Button mBtnEvent;
     private ViewPager mViewPager;
     private EventViewPagerAdapter mPagerAdapter;
 
@@ -239,13 +239,24 @@ public class MapFragment extends Fragment {
                 if (cameraLatitude == null || cameraLongitude == null) {
                     cameraLatitude = newLatitude;
                     cameraLongitude = newLongitude;
-                    generateMarkers();
+
+                    if (mCurrentUser.isOrg) {
+                        generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                    } else {
+                        generateMarkersEvents();
+                    }
                 }
 
                 if (map.getCameraPosition().zoom > 10) {
                     cameraLongitude = newLongitude;
                     cameraLatitude = newLatitude;
-                    generateMarkers();
+
+                    if (mCurrentUser.isOrg) {
+                        generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+                    } else if (Math.abs(cameraLongitude - newLongitude) >= 0.01
+                                || Math.abs(cameraLatitude - newLatitude) >= 0.01) {
+                        generateMarkersEvents();
+                    }
                 }
             }
         });
@@ -262,14 +273,6 @@ public class MapFragment extends Fragment {
             map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         } else {
             Toast.makeText(mContext, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void generateMarkers() {
-        if (mCurrentUser.isOrg) {
-            generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
-        } else {
-            generateMarkersEvents();
         }
     }
 
@@ -414,6 +417,7 @@ public class MapFragment extends Fragment {
                             try {
                                 final JSONObject restaurantJSON = new JSONObject(jsonData);
                                 eventsNearby.add(restaurantJSON);
+                                System.out.println(restaurantJSON);
                                 final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                                 final String restaurantName = restaurantJSON.getString("name");
                                 final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
@@ -514,7 +518,7 @@ public class MapFragment extends Fragment {
             animate.setDuration(500);
             animate.setFillAfter(true);
             slideView.startAnimation(animate);
-            btn_event = slideViewContent.findViewById(R.id.btn_event);
+            mBtnEvent = slideViewContent.findViewById(R.id.btn_event);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -522,7 +526,7 @@ public class MapFragment extends Fragment {
 
     private void slideUpMenuCreate(final JSONObject restaurant) {
         slideUpAnimation(restaurant);
-        btn_event.setOnClickListener(new View.OnClickListener() {
+        mBtnEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, EventActivity.class);
@@ -579,7 +583,7 @@ public class MapFragment extends Fragment {
     private void setUpViewPager(final DataSnapshot snapshot) {
         final PageIndicatorView pageIndicatorView = slideViewContent.findViewById(R.id.pageIndicatorView);
         mSavedEvents = mCurrentUser.getSavedEventsIDs();
-        btn_event = slideViewContent.findViewById(R.id.btn_event);
+        mBtnEvent = slideViewContent.findViewById(R.id.btn_event);
 
         mViewPager = slideViewContent.findViewById(R.id.viewPager);
         pageIndicatorView.setSelection(0);
@@ -590,7 +594,7 @@ public class MapFragment extends Fragment {
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         for (DataSnapshot eventChild : snapshot.getChildren()) {
-            FrameLayout event = (FrameLayout) inflater.inflate (R.layout.event_info_fragment, null);
+            FrameLayout event = (FrameLayout) inflater.inflate(R.layout.event_info_fragment, null);
             TextView eventOrg = event.findViewById(R.id.org);
             TextView eventInfo = event.findViewById(R.id.info);
             ImageView eventVoucher = event.findViewById(R.id.voucher_img);
@@ -598,8 +602,9 @@ public class MapFragment extends Fragment {
             String date = getDate((long) eventChild.child("startTime").getValue(), "MMM dd, yyyy");
             String startTime = getDate((long) eventChild.child("startTime").getValue(), "h:mm a");
             String endTime = getDate((long) eventChild.child("endTime").getValue(), "h:mm a");
+            String orgName = "temp Org Name";
 
-            eventOrg.setText("Org name " + "is having a Dine & Donate here on " + date + " from " + startTime + " to " + endTime);
+            eventOrg.setText(getString(R.string.main_info_event, orgName, date, startTime, endTime));
             eventInfo.setText(eventChild.child("info").getValue().toString());
 
             RequestOptions requestOptions = new RequestOptions()
@@ -633,10 +638,10 @@ public class MapFragment extends Fragment {
 
     private void saveButtonAtPosition(int pagerPosition, final DataSnapshot snapshot) {
         if (mSavedEvents.get(mPagerAdapter.getEventId(pagerPosition)) != null) {
-            btn_event.setText(getString(R.string.saved));
+            mBtnEvent.setText(getString(R.string.saved));
         } else {
-            btn_event.setText(getString(R.string.save));
-            btn_event.setOnClickListener(new View.OnClickListener() {
+            mBtnEvent.setText(getString(R.string.save));
+            mBtnEvent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String eventId = mPagerAdapter.getEventId(0);
@@ -647,7 +652,7 @@ public class MapFragment extends Fragment {
                             if (databaseError != null) {
                                 Toast.makeText(getContext(), getString(R.string.errorMsg), Toast.LENGTH_LONG).show();
                             } else {
-                                btn_event.setText(getString(R.string.saved));
+                                mBtnEvent.setText(getString(R.string.saved));
                                 mCurrentUser.addSavedEventID(mSavedEvents);
                             }
                         }
