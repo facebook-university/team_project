@@ -17,27 +17,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.dine_and_donate.UploadUtil;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class EventActivity extends AppCompatActivity {
@@ -48,6 +45,7 @@ public class EventActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mRef;
     private StorageReference mStorageRef;
+    private Event newEvent;
 
     private CalendarView mCalendarView;
 
@@ -62,9 +60,13 @@ public class EventActivity extends AppCompatActivity {
     private Button mBtnCreate;
     private Button mChooseImage;
     private ImageView mVoucherImageView;
-
+    private User mCurrUser;
     private Uri mSelectedImage;
     private FirebaseUser mFirebaseCurrentUser;
+    private Map<String, String> mCreatedEvents;
+    private UploadUtil uploadUtil;
+    private Task<Uri> urlTask;
+    private Intent mIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,6 +93,10 @@ public class EventActivity extends AppCompatActivity {
         mBtnCreate = findViewById(R.id.create_event);
         mChooseImage = findViewById(R.id.btnChoosePhoto);
         mVoucherImageView = findViewById(R.id.ivVoucherImage);
+
+        mIntent = new Intent();
+        mCurrUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
+        mCreatedEvents = mCurrUser.getSavedEventsIDs();
 
         final Intent intent = getIntent();
         final String location = intent.getStringExtra("location");
@@ -130,55 +136,42 @@ public class EventActivity extends AppCompatActivity {
         mChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pickFromGallery();
+                uploadUtil = new UploadUtil(EventActivity.this);
+                uploadUtil.pickFromGallery(mIntent);
             }
         });
 
         mBtnCreate.setOnClickListener(new View.OnClickListener() {
+
             final Uri[] downloadUri = new Uri[1];
             @Override
             public void onClick(View v) {
-                if(mSelectedImage != null) {
-                    final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
-                    UploadTask uploadTask = ref.putFile(mSelectedImage);
-
-                    Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                        @Override
-                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                            if (!task.isSuccessful()) {
-                                throw task.getException();
-                            }
-
-                            // Continue with the task to get the download URL
-                            return ref.getDownloadUrl();
-                        }
-                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Uri> task) {
-                            if (task.isSuccessful()) {
-                                downloadUri[0] = task.getResult();
-                                String s = downloadUri[0].toString();
-                                writeEvent(intent, s, location);
-                            } else {
-                                // Handle failures
-                            }
-                        }
-                    });
-
-                }
+                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask);
             }
         });
     }
 
     private void writeEvent(Intent intent, String url, String location) {
         String orgId = mFirebaseCurrentUser.getUid();
-        String yelpId = intent.getStringExtra("yelpID");
+        final String yelpId = intent.getStringExtra("yelpID");
         long eventDate = mCalendarView.getDate();
         long startTime = convert(eventDate, mStartHour.getSelectedItemPosition()+1, mStartMin.getSelectedItemPosition(), mStartHalf.getSelectedItem().equals("PM"));
         long endTime = convert(eventDate, mEndHour.getSelectedItemPosition()+1, mEndMin.getSelectedItemPosition(), mEndHalf.getSelectedItem().equals("PM"));
         String info = mEtEventInfo.getText().toString();
-        Event newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
-        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
+        newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
+        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                //there is not error, can add event to database
+                if (databaseError == null) {
+                    mCreatedEvents.put(databaseReference.getKey(), yelpId);
+                    mRef.child("users").child(mFirebaseCurrentUser.getUid()).child("Events").setValue(mCreatedEvents);
+                }
+                Intent intent = new Intent(EventActivity.this, HomeActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
+                startActivity(intent);
+            }
+        });
         finish();
     }
 
@@ -193,14 +186,6 @@ public class EventActivity extends AppCompatActivity {
                     mVoucherImageView.setImageURI(mSelectedImage);
                     break;
             }
-    }
-
-    private void pickFromGallery(){
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        String[] mimeTypes = {"image/jpeg", "image/png"};
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        startActivityForResult(intent, GALLERY_REQUEST_CODE);
     }
 
     private long convert(long day, int hour, int min, boolean isPM) {
