@@ -524,6 +524,23 @@ public class MapFragment extends Fragment {
 
     private void slideUpMenuCreate(final JSONObject restaurant) {
         slideUpAnimation(restaurant);
+        TextView phoneNumber = slideView.findViewById(R.id.phone_number);
+
+        ImageView restaurantImg = slideView.findViewById(R.id.restaurant_image);
+        RequestOptions requestOptions = new RequestOptions()
+                .placeholder(R.drawable.ic_launcher_background);
+
+        try {
+            phoneNumber.setText(restaurant.getString("display_phone"));
+
+            Glide.with(mContext)
+                    .load(restaurant.getString("image_url"))
+                    .apply(requestOptions)
+                    .into(restaurantImg);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         mBtnEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

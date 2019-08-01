@@ -17,7 +17,7 @@
     <string name="eventDescriptionTextView">Event Description</string>
     <string name="findAutocompleteHint">Find Restaurant</string>
     <string name="eventDescriptionHint">The proceeds for this event will...</string>
-    <string name="createEvent">Create Event</string>
+    <string name="createEvent">Post Fundraiser</string>
     <string name="resturantName">Restaurant Name Here</string>
     <string name="launchFundraiser">Launch a Fundraiser</string>
     <string name="savedButton">Save</string>
