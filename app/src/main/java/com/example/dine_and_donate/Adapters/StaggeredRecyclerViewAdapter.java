@@ -2,6 +2,8 @@ package com.example.dine_and_donate.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.transition.Fade;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +13,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.dine_and_donate.Activities.HomeActivity;
+import com.example.dine_and_donate.HomeFragments.VoucherDetailFragment;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.Transitions.VoucherTransition;
 
 import java.util.ArrayList;
 
@@ -41,10 +48,11 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
 
     @Override
     //assign everything to the widgets
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         Log.d("tag", "onBindViewHolder: called");
 
-        Event event = mEvents.get(position);
+        final Event event = mEvents.get(position);
+        holder.event = event;
 
         //dummy image
         RequestOptions requestOptions = new RequestOptions()
@@ -56,14 +64,30 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
                 .apply(requestOptions)
                 .into(holder.image);
         holder.name.setText(event.locationString.split("\\r?\\n")[0]);
-
         holder.image.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "Clicked voucher", Toast.LENGTH_SHORT).show();
+                HomeActivity homeActivity = (HomeActivity) mContext;
+
+                VoucherDetailFragment voucherFragment = new VoucherDetailFragment(event.imageUrl);
+
+                voucherFragment.setSharedElementEnterTransition(new VoucherTransition());
+                voucherFragment.setEnterTransition(new Fade());
+                voucherFragment.setExitTransition(new Fade());
+                voucherFragment.setSharedElementReturnTransition(new VoucherTransition());
+
+
+                homeActivity.
+                        getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.flContainer, voucherFragment)
+                        .addSharedElement(holder.image, "voucher_image")
+                        .addToBackStack(null)
+                        .commit();
             }
         });
     }
+
 
     @Override
     //return number of images present held by the adapter
@@ -72,12 +96,14 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
     }
 
     //describes an item view inside a recycler view
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
+
+        Event event;
         ImageView image;
         TextView name;
 
         //constructor
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
             this.image = itemView.findViewById(R.id.voucher_image);
             this.name = itemView.findViewById(R.id.name);

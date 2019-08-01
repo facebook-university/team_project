@@ -9,13 +9,17 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.transition.Fade;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -26,9 +30,11 @@ import com.example.dine_and_donate.HomeFragments.ListFragment;
 import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.HomeFragments.NotificationsFragment;
 import com.example.dine_and_donate.HomeFragments.ProfileFragment;
+import com.example.dine_and_donate.HomeFragments.VoucherDetailFragment;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.NotifyWorker;
 import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.Transitions.VoucherTransition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -245,4 +251,6 @@ public class HomeActivity extends AppCompatActivity {
             workManager.enqueue(OneTimeWorkRequest.from(NotifyWorker.class));
         }
     }
+
+
 }
