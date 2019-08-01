@@ -1,6 +1,7 @@
 package com.example.dine_and_donate;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,9 +36,9 @@ import org.parceler.Parcels;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class EditProfileActivity extends AppCompatActivity {
+import static com.example.dine_and_donate.UploadUtil.GALLERY_REQUEST_CODE;
 
-    final private static int GALLERY_REQUEST_CODE = 100;
+public class EditProfileActivity extends AppCompatActivity {
 
     private EditText mEditName;
     private EditText mEditNumber;
@@ -54,6 +55,10 @@ public class EditProfileActivity extends AppCompatActivity {
     private DatabaseReference mRefForUser;
     private StorageReference mStorageRef;
     private User mCurrentUser;
+    private Context mContext;
+    private UploadUtil uploadUtil;
+    private Intent mIntent;
+    private Task<Uri> urlTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +80,10 @@ public class EditProfileActivity extends AppCompatActivity {
         mRefForUser = mRef.child("users").child(mFbUser.getUid());
 
 
+        mIntent = new Intent(Intent.ACTION_PICK);
         mClearName.setVisibility(View.INVISIBLE);
         mStorageRef = FirebaseStorage.getInstance().getReference();
+
 
         //retrieve values from database
         mRefForUser.addValueEventListener(new ValueEventListener() {
@@ -165,7 +172,9 @@ public class EditProfileActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                pickFromGallery();
+                uploadUtil = new UploadUtil(EditProfileActivity.this);
+                uploadUtil.pickFromGallery(mIntent);
+                //uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, mIntent, urlTask);
                 if(mSelectedImage != null) {
                     final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
                     UploadTask uploadTask = ref.putFile(mSelectedImage);
@@ -205,7 +214,7 @@ public class EditProfileActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         // Result code is RESULT_OK only if the user selects an Image
-        if (resultCode == Activity.RESULT_OK)
+        if (resultCode == Activity.RESULT_OK) {
             switch (requestCode){
                 case GALLERY_REQUEST_CODE:
                     //data.getData returns the content URI for the selected Image
@@ -213,6 +222,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     mProfPic.setImageURI(mSelectedImage);
                     break;
             }
+        }
     }
 
     private void pickFromGallery(){

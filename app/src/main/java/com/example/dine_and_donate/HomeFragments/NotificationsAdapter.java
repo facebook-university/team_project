@@ -1,7 +1,8 @@
 package com.example.dine_and_donate.HomeFragments;
 
 import android.content.Context;
-import android.util.Log;
+import android.graphics.Color;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.dine_and_donate.Models.Notifications;
+import com.example.dine_and_donate.Models.Notification;
 import com.example.dine_and_donate.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,18 +20,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.ViewHolder> {
 
-    private List<Notifications> mNotifications;
+    private List<Notification> mNotifications;
     private Context mContext;
     private DatabaseReference mRef;
     private DatabaseReference mNotificationsRef;
     private FirebaseDatabase mDatabase;
 
-    //pass in posts array in the constructor
-    public NotificationsAdapter(List<Notifications> notifications) {
+    //pass in notifications array in the constructor
+    public NotificationsAdapter(List<Notification> notifications) {
         mNotifications = notifications;
     }
 
@@ -50,16 +54,21 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     //bind the values based on the position of the element, called as a user scrolls down
     public void onBindViewHolder(final ViewHolder holder, int position) {
         //get data according to position
-        Notifications notification = mNotifications.get(position);
+        Notification notification = mNotifications.get(position);
         String eventId = notification.getEventId();
         String yelpId = notification.getYelpId();
         mNotificationsRef = mRef.child("events").child(yelpId).child(eventId);
         mNotificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                holder.mEventName.setText(dataSnapshot.child("info").getValue().toString());
-                holder.mStartDate.setText(dataSnapshot.child("startTime").getValue().toString());
-                holder.mPartner.setText(dataSnapshot.child("locationString").getValue().toString());
+                long millis = Long.parseLong(dataSnapshot.child("startTime").getValue().toString());
+                DateFormat simple = new SimpleDateFormat("dd MMM HH:mm");
+                Date result = new Date(millis);
+                String formattedDate = "<b>" + simple.format(result) + "</b>";
+                holder.mStartDate.setText(Html.fromHtml(formattedDate));
+                final String[] org = {""};
+                String formattedInfo = "<b>" + org[0] + "</b>" + " organized an event at " + "<b>" + getRestaurantName(dataSnapshot.child("locationString").getValue().toString()) +"</b> "  + "!";
+                holder.mPartner.setText(Html.fromHtml(formattedInfo));
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -68,49 +77,41 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         });
     }
 
+    private String getRestaurantName(String entireLocation) {
+        int positionOfNewLine = entireLocation.indexOf("\n");
+        String restName = "";
+        if (positionOfNewLine >= 0) {
+            restName = entireLocation.substring(0, positionOfNewLine);
+        }
+        return restName;
+    }
+
     @Override
-    //must return the size; if it is 0, nothing will render on the screen
+    //return size of list
     public int getItemCount() {
-        Log.d("adapter", "size " + mNotifications.size());
         return mNotifications.size();
     }
 
-    // Clean all elements of the recycler
-    public void clear() {
-        mNotifications.clear();
-        notifyDataSetChanged();
-    }
-
-    // Add a list of items -- change to type used
-    public void addAll(List<Notifications> list) {
-        mNotifications.addAll(list);
-        notifyDataSetChanged();
-    }
-
-    //create ViewHolder pattern that will contain all the fine view by ID lookups
+    //create ViewHolder pattern that will contain all the find view by ID lookups
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView mOrgPic;
-        public TextView mEventName;
         public TextView mStartDate;
         public TextView mPartner;
-        public TextView mOrgName;
+        public androidx.constraintlayout.widget.ConstraintLayout mItem;
 
         //constructor takes in an inflated layout
         public ViewHolder(View itemView) {
-            //call the superclass
             super(itemView);
-            //perform findViewById lookups
-            mOrgPic = (ImageView) itemView.findViewById(R.id.org_iv);
-            mEventName = (TextView) itemView.findViewById(R.id.event_name_tv);
-            mStartDate = (TextView) itemView.findViewById(R.id.date_tv);
-            mPartner = (TextView) itemView.findViewById(R.id.partnered_with_tv);
-            mOrgName = (TextView) itemView.findViewById(R.id.org_name_tv);
+            mOrgPic = itemView.findViewById(R.id.org_iv);
+            mStartDate = itemView.findViewById(R.id.date_tv);
+            mPartner = itemView.findViewById(R.id.partnered_with_tv);
+            mItem =  itemView.findViewById(R.id.notification_layout);
+            mItem.setOnClickListener(this);
         }
 
         @Override
-        //in case we want to make the notification clickable
         public void onClick(View v) {
-
+            v.setBackgroundColor(Color.WHITE);
         }
     }
 }

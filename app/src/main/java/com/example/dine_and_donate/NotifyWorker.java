@@ -1,7 +1,6 @@
 package com.example.dine_and_donate;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,7 +18,7 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.example.dine_and_donate.Models.Event;
-import com.example.dine_and_donate.Models.Notifications;
+import com.example.dine_and_donate.Models.Notification;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -42,7 +41,7 @@ import okhttp3.Response;
 public class NotifyWorker extends Worker {
 
     private Event mEventToday = null;
-    private Notifications mNewNotification;
+    private Notification mNewNotification;
     private DatabaseReference mRef;
     private FirebaseUser mFbUser;
     private DatabaseReference mNotificationRef;
@@ -152,7 +151,7 @@ public class NotifyWorker extends Worker {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
 
         notificationBuilder
-                .setDefaults(Notification.DEFAULT_ALL)
+                .setDefaults(android.app.Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.drawable.baker)
                 .setContentIntent(pendingIntentEvents)
@@ -162,8 +161,9 @@ public class NotifyWorker extends Worker {
 
         notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+        mRef =  FirebaseDatabase.getInstance().getReference();
         //add notification to database here; event id, yelp id and createdAt
-        mNewNotification = new Notifications(eventKey, mEventToday.getYelpID(), createdAt);
+        mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt);
         mNotificationRef = mRef.child("users").child(mFbUser.getUid()).getRef().child("Notifications").push();
         mRef.child("users").child(mFbUser.getUid()).child("Notifications").addValueEventListener(new ValueEventListener() {
             @Override

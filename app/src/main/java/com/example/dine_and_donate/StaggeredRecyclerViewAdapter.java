@@ -46,7 +46,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
         RequestOptions requestOptions = new RequestOptions()
                 .placeholder(R.drawable.ic_launcher_background);
 
-        //pouplate recycler view for tab fragment
+        //populate recycler view for tab fragment
         Glide.with(mContext)
                 .load(mImages.get(position))
                 .apply(requestOptions)

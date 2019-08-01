@@ -11,9 +11,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.dine_and_donate.Models.Notifications;
+import com.example.dine_and_donate.Models.Notification;
 import com.example.dine_and_donate.R;
-import com.example.dine_and_donate.YelpService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -22,20 +21,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.security.auth.callback.Callback;
 
 public class NotificationsFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private NotificationsAdapter mNotificationsAdapter;
-    private List<Notifications> mNotificationList;
+    private List<Notification> mNotificationList;
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
     private DatabaseReference mNotificationsRef;
@@ -60,16 +54,15 @@ public class NotificationsFragment extends Fragment {
         mNotificationList = new ArrayList<>();
         mNotificationsAdapter = new NotificationsAdapter(mNotificationList);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getContext());
+
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mNotificationsAdapter);
 
-        mNotificationList.clear();
-        loadTopPosts(0);
+        loadTopNotifications(0);
         Collections.reverse(mNotificationList);
-        mNotificationsAdapter.notifyDataSetChanged();
     }
 
-    private void loadTopPosts(int page) {
+    private void loadTopNotifications(int page) {
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference();
@@ -80,7 +73,7 @@ public class NotificationsFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 //look through all notifications of that user
                 for(DataSnapshot notificationsDs : dataSnapshot.getChildren()) {
-                    Notifications notification = notificationsDs.getValue(Notifications.class);
+                    Notification notification = notificationsDs.getValue(Notification.class);
                     mNotificationList.add(notification);
                     mNotificationsAdapter.notifyDataSetChanged();
                 }

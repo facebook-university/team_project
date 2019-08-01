@@ -12,7 +12,6 @@ import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -75,7 +74,6 @@ public class EventActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mFirebaseCurrentUser = mAuth.getCurrentUser();
-
 
         mDatabase = FirebaseDatabase.getInstance();
         mRef = mDatabase.getReference();
@@ -185,13 +183,10 @@ public class EventActivity extends AppCompatActivity {
         mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                //there is an error, can not add event to database
-                if (databaseError != null) {
-                    Toast.makeText(EventActivity.this, "Error Saving Data To Database", Toast.LENGTH_LONG).show();
-                } else {
+                //there is not error, can add event to database
+                if (databaseError == null) {
                     mCreatedEvents.put(databaseReference.getKey(), yelpId);
                     mRef.child("users").child(mFirebaseCurrentUser.getUid()).child("Events").setValue(mCreatedEvents);
-                    Toast.makeText(EventActivity.this, "Saved Data To Database", Toast.LENGTH_LONG).show();
                 }
                 Intent intent = new Intent(EventActivity.this, HomeActivity.class);
                 intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
@@ -200,7 +195,6 @@ public class EventActivity extends AppCompatActivity {
         });
         finish();
     }
-
 
     public void onActivityResult(int requestCode,int resultCode,Intent data){
         super.onActivityResult(requestCode, resultCode, data);
