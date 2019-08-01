@@ -1,13 +1,12 @@
 package com.example.dine_and_donate;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -15,20 +14,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-public class UploadUtil extends AppCompatActivity {
+public class UploadUtil {
 
     final public static int GALLERY_REQUEST_CODE = 100;
 
-    private Context mContext;
-//    private Intent mIntent;
+    private Activity mActivity;
 
-    public UploadUtil(Context context) {
-        mContext = context;
-//        mIntent = new Intent();
+    public UploadUtil(Activity currActivity) {
+        mActivity = currActivity;
     }
 
 
-    public void inOnClick(View v, Uri selectedImage, final Uri[] downloadUri, StorageReference mStorageRef, final Intent intent, Task<Uri> urlTask) {
+    public void inOnClick(View v, Uri selectedImage, final Uri[] downloadUri, StorageReference mStorageRef, Task<Uri> urlTask) {
         if(selectedImage != null) {
             final StorageReference ref = mStorageRef.child("images/"+selectedImage.getLastPathSegment());
             UploadTask uploadTask = ref.putFile(selectedImage);
@@ -55,13 +52,11 @@ public class UploadUtil extends AppCompatActivity {
     }
 
     public void pickFromGallery(Intent intent){
-        intent = new Intent();
         intent.setAction(Intent.ACTION_PICK);
         Log.d("helper method", "gets here");
         intent.setType("image/*");
         String[] mimeTypes = {"image/jpeg", "image/png"};
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        startActivityForResult(intent, GALLERY_REQUEST_CODE);
-//        return intent;
+        mActivity.startActivityForResult(intent, GALLERY_REQUEST_CODE);
     }
 }

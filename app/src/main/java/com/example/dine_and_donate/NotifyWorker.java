@@ -48,6 +48,7 @@ public class NotifyWorker extends Worker {
     private DatabaseReference mNotificationRef;
     private Integer mCounter = 0;
 
+
     public NotifyWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }

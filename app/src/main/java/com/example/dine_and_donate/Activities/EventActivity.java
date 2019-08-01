@@ -17,12 +17,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.example.dine_and_donate.UploadUtil;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,7 +29,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import org.parceler.Parcels;
 
@@ -67,6 +64,9 @@ public class EventActivity extends AppCompatActivity {
     private Uri mSelectedImage;
     private FirebaseUser mFirebaseCurrentUser;
     private Map<String, String> mCreatedEvents;
+    private UploadUtil uploadUtil;
+    private Task<Uri> urlTask;
+    private Intent mIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,7 +94,7 @@ public class EventActivity extends AppCompatActivity {
         mChooseImage = findViewById(R.id.btnChoosePhoto);
         mVoucherImageView = findViewById(R.id.ivVoucherImage);
 
-
+        mIntent = new Intent();
         mCurrUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
         mCreatedEvents = mCurrUser.getSavedEventsIDs();
 
@@ -136,7 +136,8 @@ public class EventActivity extends AppCompatActivity {
         mChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pickFromGallery();
+                uploadUtil = new UploadUtil(EventActivity.this);
+                uploadUtil.pickFromGallery(mIntent);
             }
         });
 
@@ -145,30 +146,7 @@ public class EventActivity extends AppCompatActivity {
             final Uri[] downloadUri = new Uri[1];
             @Override
             public void onClick(View v) {
-                if(mSelectedImage != null) {
-                    final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
-                    UploadTask uploadTask = ref.putFile(mSelectedImage);
-
-                    Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                        @Override
-                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                            if (!task.isSuccessful()) {
-                                throw task.getException();
-                            }
-                            // Continue with the task to get the download URL
-                            return ref.getDownloadUrl();
-                        }
-                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Uri> task) {
-                            if (task.isSuccessful()) {
-                                downloadUri[0] = task.getResult();
-                                String s = downloadUri[0].toString();
-                                writeEvent(intent, s, location);
-                            }
-                        }
-                    });
-                }
+                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask);
             }
         });
     }
@@ -208,14 +186,6 @@ public class EventActivity extends AppCompatActivity {
                     mVoucherImageView.setImageURI(mSelectedImage);
                     break;
             }
-    }
-
-    private void pickFromGallery(){
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        String[] mimeTypes = {"image/jpeg", "image/png"};
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        startActivityForResult(intent, GALLERY_REQUEST_CODE);
     }
 
     private long convert(long day, int hour, int min, boolean isPM) {

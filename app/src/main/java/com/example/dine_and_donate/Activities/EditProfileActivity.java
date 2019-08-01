@@ -19,8 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.UploadUtil;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,7 +29,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import org.parceler.Parcels;
 
@@ -175,31 +172,7 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 uploadUtil = new UploadUtil(EditProfileActivity.this);
                 uploadUtil.pickFromGallery(mIntent);
-                //uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, mIntent, urlTask);
-                if(mSelectedImage != null) {
-                    final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
-                    UploadTask uploadTask = ref.putFile(mSelectedImage);
-
-                    Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                        @Override
-                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                            if (!task.isSuccessful()) {
-                                throw task.getException();
-                            }
-
-                            // Continue with the task to get the download URL
-                            return ref.getDownloadUrl();
-                        }
-                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Uri> task) {
-                            if (task.isSuccessful()) {
-                                downloadUri[0] = task.getResult();
-                                String s = downloadUri[0].toString();
-                            }
-                        }
-                    });
-                }
+                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask);
             }
         });
     }
@@ -224,14 +197,6 @@ public class EditProfileActivity extends AppCompatActivity {
                     break;
             }
         }
-    }
-
-    private void pickFromGallery(){
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        String[] mimeTypes = {"image/jpeg", "image/png"};
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        startActivityForResult(intent, GALLERY_REQUEST_CODE);
     }
 }
 
