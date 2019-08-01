@@ -20,17 +20,16 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.UploadUtil;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -41,6 +40,7 @@ import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class EventActivity extends AppCompatActivity {
@@ -51,6 +51,7 @@ public class EventActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mRef;
     private StorageReference mStorageRef;
+    private Event newEvent;
 
     private CalendarView mCalendarView;
     private TimePicker mStartTimePicker;
@@ -61,9 +62,13 @@ public class EventActivity extends AppCompatActivity {
     private Button mBtnCreate;
     private Button mChooseImage;
     private ImageView mVoucherImageView;
-
+    private User mCurrUser;
     private Uri mSelectedImage;
     private FirebaseUser mFirebaseCurrentUser;
+    private Map<String, String> mCreatedEvents;
+    private UploadUtil uploadUtil;
+    private Task<Uri> urlTask;
+    private Intent mIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,6 +94,10 @@ public class EventActivity extends AppCompatActivity {
         mBtnCreate = findViewById(R.id.create_event);
         mChooseImage = findViewById(R.id.btnChoosePhoto);
         mVoucherImageView = findViewById(R.id.ivVoucherImage);
+
+        mIntent = new Intent();
+        mCurrUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
+        mCreatedEvents = mCurrUser.getSavedEventsIDs();
 
         final Intent intent = getIntent();
         final String location = intent.getStringExtra("location");
@@ -135,27 +144,40 @@ public class EventActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void writeEvent(Intent intent, String url, String location) {
+    public void writeEvent(Intent intent, String url, String location) {
         String orgId = mFirebaseCurrentUser.getUid();
-        String yelpId = intent.getStringExtra("yelpID");
+        final String yelpId = intent.getStringExtra("yelpID");
         long eventDate = mCalendarView.getDate() - (mCalendarView.getDate() % 86400000);
         //todo: i think this is grabbing the right time from the timePicker but conversion is wrong because of time zones
-        long startTime = eventDate + (mStartTimePicker.getHour()*3600000) + (mStartTimePicker.getMinute()*60000);
-        long endTime = eventDate + (mEndTimePicker.getHour()*3600000) + (mEndTimePicker.getMinute()*60000);
+        long startTime = eventDate + (mStartTimePicker.getHour() * 3600000) + (mStartTimePicker.getMinute() * 60000);
+        long endTime = eventDate + (mEndTimePicker.getHour() * 3600000) + (mEndTimePicker.getMinute() * 60000);
         String info = mEtEventInfo.getText().toString();
-        Event newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
-        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
+        newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
+        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                //there is not error, can add event to database
+                if (databaseError == null) {
+                    mCreatedEvents.put(databaseReference.getKey(), yelpId);
+                    mRef.child("users").child(mFirebaseCurrentUser.getUid()).child("Events").setValue(mCreatedEvents);
+                }
+                Intent intent = new Intent(EventActivity.this, HomeActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
+                startActivity(intent);
+            }
+        });
         finish();
     }
 
-    public void onActivityResult(int requestCode,int resultCode,Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // Result code is RESULT_OK only if the user selects an Image
         if (resultCode == Activity.RESULT_OK)
-            switch (requestCode){
+            switch (requestCode) {
                 case GALLERY_REQUEST_CODE:
                     //data.getData returns the content URI for the selected Image
                     mSelectedImage = data.getData();
@@ -164,11 +186,13 @@ public class EventActivity extends AppCompatActivity {
             }
     }
 
-    private void pickFromGallery(){
+
+    private void pickFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         String[] mimeTypes = {"image/jpeg", "image/png"};
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         startActivityForResult(intent, GALLERY_REQUEST_CODE);
+
     }
 }

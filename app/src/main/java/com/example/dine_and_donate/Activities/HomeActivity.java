@@ -220,8 +220,8 @@ public class HomeActivity extends AppCompatActivity {
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 00);
+        calendar.set(Calendar.SECOND, 00);
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
             calendar.add(Calendar.DATE, 1);
         }

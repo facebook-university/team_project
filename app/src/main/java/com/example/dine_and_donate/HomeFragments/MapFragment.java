@@ -63,6 +63,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -489,6 +490,7 @@ public class MapFragment extends Fragment {
                 Intent intent = new Intent(mContext, EventActivity.class);
                 try {
                     intent.putExtra("location", Restaurant.format(restaurant));
+                    intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
                     JSONObject restLocation = restaurant.getJSONObject("coordinates");
                     intent.putExtra("yelpID", restaurant.getString("id"));
                     intent.putExtra("isOrg", mCurrentUser.isOrg);
