@@ -504,7 +504,7 @@ public class MapFragment extends Fragment {
                     Double.parseDouble(restLongitude)) + " miles away");
 
             restName.setText(restaurant.getString("name"));
-            rating.setRating((int) Double.parseDouble(restaurant.getString("rating")));
+            rating.setRating(Math.round(Double.parseDouble(restaurant.getString("rating"))));
             typeOfFood.setText(foodCategories);
 
             slideView.setVisibility(View.VISIBLE);
