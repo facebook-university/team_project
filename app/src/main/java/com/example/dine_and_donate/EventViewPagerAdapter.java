@@ -16,10 +16,11 @@ public class EventViewPagerAdapter extends PagerAdapter {
     @Override
     public int getItemPosition(Object object) {
         int index = views.indexOf (object);
-        if (index == -1)
+        if (index == -1) {
             return POSITION_NONE;
-        else
+        } else {
             return index;
+        }
     }
 
     @Override
@@ -31,7 +32,7 @@ public class EventViewPagerAdapter extends PagerAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView (views.get (position));
+        container.removeView(views.get (position));
     }
 
     @Override
