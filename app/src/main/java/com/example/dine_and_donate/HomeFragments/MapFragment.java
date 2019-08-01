@@ -253,8 +253,7 @@ public class MapFragment extends Fragment {
 
                     if (mCurrentUser.isOrg) {
                         generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
-                    } else if (Math.abs(cameraLongitude - newLongitude) >= 0.01
-                                || Math.abs(cameraLatitude - newLatitude) >= 0.01) {
+                    } else {
                         generateMarkersEvents();
                     }
                 }
@@ -417,7 +416,6 @@ public class MapFragment extends Fragment {
                             try {
                                 final JSONObject restaurantJSON = new JSONObject(jsonData);
                                 eventsNearby.add(restaurantJSON);
-                                System.out.println(restaurantJSON);
                                 final JSONObject restLocation = restaurantJSON.getJSONObject("coordinates");
                                 final String restaurantName = restaurantJSON.getString("name");
                                 final LatLng restaurantPosition = new LatLng(restLocation.getDouble("latitude"), restLocation.getDouble("longitude"));
@@ -636,7 +634,7 @@ public class MapFragment extends Fragment {
         });
     }
 
-    private void saveButtonAtPosition(int pagerPosition, final DataSnapshot snapshot) {
+    private void saveButtonAtPosition(final int pagerPosition, final DataSnapshot snapshot) {
         if (mSavedEvents.get(mPagerAdapter.getEventId(pagerPosition)) != null) {
             mBtnEvent.setText(getString(R.string.saved));
         } else {
@@ -644,7 +642,7 @@ public class MapFragment extends Fragment {
             mBtnEvent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String eventId = mPagerAdapter.getEventId(0);
+                    String eventId = mPagerAdapter.getEventId(pagerPosition);
                     mSavedEvents.put(eventId, snapshot.getKey());
                     mRefForUser.child("Events").setValue(mSavedEvents, new DatabaseReference.CompletionListener() {
                         @Override
