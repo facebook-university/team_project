@@ -67,7 +67,7 @@
                     android:text="@string/startTimeTextView" />
 
                 <TimePicker
-                    android:id="@+id/timePicker1"
+                    android:id="@+id/startTimePicker"
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
                     android:timePickerMode="spinner" />
@@ -90,7 +90,7 @@
                     android:text="@string/endTimeTextView" />
 
                 <TimePicker
-                    android:id="@+id/timePicker2"
+                    android:id="@+id/endTimePicker"
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
                     android:timePickerMode="spinner" />

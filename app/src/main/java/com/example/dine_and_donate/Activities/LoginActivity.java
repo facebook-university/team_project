@@ -52,7 +52,6 @@ public class LoginActivity extends AppCompatActivity {
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference();
         mRefChild = mRef.child("users");
-
         //if someone is already signed in, skip sign in process
         if(mFbUser != null) {
             createUserModel();

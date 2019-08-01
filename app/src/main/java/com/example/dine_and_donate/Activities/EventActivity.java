@@ -3,6 +3,7 @@ package com.example.dine_and_donate.Activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -12,9 +13,11 @@ import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
@@ -50,6 +53,8 @@ public class EventActivity extends AppCompatActivity {
     private StorageReference mStorageRef;
 
     private CalendarView mCalendarView;
+    private TimePicker mStartTimePicker;
+    private TimePicker mEndTimePicker;
 
     private AutoCompleteTextView mAcSearch;
     private EditText mEtEventInfo;
@@ -73,6 +78,11 @@ public class EventActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         mCalendarView = findViewById(R.id.cvChooseDate);
+        mStartTimePicker = findViewById(R.id.startTimePicker);
+        mStartTimePicker.setEnabled(true);
+        mEndTimePicker = findViewById(R.id.endTimePicker);
+        mEndTimePicker.setEnabled(true);
+
 
         mAcSearch = findViewById(R.id.acSearch);
         mEtEventInfo = findViewById(R.id.etEventInfo);
@@ -83,37 +93,6 @@ public class EventActivity extends AppCompatActivity {
         final Intent intent = getIntent();
         final String location = intent.getStringExtra("location");
         mAcSearch.setText(location);
-
-        List<String> hoursArray = new ArrayList<>();
-        List<String> minsArray = new ArrayList<>();
-        List<String> halfsArray = new ArrayList<>();
-
-        halfsArray.add("AM");
-        halfsArray.add("PM");
-
-        for(int i = 0; i < 60; i++) {
-            if(i < 13 && i != 0) {
-                hoursArray.add(Integer.toString(i));
-            }
-            if(i < 10) {
-                minsArray.add("0" + i);
-            } else {
-                minsArray.add(Integer.toString(i));
-            }
-        }
-
-        //Todo: make time selection better
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, hoursArray);
-//        mStartHour.setAdapter(adapter);
-//        mEndHour.setAdapter(adapter);
-//
-//        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, minsArray);
-//        mStartMin.setAdapter(adapter);
-//        mEndMin.setAdapter(adapter);
-//
-//        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, halfsArray);
-//        mStartHalf.setAdapter(adapter);
-//        mEndHalf.setAdapter(adapter);
 
         mChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,14 +137,17 @@ public class EventActivity extends AppCompatActivity {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void writeEvent(Intent intent, String url, String location) {
         String orgId = mFirebaseCurrentUser.getUid();
         String yelpId = intent.getStringExtra("yelpID");
-        long eventDate = mCalendarView.getDate();
-        //todo: get times here
+        long eventDate = mCalendarView.getDate() - (mCalendarView.getDate() % 86400000);
+        //todo: i think this is grabbing the right time from the timePicker but conversion is wrong because of time zones
+        long startTime = eventDate + (mStartTimePicker.getHour()*3600000) + (mStartTimePicker.getMinute()*60000);
+        long endTime = eventDate + (mEndTimePicker.getHour()*3600000) + (mEndTimePicker.getMinute()*60000);
         String info = mEtEventInfo.getText().toString();
-        //Event newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
-        //mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
+        Event newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
+        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent);
         finish();
     }
 
@@ -188,9 +170,5 @@ public class EventActivity extends AppCompatActivity {
         String[] mimeTypes = {"image/jpeg", "image/png"};
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         startActivityForResult(intent, GALLERY_REQUEST_CODE);
-    }
-
-    private long convert(long day, int hour, int min, boolean isPM) {
-        return isPM ? (day + (2 * hour * 3600000) + (min * 60000)) : (day + (hour * 3600000) + (min * 60000));
     }
 }
