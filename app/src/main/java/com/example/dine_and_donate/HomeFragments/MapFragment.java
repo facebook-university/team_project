@@ -14,8 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,8 +29,11 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.EventActivity;
+import com.example.dine_and_donate.EventViewPagerAdapter;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
 
 import com.example.dine_and_donate.Models.Event;
@@ -59,6 +66,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.rd.PageIndicatorView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,6 +74,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -99,8 +108,11 @@ public class MapFragment extends Fragment {
     private Double cameraLongitude;
 
     private View slideView;
+    private View slideViewContent;
     private boolean slideViewIsUp;
-    private Button btnCreate;
+    private Button btn_event;
+    private ViewPager mViewPager;
+    private EventViewPagerAdapter mPagerAdapter;
 
     private Context mContext;
 
@@ -111,8 +123,7 @@ public class MapFragment extends Fragment {
     private DatabaseReference mRefForEvents;
     private User mCurrentUser;
     private ArrayList<Event> mNearbyEvents;
-
-    private ArrayList<Event> nearbyEvents = new ArrayList<>();
+    private Map<String, String> mSavedEvents;
 
     private HomeActivity homeActivity;
 
@@ -181,6 +192,11 @@ public class MapFragment extends Fragment {
 
         // setting up slide view with restaurant info
         slideView = view.findViewById(R.id.slide_menu);
+        ViewStub stub = (ViewStub) slideView.findViewById(R.id.slide_up_stub);
+        Integer slide_up_layout = (mCurrentUser.isOrg) ? R.layout.create_slide_up_fragment : R.layout.save_slide_up_fragment;
+        stub.setLayoutResource(slide_up_layout);
+        slideViewContent = stub.inflate();
+
         slideView.setVisibility(View.INVISIBLE);
         slideViewIsUp = false;
 
@@ -455,7 +471,40 @@ public class MapFragment extends Fragment {
     private void slideUpAnimation(final JSONObject restaurant) {
         try {
             TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
+            RatingBar rating = slideView.findViewById(R.id.ratingBar);
+            TextView typeOfFood = slideView.findViewById(R.id.typeOfFood);
+            TextView milesAway = slideView.findViewById(R.id.milesAway);
+
+            String foodCategories;
+
+            try {
+                foodCategories = restaurant.getString("price") + " ∙ ";
+            } catch (JSONException e) {
+                foodCategories = "";
+            }
+
+            JSONArray categoriesJSONArray = restaurant.getJSONArray("categories");
+
+            for (int i = 0; i < categoriesJSONArray.length(); i++) {
+                foodCategories += categoriesJSONArray.getJSONObject(i).getString("title");
+                if (i + 1 != categoriesJSONArray.length()) {
+                    foodCategories += ", ";
+                }
+            }
+
+            JSONObject coordinates = restaurant.getJSONObject("coordinates");
+            String restLatitude = coordinates.getString("latitude");
+            String restLongitude = coordinates.getString("longitude");
+
+            milesAway.setText(distance(mCurrentLocation.getLatitude(),
+                    mCurrentLocation.getLongitude(),
+                    Double.parseDouble(restLatitude),
+                    Double.parseDouble(restLongitude)) + " miles away");
+
             restName.setText(restaurant.getString("name"));
+            rating.setRating((int) Double.parseDouble(restaurant.getString("rating")));
+            typeOfFood.setText(foodCategories);
+
             slideView.setVisibility(View.VISIBLE);
             TranslateAnimation animate = new TranslateAnimation(
                     0,
@@ -465,7 +514,7 @@ public class MapFragment extends Fragment {
             animate.setDuration(500);
             animate.setFillAfter(true);
             slideView.startAnimation(animate);
-            btnCreate = slideView.findViewById(R.id.btn_create_event);
+            btn_event = slideViewContent.findViewById(R.id.btn_event);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -473,7 +522,7 @@ public class MapFragment extends Fragment {
 
     private void slideUpMenuCreate(final JSONObject restaurant) {
         slideUpAnimation(restaurant);
-        btnCreate.setOnClickListener(new View.OnClickListener() {
+        btn_event.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, EventActivity.class);
@@ -492,8 +541,7 @@ public class MapFragment extends Fragment {
 
     private void slideUpMenuSave(final JSONObject restaurant, final DataSnapshot snapshot) {
         slideUpAnimation(restaurant);
-        setUpCarousel(snapshot);
-        btnCreate.setText(getString(R.string.save));
+        setUpViewPager(snapshot);
     }
 
     private void slideDownMenu() {
@@ -528,57 +576,85 @@ public class MapFragment extends Fragment {
         }
     }
 
-    private void setUpCarousel(final DataSnapshot snapshot) {
-        CarouselPicker carouselPicker = (CarouselPicker) slideView.findViewById(R.id.carousel);
+    private void setUpViewPager(final DataSnapshot snapshot) {
+        final PageIndicatorView pageIndicatorView = slideViewContent.findViewById(R.id.pageIndicatorView);
+        mSavedEvents = mCurrentUser.getSavedEventsIDs();
+        btn_event = slideViewContent.findViewById(R.id.btn_event);
 
-        final ArrayList<String> eventIDs = new ArrayList<String>();
-        List<CarouselPicker.PickerItem> mixItems = new ArrayList<>();
+        mViewPager = slideViewContent.findViewById(R.id.viewPager);
+        pageIndicatorView.setSelection(0);
+        mPagerAdapter = new EventViewPagerAdapter();
+        mViewPager.setAdapter(mPagerAdapter);
+
+        // Create an initial view to display; must be a subclass of FrameLayout.
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         for (DataSnapshot eventChild : snapshot.getChildren()) {
-            mixItems.add(new CarouselPicker.TextItem(getDate((long) eventChild.child("startTime").getValue(),
-                    "MMM dd, yyyy \n hh:mm"),
-                    5));
-            eventIDs.add(eventChild.getKey());
+            FrameLayout event = (FrameLayout) inflater.inflate (R.layout.event_info_fragment, null);
+            TextView eventOrg = event.findViewById(R.id.org);
+            TextView eventInfo = event.findViewById(R.id.info);
+            ImageView eventVoucher = event.findViewById(R.id.voucher_img);
+
+            String date = getDate((long) eventChild.child("startTime").getValue(), "MMM dd, yyyy");
+            String startTime = getDate((long) eventChild.child("startTime").getValue(), "h:mm a");
+            String endTime = getDate((long) eventChild.child("endTime").getValue(), "h:mm a");
+
+            eventOrg.setText("Org name " + "is having a Dine & Donate here on " + date + " from " + startTime + " to " + endTime);
+            eventInfo.setText(eventChild.child("info").getValue().toString());
+
+            RequestOptions requestOptions = new RequestOptions()
+                    .placeholder(R.drawable.ic_launcher_background);
+
+            Glide.with(mContext)
+                    .load(eventChild.child("imageUrl").getValue().toString())
+                    .apply(requestOptions)
+                    .into(eventVoucher);
+
+            mPagerAdapter.addView(event, eventChild.getKey());
+            mPagerAdapter.notifyDataSetChanged();
         }
 
-        CarouselPicker.CarouselViewAdapter mixAdapter = new CarouselPicker.CarouselViewAdapter(slideView.getContext(), mixItems, 0);
-        carouselPicker.setAdapter(mixAdapter);
+        saveButtonAtPosition(0, snapshot);
 
-        btnCreate.setOnClickListener(new View.OnClickListener() {
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onClick(View v) {
-                final Map<String, String> savedEvents = mCurrentUser.getSavedEventsIDs();
-                savedEvents.put(eventIDs.get(position), snapshot.getKey());
-                mRefForUser.child("Events").setValue(savedEvents, new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                        if (databaseError != null) {
-                            Toast.makeText(getContext(), getString(R.string.errorMsg), Toast.LENGTH_LONG).show();
-                        } else {
-                            btnCreate.setText(getString(R.string.saved));
-                            mCurrentUser.addSavedEventID(savedEvents);
+            public void onPageScrolled(int pagerPosition, float positionOffset, int positionOffsetPixels) { }
+
+            @Override
+            public void onPageSelected(int pagerPosition) {
+                pageIndicatorView.setSelection(pagerPosition);
+                saveButtonAtPosition(pagerPosition, snapshot);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) { }
+        });
+    }
+
+    private void saveButtonAtPosition(int pagerPosition, final DataSnapshot snapshot) {
+        if (mSavedEvents.get(mPagerAdapter.getEventId(pagerPosition)) != null) {
+            btn_event.setText(getString(R.string.saved));
+        } else {
+            btn_event.setText(getString(R.string.save));
+            btn_event.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String eventId = mPagerAdapter.getEventId(0);
+                    mSavedEvents.put(eventId, snapshot.getKey());
+                    mRefForUser.child("Events").setValue(mSavedEvents, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                            if (databaseError != null) {
+                                Toast.makeText(getContext(), getString(R.string.errorMsg), Toast.LENGTH_LONG).show();
+                            } else {
+                                btn_event.setText(getString(R.string.saved));
+                                mCurrentUser.addSavedEventID(mSavedEvents);
+                            }
                         }
-                    }
-                });
-            }
-        });
-
-        carouselPicker.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                btnCreate.setText(getString(R.string.save));
-            }
-
-            @Override
-            public void onPageSelected(final int i) {
-                position = i;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+                    });
+                }
+            });
+        }
     }
 
     public static String getDate(long milliSeconds, String dateFormat) {
@@ -589,5 +665,19 @@ public class MapFragment extends Fragment {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
+    }
+
+    private static String distance(double lat1, double lon1, double lat2, double lon2) {
+        if ((lat1 == lat2) && (lon1 == lon2)) {
+            return "0";
+        }
+        else {
+            double theta = lon1 - lon2;
+            double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
+            dist = Math.acos(dist);
+            dist = Math.toDegrees(dist);
+            dist = dist * 60 * 1.1515;
+            return new DecimalFormat("#.##").format(dist);
+        }
     }
 }

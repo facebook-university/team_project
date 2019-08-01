@@ -30,8 +30,8 @@
     <string name="callRestaurant">Call Restaurant</string>
     <string name="userTypeIntro">I am looking to...</string>
     <string name="haveAcct">Already have an account?.</string>
-    <string name="save">Save</string>
-    <string name="saved">Saved!</string>
+    <string name="save">Save Event</string>
+    <string name="saved">Event Saved</string>
     <string name="errorMsg">Sorry, something went wrong!</string>
     <string name="choose_photo">Choose photo</string>
     <string name="upload_voucher_image">Upload Voucher Image</string>

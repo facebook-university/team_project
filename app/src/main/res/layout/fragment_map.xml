@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout2"
+    android:layout_marginTop="30dp"
+    android:layout_marginBottom="30dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -17,40 +19,19 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"
         android:background="@color/white"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <TextView
-            android:id="@+id/tv_restaurant_name"
+        <ViewStub
+            android:id="@+id/slide_up_stub"
+            android:inflatedId="@+id/message_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/resturantName"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+            android:layout_height="match_parent"
+            android:layout_weight="0.75" />
 
-        <in.goodiebag.carouselpicker.CarouselPicker
-            android:id="@+id/carousel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:background="#CCC"
-            app:items_visible="three" />
-
-        <Button
-            android:id="@+id/btn_create_event"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#00C853"
-            android:fontFamily="serif"
-            android:text="@string/createEvent"
-            android:textColor="#E6575151" />
     </LinearLayout>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
