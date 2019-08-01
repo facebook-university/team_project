@@ -142,7 +142,6 @@ public class EventActivity extends AppCompatActivity {
         });
 
         mBtnCreate.setOnClickListener(new View.OnClickListener() {
-
             final Uri[] downloadUri = new Uri[1];
             @Override
             public void onClick(View v) {
