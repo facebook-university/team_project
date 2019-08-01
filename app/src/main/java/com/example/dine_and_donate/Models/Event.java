@@ -1,6 +1,7 @@
 package com.example.dine_and_donate.Models;
 
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.File;
@@ -28,6 +29,15 @@ public class Event {
         this.info = info;
         this.imageUrl = imageUrl;
     }
+
+    public static ArrayList<Event> eventsHappeningAtRestaurant(DataSnapshot ds) {
+        ArrayList<Event> events = new ArrayList<>();
+        for(DataSnapshot snapshot : ds.getChildren()) {
+            events.add(snapshot.getValue(Event.class));
+        }
+        return events;
+    }
+
 
     public String getOrgId() {
         return orgId;

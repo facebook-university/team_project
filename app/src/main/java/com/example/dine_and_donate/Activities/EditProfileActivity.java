@@ -1,4 +1,4 @@
-package com.example.dine_and_donate;
+package com.example.dine_and_donate.Activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,8 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.User;
+import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.UploadUtil;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

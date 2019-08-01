@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.example.dine_and_donate.Activities.LoginActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Notification;
 import com.google.firebase.auth.FirebaseAuth;

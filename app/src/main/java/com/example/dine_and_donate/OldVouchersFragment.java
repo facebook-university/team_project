@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.example.dine_and_donate.Adapters.StaggeredRecyclerViewAdapter;
+
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,7 +55,7 @@ public class OldVouchersFragment extends Fragment {
         mRefForEvent = mRef.child("events");
 
         HomeActivity homeActivity = (HomeActivity) getActivity();
-        mCurrUser = homeActivity.mCurrentUser;
+        mCurrUser = homeActivity.currentUser;
         pastEvents = mCurrUser.getSavedEventsIDs();
         final long dateMillis = Calendar.getInstance().getTimeInMillis();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
