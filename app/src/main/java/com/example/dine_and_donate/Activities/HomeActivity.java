@@ -5,10 +5,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-
-import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,15 +38,12 @@ public class HomeActivity extends AppCompatActivity {
 
     private BottomNavigationView mBottomNavigationView;
     private DrawerLayout mDrawerNav;
-
     private NotificationsFragment mNotificationsFragment = new NotificationsFragment();
     private MapFragment mMapFragment = new MapFragment();
     private ProfileFragment mProfileFragment = new ProfileFragment();
     private ListFragment mListFragment = new ListFragment();
     private Fragment mDefaultFragment;
-
     public User currentUser;
-
     private ImageButton mBtnSwap;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
@@ -110,7 +103,10 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
+                        // Supply index input as an argument.
                         fragment = mNotificationsFragment;
+//                        ((NotificationsFragment) fragment).setLat(markerLatLng.latitude);
+//                        ((NotificationsFragment) fragment).setLng(markerLatLng.longitude);
                         mShowButton = false;
                         break;
                     case R.id.action_map:
@@ -187,6 +183,7 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtra(User.class.getSimpleName(), Parcels.wrap(currentUser));
         startActivity(intent);
     }
+
 
     private void setExploreTab() {
         if (mShowButton) {

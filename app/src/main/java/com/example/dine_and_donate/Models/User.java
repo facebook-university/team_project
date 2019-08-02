@@ -4,7 +4,6 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 import org.parceler.Parcel;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,27 +15,28 @@ public class User {
     public String email;
     public boolean isOrg;
     public String phoneNumber;
-    public File profileImage;
     public String bio;
     public Boolean prefersPhoneContact;
     public Map<String, String> savedEventsIDs = new HashMap<String, String>();
-    public String imageUrl;
+    public String profPic;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String name, String email) {
+    public User(String name, String email, String profPic) {
         this.name = name;
         this.email = email;
         this.isOrg = false;
+        this.profPic = profPic;
     }
 
-    public User(String name, String email, String phoneNumber) {
+    public User(String name, String email, String phoneNumber, String profPic) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.isOrg = true;
+        this.profPic = profPic;
     }
 
     public String getName() {
@@ -75,7 +75,7 @@ public class User {
 
     public void addSavedEventID(Map<String, String> ids) { this.savedEventsIDs = ids; }
 
-    public String getImageUrl() { return imageUrl; }
+    public String getProfPic() { return this.profPic; }
 
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public void setProfPic(String imageUrl) { this.profPic = imageUrl; }
 }

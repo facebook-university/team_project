@@ -21,6 +21,7 @@ import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.UploadUtil;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -64,6 +65,7 @@ public class EventActivity extends AppCompatActivity {
     private Uri mSelectedImage;
     private FirebaseUser mFirebaseCurrentUser;
     private Map<String, String> mCreatedEvents;
+
     private UploadUtil uploadUtil;
     private Task<Uri> urlTask;
     private Intent mIntent;
@@ -81,7 +83,6 @@ public class EventActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         mCalendarView = findViewById(R.id.cvChooseDate);
-
         mAcSearch = findViewById(R.id.acSearch);
         mStartHour = findViewById(R.id.startHour);
         mStartMin = findViewById(R.id.startMin);
@@ -145,7 +146,16 @@ public class EventActivity extends AppCompatActivity {
             final Uri[] downloadUri = new Uri[1];
             @Override
             public void onClick(View v) {
-                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask);
+                OnCompleteListener onCompleteListener = new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            downloadUri[0] = task.getResult();
+                            writeEvent(getIntent(), downloadUri[0].toString(), location);
+                        }
+                    }
+                };
+                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask, onCompleteListener);
             }
         });
     }

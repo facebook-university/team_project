@@ -1,7 +1,6 @@
 package com.example.dine_and_donate.HomeFragments;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.dine_and_donate.Models.Notification;
@@ -75,6 +76,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
             }
         });
+        holder.mNotifiedAt.setText("2 m ago");
+        //holder.mNotifiedAt.setText(DateUtils.getRelativeTimeSpanString(notification.getCreatedAt(), System.currentTimeMillis(),DateUtils.M).toString());
     }
 
     private String getRestaurantName(String entireLocation) {
@@ -97,6 +100,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         public ImageView mOrgPic;
         public TextView mStartDate;
         public TextView mPartner;
+        public TextView mNotifiedAt;
         public androidx.constraintlayout.widget.ConstraintLayout mItem;
 
         //constructor takes in an inflated layout
@@ -106,12 +110,19 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             mStartDate = itemView.findViewById(R.id.date_tv);
             mPartner = itemView.findViewById(R.id.partnered_with_tv);
             mItem =  itemView.findViewById(R.id.notification_layout);
+            mNotifiedAt = itemView.findViewById(R.id.notified_at_tv);
             mItem.setOnClickListener(this);
         }
 
         @Override
+        //TODO not finished
         public void onClick(View v) {
-            v.setBackgroundColor(Color.WHITE);
+            MapFragment mMapFragment = new MapFragment();
+            ProfileFragment mProfileFragment = new ProfileFragment();
+            AppCompatActivity activity = (AppCompatActivity) v.getContext();
+//            Fragment fragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
+            Fragment fragment = new MapFragment();
+            activity.getSupportFragmentManager().beginTransaction().replace(R.id.bottom_navigation, fragment).addToBackStack(null).commit();
         }
     }
 }

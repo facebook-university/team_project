@@ -59,11 +59,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mSignUpBtn = findViewById(R.id.final_signup_btn);
         mBackToLogin = findViewById(R.id.back_to_login_btn);
 
-        mName.setVisibility(View.GONE);
-        mEmail.setVisibility(View.GONE);
-        mPassword.setVisibility(View.GONE);
-        mOrgPhone.setVisibility(View.GONE);
-        mSignUpBtn.setVisibility(View.GONE);
+        invisibleView();
 
         //display specific text views depending on user type selected
         mSpinner = findViewById(R.id.user_options);
@@ -89,11 +85,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     mSignUpBtn.setVisibility(View.VISIBLE);
                     mPassword.setVisibility(View.VISIBLE);
                 } else {
-                    mName.setVisibility(View.GONE);
-                    mEmail.setVisibility(View.GONE);
-                    mPassword.setVisibility(View.GONE);
-                    mOrgPhone.setVisibility(View.GONE);
-                    mSignUpBtn.setVisibility(View.GONE);
+                    invisibleView();
                 }
             }
 
@@ -154,7 +146,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     if (task.isSuccessful()) {
                         mUser = mAuth.getCurrentUser();
                         Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
-                        mCreatedUser = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
+                        mCreatedUser = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"), "");
                         navigationHelper(HomeActivity.class);
                     } else {
                         // If sign in fails, display a message to the user.
@@ -167,12 +159,12 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
             });
     }
 
-    private User writeNewUser(String userId, String name, String email, boolean isOrg) {
+    private User writeNewUser(String userId, String name, String email, boolean isOrg, String profPic) {
         User user;
         if(!isOrg) {
-            user = new User(name, email);
+            user = new User(name, email, profPic);
         } else {
-            user = new User(name, email, mOrgPhone.getText().toString());
+            user = new User(name, email, mOrgPhone.getText().toString(), profPic);
         }
         mDatabase.child("users").child(userId).setValue(user);
         return user;
@@ -183,5 +175,13 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCreatedUser));
         startActivity(intent);
         finish();
+    }
+
+    private void invisibleView() {
+        mName.setVisibility(View.GONE);
+        mEmail.setVisibility(View.GONE);
+        mPassword.setVisibility(View.GONE);
+        mOrgPhone.setVisibility(View.GONE);
+        mSignUpBtn.setVisibility(View.GONE);
     }
 }

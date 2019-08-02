@@ -34,6 +34,8 @@ public class NotificationsFragment extends Fragment {
     private DatabaseReference mRef;
     private DatabaseReference mNotificationsRef;
     private FirebaseDatabase mDatabase;
+    private double mLat;
+    private double mLng;
 
     @Nullable
     @Override
@@ -54,7 +56,6 @@ public class NotificationsFragment extends Fragment {
         mNotificationList = new ArrayList<>();
         mNotificationsAdapter = new NotificationsAdapter(mNotificationList);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getContext());
-
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mNotificationsAdapter);
 
@@ -84,5 +85,13 @@ public class NotificationsFragment extends Fragment {
 
             }
         });
+    }
+
+    public void setLat(double lat){
+        this.mLat = lat;
+    }
+
+    public void setLng(double lng){
+        this.mLng = lng;
     }
 }

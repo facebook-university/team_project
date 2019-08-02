@@ -1,10 +1,10 @@
 package com.example.dine_and_donate.Activities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.UploadUtil;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,17 +47,19 @@ public class EditProfileActivity extends AppCompatActivity {
     private TextView mNumberTextView;
     private Button mChangeProfPic;
     private CircleImageView mProfPic;
-    private Uri mSelectedImage;
+
     private FirebaseDatabase mDatabase;
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForUser;
     private StorageReference mStorageRef;
+
     private User mCurrentUser;
-    private Context mContext;
+    private Uri mSelectedImage;
     private UploadUtil uploadUtil;
     private Intent mIntent;
     private Task<Uri> urlTask;
+    private  Uri[] downloadUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +80,11 @@ public class EditProfileActivity extends AppCompatActivity {
         mRef = mDatabase.getReference(); //need an instance of database reference
         mRefForUser = mRef.child("users").child(mFbUser.getUid());
 
-
+        downloadUri = new Uri[1];
         mIntent = new Intent(Intent.ACTION_PICK);
         mClearName.setVisibility(View.INVISIBLE);
         mStorageRef = FirebaseStorage.getInstance().getReference();
-
+        mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
         //retrieve values from database
         mRefForUser.addValueEventListener(new ValueEventListener() {
@@ -148,7 +151,20 @@ public class EditProfileActivity extends AppCompatActivity {
                         if (databaseError != null) {
                             Toast.makeText(EditProfileActivity.this, "Error Saving Data To Database", Toast.LENGTH_LONG).show();
                         } else {
+                            Log.d("db", "uploaded to db");
                             mCurrentUser.setName(newName);
+                        }
+                    }
+                });
+
+                mRefForUser.child("profPic").setValue(downloadUri[0], new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        if(databaseError == null) {
+                            Log.d("works", "worked");
+
+                        } else {
+                            Log.d("didnt work", ":(");
                         }
                         Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
                         intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
@@ -166,13 +182,22 @@ public class EditProfileActivity extends AppCompatActivity {
         });
 
         mChangeProfPic.setOnClickListener(new View.OnClickListener() {
-            final Uri[] downloadUri = new Uri[1];
-
             @Override
             public void onClick(View v) {
                 uploadUtil = new UploadUtil(EditProfileActivity.this);
                 uploadUtil.pickFromGallery(mIntent);
-                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask);
+                OnCompleteListener onCompleteListener = new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            downloadUri[0] = task.getResult();
+                            Log.d("in on comp", mCurrentUser.getProfPic() + "");
+                            mCurrentUser.setProfPic(downloadUri[0].toString());
+                        }
+                    }
+                };
+                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask, onCompleteListener);
+                Log.d("prof", mCurrentUser.getProfPic() + "");
             }
         });
     }

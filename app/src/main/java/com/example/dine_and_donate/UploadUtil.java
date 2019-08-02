@@ -25,7 +25,7 @@ public class UploadUtil {
     }
 
 
-    public void inOnClick(View v, Uri selectedImage, final Uri[] downloadUri, StorageReference mStorageRef, Task<Uri> urlTask) {
+    public void inOnClick(View v, Uri selectedImage, final Uri[] downloadUri, StorageReference mStorageRef, Task<Uri> urlTask, OnCompleteListener onCompleteListener) {
         if(selectedImage != null) {
             final StorageReference ref = mStorageRef.child("images/"+selectedImage.getLastPathSegment());
             UploadTask uploadTask = ref.putFile(selectedImage);
@@ -39,15 +39,7 @@ public class UploadUtil {
                     // Continue with the task to get the download URL
                     return ref.getDownloadUrl();
                 }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        downloadUri[0] = task.getResult();
-                        String s = downloadUri[0].toString();
-                    }
-                }
-            });
+            }).addOnCompleteListener(onCompleteListener);
         }
     }
 
