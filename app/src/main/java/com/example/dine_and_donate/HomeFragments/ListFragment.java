@@ -48,8 +48,12 @@ public class ListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mOrgAdapter = new RestaurantListViewAdapter(mRestaurantsJSON);
-        mUserAdapter = new EventListViewAdapter(mAllEvents,mIdToRestaurant, mIdToOrg);
+        mActivity = (HomeActivity) getActivity();
+        if(mActivity.currentUser.isOrg) {
+            mOrgAdapter = new RestaurantListViewAdapter(mRestaurantsJSON);
+        } else {
+            mUserAdapter = new EventListViewAdapter(mAllEvents,mIdToRestaurant, mIdToOrg);
+        }
     }
 
     @Override
@@ -57,7 +61,6 @@ public class ListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mRvNearbyList = view.findViewById(R.id.rvNearbyList);
         mRvNearbyList.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        mActivity = (HomeActivity) getActivity();
 
         if(mActivity.currentUser.isOrg) {
             mRvNearbyList.setAdapter(mOrgAdapter);
