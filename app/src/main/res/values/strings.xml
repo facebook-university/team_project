@@ -26,6 +26,8 @@
     <string name="number">Number</string>
     <string name="changeProfPic">Change Profile Picture</string>
     <string name="logOut">Log Out</string>
+    <string name="logIn">Log In</string>
+    <string name="signUp">Sign Up</string>
     <string name="help">Help</string>
     <string name="callRestaurant">Call Restaurant</string>
     <string name="userTypeIntro">I am looking to...</string>
@@ -35,6 +37,7 @@
     <string name="errorMsg">Sorry, something went wrong!</string>
     <string name="choose_photo">Choose photo</string>
     <string name="upload_voucher_image">Upload Voucher Image</string>
+    <string name="info">ingo</string>
     <string name="main_info_event">%1$s is having a Dine &amp; Donate here on %2$s from %3$s to %4$s</string>
 
 </resources>

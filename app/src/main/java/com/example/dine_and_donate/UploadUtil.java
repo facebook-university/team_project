@@ -24,7 +24,6 @@ public class UploadUtil {
         mActivity = currActivity;
     }
 
-
     public void inOnClick(View v, Uri selectedImage, final Uri[] downloadUri, StorageReference mStorageRef, Task<Uri> urlTask, OnCompleteListener onCompleteListener) {
         if(selectedImage != null) {
             final StorageReference ref = mStorageRef.child("images/"+selectedImage.getLastPathSegment());

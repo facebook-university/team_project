@@ -19,8 +19,7 @@
         app:layout_constraintBottom_toTopOf="@+id/et_name"
         app:layout_constraintEnd_toStartOf="@+id/user_options"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/user_options"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="@+id/user_options" />
 
     <Spinner
         android:id="@+id/user_options"
@@ -75,7 +74,6 @@
         android:password="true"
         app:layout_constraintBottom_toTopOf="@+id/et_org_phone"
         app:layout_constraintEnd_toEndOf="@+id/et_email"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/et_email" />
 
     <EditText
@@ -100,7 +98,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="48dp"
-        android:text="Sign Up"
+        android:text="@string/signUp"
         app:layout_constraintBottom_toTopOf="@+id/haveAcct_tv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -127,7 +125,7 @@
         android:layout_marginEnd="72dp"
         android:layout_marginRight="72dp"
         android:layout_marginBottom="32dp"
-        android:text="Log In"
+        android:text="@string/logIn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
