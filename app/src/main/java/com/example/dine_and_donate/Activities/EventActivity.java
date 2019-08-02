@@ -6,13 +6,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
@@ -38,8 +36,6 @@ import com.google.firebase.storage.UploadTask;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -57,7 +53,7 @@ public class EventActivity extends AppCompatActivity {
     private TimePicker mStartTimePicker;
     private TimePicker mEndTimePicker;
 
-    private AutoCompleteTextView mAcSearch;
+    private TextView mTvLocation;
     private EditText mEtEventInfo;
     private Button mBtnCreate;
     private Button mChooseImage;
@@ -68,7 +64,7 @@ public class EventActivity extends AppCompatActivity {
     private Map<String, String> mCreatedEvents;
     private UploadUtil uploadUtil;
     private Task<Uri> urlTask;
-    private Intent mIntent;
+    private Event mEditEvent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,19 +85,25 @@ public class EventActivity extends AppCompatActivity {
         mEndTimePicker.setEnabled(true);
 
 
-        mAcSearch = findViewById(R.id.acSearch);
+        mTvLocation = findViewById(R.id.tvLocation);
         mEtEventInfo = findViewById(R.id.etEventInfo);
         mBtnCreate = findViewById(R.id.create_event);
         mChooseImage = findViewById(R.id.btnChoosePhoto);
         mVoucherImageView = findViewById(R.id.ivVoucherImage);
 
-        mIntent = new Intent();
         mCurrUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
         mCreatedEvents = mCurrUser.getSavedEventsIDs();
 
         final Intent intent = getIntent();
-        final String location = intent.getStringExtra("location");
-        mAcSearch.setText(location);
+        final String yelp_id = intent.getStringExtra("yelpId");
+        mEditEvent = Parcels.unwrap(intent.getParcelableExtra(Event.class.getSimpleName()));
+        mTvLocation.setText(mEditEvent.locationString);
+
+        if(mEditEvent != null) {
+            // todo : set date, times, info, photo
+            mTvLocation.setText(mEditEvent.locationString);
+            mEtEventInfo.setText(mEditEvent.info);
+        }
 
         mChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,30 +136,28 @@ public class EventActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 downloadUri[0] = task.getResult();
                                 String s = downloadUri[0].toString();
-                                writeEvent(intent, s, location);
+                                writeEvent(yelp_id, s);
                             } else {
                                 // Handle failures
                             }
                         }
                     });
-
                 }
             }
         });
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public void writeEvent(Intent intent, String url, String location) {
+    public void writeEvent(final String yelpId, String url) {
         String orgId = mFirebaseCurrentUser.getUid();
-        final String yelpId = intent.getStringExtra("yelpID");
         long eventDate = mCalendarView.getDate() - (mCalendarView.getDate() % 86400000);
         //todo: i think this is grabbing the right time from the timePicker but conversion is wrong because of time zones
         long startTime = eventDate + (mStartTimePicker.getHour() * 3600000) + (mStartTimePicker.getMinute() * 60000);
         long endTime = eventDate + (mEndTimePicker.getHour() * 3600000) + (mEndTimePicker.getMinute() * 60000);
         String info = mEtEventInfo.getText().toString();
-        newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
-        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent, new DatabaseReference.CompletionListener() {
+        String id = mEditEvent == null ? UUID.randomUUID().toString() : mEditEvent.eventId;
+        newEvent = new Event(orgId, yelpId, mEditEvent.locationString, startTime, endTime, info, url, id);
+        mRef.child("events").child(yelpId).child(id).setValue(newEvent, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 //there is not error, can add event to database
@@ -193,6 +193,5 @@ public class EventActivity extends AppCompatActivity {
         String[] mimeTypes = {"image/jpeg", "image/png"};
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         startActivityForResult(intent, GALLERY_REQUEST_CODE);
-
     }
 }

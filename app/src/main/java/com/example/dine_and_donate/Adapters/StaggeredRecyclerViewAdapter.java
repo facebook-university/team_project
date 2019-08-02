@@ -70,7 +70,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
             public void onClick(View v) {
                 HomeActivity homeActivity = (HomeActivity) mContext;
 
-                VoucherDetailFragment voucherFragment = new VoucherDetailFragment(event.imageUrl);
+                VoucherDetailFragment voucherFragment = new VoucherDetailFragment(event);
 
                 voucherFragment.setSharedElementEnterTransition(new VoucherTransition());
                 voucherFragment.setEnterTransition(new Fade());

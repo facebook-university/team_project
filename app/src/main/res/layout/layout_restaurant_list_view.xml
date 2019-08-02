@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     app:cardElevation="2dp"
     app:cardCornerRadius="10dp"
-    app:strokeColor="#e9e9e9"
+    app:strokeColor="@color/greyCardStroke"
     app:cardBackgroundColor="#fafafa"
     app:strokeWidth="1dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
