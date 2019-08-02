@@ -82,11 +82,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import in.goodiebag.carouselpicker.CarouselPicker;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -489,10 +487,10 @@ public class MapFragment extends Fragment {
 
     private void slideUpAnimation(final JSONObject restaurant) {
         try {
-            TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
+            TextView restName = slideView.findViewById(R.id.tvRestaurantName);
             RatingBar rating = slideView.findViewById(R.id.ratingBar);
-            TextView typeOfFood = slideView.findViewById(R.id.typeOfFood);
-            TextView milesAway = slideView.findViewById(R.id.milesAway);
+            TextView typeOfFood = slideView.findViewById(R.id.tvDescription);
+            TextView milesAway = slideView.findViewById(R.id.tvDistance);
 
             String foodCategories;
 
@@ -543,7 +541,7 @@ public class MapFragment extends Fragment {
         slideUpAnimation(restaurant);
         TextView phoneNumber = slideView.findViewById(R.id.phone_number);
 
-        ImageView restaurantImg = slideView.findViewById(R.id.restaurant_image);
+        ImageView restaurantImg = slideView.findViewById(R.id.ivRestaurant);
         RequestOptions requestOptions = new RequestOptions()
                 .placeholder(R.drawable.ic_launcher_background);
 
@@ -595,7 +593,7 @@ public class MapFragment extends Fragment {
     }
 
 
-    public Location getmCurrentLocation() {
+    public Location getCurrentLocation() {
         return mCurrentLocation;
     }
 
@@ -708,7 +706,7 @@ public class MapFragment extends Fragment {
         return formatter.format(calendar.getTime());
     }
 
-    private static String distance(double lat1, double lon1, double lat2, double lon2) {
+    public static String distance(double lat1, double lon1, double lat2, double lon2) {
         if ((lat1 == lat2) && (lon1 == lon2)) {
             return "0";
         }

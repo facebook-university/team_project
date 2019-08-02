@@ -66,30 +66,11 @@
                     android:gravity="center"
                     android:text="@string/startTimeTextView" />
 
-                <LinearLayout
+                <TimePicker
+                    android:id="@+id/startTimePicker"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="horizontal">
-
-                    <Spinner
-                        android:id="@+id/startHour"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1" />
-
-                    <Spinner
-                        android:id="@+id/startMin"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <Spinner
-                        android:id="@+id/startHalf"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-                </LinearLayout>
+                    android:layout_height="100dp"
+                    android:timePickerMode="spinner" />
             </LinearLayout>
 
             <LinearLayout
@@ -108,30 +89,11 @@
                     android:gravity="center"
                     android:text="@string/endTimeTextView" />
 
-                <LinearLayout
+                <TimePicker
+                    android:id="@+id/endTimePicker"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="horizontal">
-
-                    <Spinner
-                        android:id="@+id/endHour"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <Spinner
-                        android:id="@+id/endMin"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <Spinner
-                        android:id="@+id/endHalf"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-                </LinearLayout>
+                    android:layout_height="100dp"
+                    android:timePickerMode="spinner" />
             </LinearLayout>
 
             <TextView

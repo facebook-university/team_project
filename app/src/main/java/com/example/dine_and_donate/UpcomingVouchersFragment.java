@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Adapters.StaggeredRecyclerViewAdapter;
+import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,12 +28,11 @@ import java.util.Map;
 public class UpcomingVouchersFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
-    private ArrayList<String> mImageUrls = new ArrayList<>();
-    private ArrayList<String> mNames = new ArrayList<>();
     private Map<String, String> mSavedEventsIDs;
     private User mCurrUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForEvent;
+    private ArrayList<Event> mEvents = new ArrayList<>();
 
     //create view based on data in array lists, inflates the layout of the fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -57,7 +57,7 @@ public class UpcomingVouchersFragment extends Fragment {
                     for(DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
                         if(mSavedEventsIDs.containsKey(dsEvent.getKey())) {
-                            initBitmapsUpcomingEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
+                            initBitmapsUpcomingEvents(dsEvent.getValue(Event.class));
                         }
                     }
                 }
@@ -68,15 +68,14 @@ public class UpcomingVouchersFragment extends Fragment {
             }
         });
         mRecyclerView = view.findViewById(R.id.rv_vouchers);
-        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
+        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mRecyclerView.setAdapter(staggeredRecyclerViewAdapter);
     }
 
     //add images and descriptions to respective arrayLists
-    private void initBitmapsUpcomingEvents(String mUrls, String mDescriptions) {
-        mImageUrls.add(mUrls);
-        mNames.add(mDescriptions);
+    private void initBitmapsUpcomingEvents(Event event) {
+        mEvents.add(event);
     }
 }

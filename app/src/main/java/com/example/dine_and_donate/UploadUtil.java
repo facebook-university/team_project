@@ -45,6 +45,7 @@ public class UploadUtil {
                     if (task.isSuccessful()) {
                         downloadUri[0] = task.getResult();
                         String s = downloadUri[0].toString();
+
                     }
                 }
             });

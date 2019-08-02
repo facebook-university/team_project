@@ -6,9 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -191,10 +188,12 @@ public class HomeActivity extends AppCompatActivity {
     private void setExploreTab() {
         if (mShowButton) {
             if (mIsOnMapView) {
+                mListFragment = new ListFragment();
                 mListFragment.setAllEvents(mMapFragment.getAllEvents());
                 mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
                 mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
                 mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
+                mListFragment.setLocation(mMapFragment.getCurrentLocation());
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, mListFragment)
                         .addToBackStack(null)
@@ -244,4 +243,6 @@ public class HomeActivity extends AppCompatActivity {
             workManager.enqueue(OneTimeWorkRequest.from(NotifyWorker.class));
         }
     }
+
+
 }
