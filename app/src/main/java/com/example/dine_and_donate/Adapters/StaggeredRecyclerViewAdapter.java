@@ -77,7 +77,6 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
                 voucherFragment.setExitTransition(new Fade());
                 voucherFragment.setSharedElementReturnTransition(new VoucherTransition());
 
-
                 homeActivity.
                         getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, voucherFragment)
@@ -87,8 +86,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
             }
         });
     }
-
-
+    
     @Override
     //return number of images present held by the adapter
     public int getItemCount() {

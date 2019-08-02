@@ -1,22 +1,16 @@
 package com.example.dine_and_donate.HomeFragments;
 
-import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.MultiTransformation;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.R;
 
@@ -25,10 +19,10 @@ public class VoucherDetailFragment extends Fragment {
     ImageView ivVoucher;
     ImageView ivShare;
     ImageView ivEdit;
-    String ImageUrl;
+    String imageUrl;
 
     public VoucherDetailFragment(String imageUrl) {
-        ImageUrl = imageUrl;
+        this.imageUrl = imageUrl;
     }
 
     @Nullable
@@ -51,7 +45,7 @@ public class VoucherDetailFragment extends Fragment {
 
         Glide.with(view.getContext())
                 // Todo: change this to real image, need to add imageUrl field in edit profile
-                .load(ImageUrl)
+                .load(imageUrl)
                 .into(ivVoucher);
 
     }

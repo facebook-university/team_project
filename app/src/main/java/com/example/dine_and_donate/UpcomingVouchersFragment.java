@@ -28,7 +28,6 @@ import java.util.Map;
 public class UpcomingVouchersFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
-
     private Map<String, String> mSavedEventsIDs;
     private User mCurrUser;
     private DatabaseReference mRef;
@@ -78,6 +77,5 @@ public class UpcomingVouchersFragment extends Fragment {
     //add images and descriptions to respective arrayLists
     private void initBitmapsUpcomingEvents(Event event) {
         mEvents.add(event);
-
     }
 }
