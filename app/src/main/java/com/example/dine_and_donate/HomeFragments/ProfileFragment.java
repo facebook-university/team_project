@@ -25,8 +25,7 @@ public class ProfileFragment extends Fragment {
     private TabLayout mTabLayout;
     private ViewPagerAdapter mVoucherPagerAdapter;
     private ViewPager mVoucherView;
-    private TextView mOrgName;
-    private TextView mConsumerName;
+    private TextView mUserName;
     private TextView mBio;
     private ImageView mProfPic;
     private ImageView mBlurredPic;
@@ -56,9 +55,14 @@ public class ProfileFragment extends Fragment {
         mLayoutForOrg = view.findViewById(R.id.forOrg);
         mTabLayout = view.findViewById(R.id.tabs_profile);
         mTabLayout.setupWithViewPager(mVoucherView);
-        mOrgName = view.findViewById(R.id.org_name);
-        mConsumerName = view.findViewById(R.id.cons_name);
         setUpTopProfile(mCurrentUserModel.name);
+        if(mCurrentUserModel.isOrg) {
+            mProfPic = view.findViewById(R.id.org_prof_pic);
+            mUserName = view.findViewById(R.id.org_name);
+        } else {
+            mProfPic = view.findViewById(R.id.cons_prof_pic);
+            mUserName = view.findViewById(R.id.cons_name);
+        }
     }
 
     //set up for top of profile page based on user type
@@ -67,11 +71,12 @@ public class ProfileFragment extends Fragment {
         if(mCurrentUserModel.isOrg) {
             mLayoutForOrg.setVisibility(View.VISIBLE);
             mLayoutForConsumer.setVisibility(View.GONE);
-            mOrgName.setText(name);
         } else {
             mLayoutForOrg.setVisibility(View.GONE);
             mLayoutForConsumer.setVisibility(View.VISIBLE);
-            mConsumerName.setText(name);
         }
+        //mUserName.setText(name);
+        //mProfPic.setImageURI(mCurrentUserModel.getProfPic());
+
     }
 }

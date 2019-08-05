@@ -105,8 +105,6 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         // Supply index input as an argument.
                         fragment = mNotificationsFragment;
-//                        ((NotificationsFragment) fragment).setLat(markerLatLng.latitude);
-//                        ((NotificationsFragment) fragment).setLng(markerLatLng.longitude);
                         mShowButton = false;
                         break;
                     case R.id.action_map:

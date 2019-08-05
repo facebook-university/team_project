@@ -10,10 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Models.User;
@@ -55,11 +53,11 @@ public class EditProfileActivity extends AppCompatActivity {
     private StorageReference mStorageRef;
 
     private User mCurrentUser;
-    private Uri mSelectedImage;
+    private Uri mLocalImageUri;
     private UploadUtil uploadUtil;
     private Intent mIntent;
     private Task<Uri> urlTask;
-    private  Uri[] downloadUri;
+    private Uri[] downloadUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,33 +142,38 @@ public class EditProfileActivity extends AppCompatActivity {
         mSaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 final String newName = mEditName.getText().toString();
-                mRef.child("users").child(mFbUser.getUid()).child("name").setValue(newName, new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                        if (databaseError != null) {
-                            Toast.makeText(EditProfileActivity.this, "Error Saving Data To Database", Toast.LENGTH_LONG).show();
-                        } else {
-                            Log.d("db", "uploaded to db");
-                            mCurrentUser.setName(newName);
-                        }
-                    }
-                });
+                mCurrentUser.setName(newName);
+                mRef.child("users").child(mFbUser.getUid()).child("name").setValue(newName);
 
-                mRefForUser.child("profPic").setValue(downloadUri[0], new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                        if(databaseError == null) {
-                            Log.d("works", "worked");
+                if (mLocalImageUri != null) {
+                    OnCompleteListener onCompleteListener = new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if (task.isSuccessful()) {
+                                downloadUri[0] = task.getResult(); // remote image uri
+                                Log.d("task", task.getResult() + "");
+                                Log.d("array", downloadUri[0] + "");
+                                mCurrentUser.setProfPic(downloadUri[0].toString());
 
-                        } else {
-                            Log.d("didnt work", ":(");
+                                Log.d("arrayElement", downloadUri[0] + "");
+                                mRefForUser.child("profPic").setValue(downloadUri[0].toString());
+                                Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
+                                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
+                                startActivity(intent);
+
+                            }
                         }
-                        Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
-                        intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
-                        startActivity(intent);
-                    }
-                });
+                    };
+
+                    Log.d("changeBtn", mCurrentUser.getProfPic() + "");
+                    uploadUtil.inOnClick(v, mLocalImageUri, downloadUri, mStorageRef, urlTask, onCompleteListener);
+                } else {
+                    Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
+                    intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
+                    startActivity(intent);
+                }
             }
         });
 
@@ -186,39 +189,27 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 uploadUtil = new UploadUtil(EditProfileActivity.this);
                 uploadUtil.pickFromGallery(mIntent);
-                OnCompleteListener onCompleteListener = new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-                        if (task.isSuccessful()) {
-                            downloadUri[0] = task.getResult();
-                            Log.d("in on comp", mCurrentUser.getProfPic() + "");
-                            mCurrentUser.setProfPic(downloadUri[0].toString());
-                        }
-                    }
-                };
-                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask, onCompleteListener);
-                Log.d("prof", mCurrentUser.getProfPic() + "");
             }
         });
     }
 
     private void setState(EditText etField, ImageButton clearField) {
-        if(etField.getText().toString().isEmpty()) {
+        if (etField.getText().toString().isEmpty()) {
             clearField.setVisibility(View.INVISIBLE);
         } else {
             clearField.setVisibility(View.VISIBLE);
         }
     }
 
-    public void onActivityResult(int requestCode,int resultCode,Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // Result code is RESULT_OK only if the user selects an Image
         if (resultCode == Activity.RESULT_OK) {
-            switch (requestCode){
+            switch (requestCode) {
                 case GALLERY_REQUEST_CODE:
                     //data.getData returns the content URI for the selected Image
-                    mSelectedImage = data.getData();
-                    mProfPic.setImageURI(mSelectedImage);
+                    mLocalImageUri = data.getData();
+                    mProfPic.setImageURI(mLocalImageUri);
                     break;
             }
         }

@@ -35,15 +35,16 @@ public class OldVouchersFragment extends Fragment {
     private User mCurrUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForEvent;
+    private StaggeredRecyclerViewAdapter mStaggeredRecyclerViewAdapter;
 
     //inflates layout of fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.tab_fragment, container, false);
         mRecyclerView = mView.findViewById(R.id.rv_vouchers);
-        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
+        mStaggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
-        mRecyclerView.setAdapter(staggeredRecyclerViewAdapter);
+        mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
         return mView;
     }
 
@@ -79,7 +80,6 @@ public class OldVouchersFragment extends Fragment {
 
             }
         });
-        mRecyclerView = view.findViewById(R.id.rv_vouchers);
         StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
@@ -90,5 +90,6 @@ public class OldVouchersFragment extends Fragment {
     private void initBitmapsPastEvents(String mUrls, String mDescriptions) {
         mImageUrls.add(mUrls);
         mNames.add(mDescriptions);
+        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
     }
 }

@@ -59,7 +59,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mSignUpBtn = findViewById(R.id.final_signup_btn);
         mBackToLogin = findViewById(R.id.back_to_login_btn);
 
-        invisibleView();
+        hideView();
 
         //display specific text views depending on user type selected
         mSpinner = findViewById(R.id.user_options);
@@ -85,7 +85,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     mSignUpBtn.setVisibility(View.VISIBLE);
                     mPassword.setVisibility(View.VISIBLE);
                 } else {
-                    invisibleView();
+                    hideView();
                 }
             }
 
@@ -177,7 +177,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         finish();
     }
 
-    private void invisibleView() {
+    private void hideView() {
         mName.setVisibility(View.GONE);
         mEmail.setVisibility(View.GONE);
         mPassword.setVisibility(View.GONE);

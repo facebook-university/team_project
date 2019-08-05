@@ -76,8 +76,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
             }
         });
-        holder.mNotifiedAt.setText("2 m ago");
-        //holder.mNotifiedAt.setText(DateUtils.getRelativeTimeSpanString(notification.getCreatedAt(), System.currentTimeMillis(),DateUtils.M).toString());
     }
 
     private String getRestaurantName(String entireLocation) {
@@ -120,7 +118,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             MapFragment mMapFragment = new MapFragment();
             ProfileFragment mProfileFragment = new ProfileFragment();
             AppCompatActivity activity = (AppCompatActivity) v.getContext();
-//            Fragment fragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
             Fragment fragment = new MapFragment();
             activity.getSupportFragmentManager().beginTransaction().replace(R.id.bottom_navigation, fragment).addToBackStack(null).commit();
         }
