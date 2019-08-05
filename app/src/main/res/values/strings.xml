@@ -35,6 +35,7 @@
     <string name="errorMsg">Sorry, something went wrong!</string>
     <string name="choose_photo">Choose photo</string>
     <string name="upload_voucher_image">Upload Voucher Image</string>
+    <string name="miles">%1$s miles away</string>
     <string name="main_info_event">%1$s is having a Dine &amp; Donate here on %2$s from %3$s to %4$s</string>
 
 </resources>

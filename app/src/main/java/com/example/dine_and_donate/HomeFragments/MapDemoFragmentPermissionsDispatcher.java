@@ -27,7 +27,7 @@ public final class MapDemoFragmentPermissionsDispatcher {
         if (PermissionUtils.hasSelfPermissions(target, PERMISSION_GETMYLOCATION)) {
             fragment.getMyLocation();
         } else {
-            ActivityCompat.requestPermissions(fragment.getActivity(), PERMISSION_GETMYLOCATION, REQUEST_GETMYLOCATION);
+            fragment.requestPermissions(PERMISSION_GETMYLOCATION, REQUEST_GETMYLOCATION);
         }
     }
 
@@ -37,7 +37,7 @@ public final class MapDemoFragmentPermissionsDispatcher {
         if (PermissionUtils.hasSelfPermissions(target, PERMISSION_STARTLOCATIONUPDATES)) {
             fragment.startLocationUpdates();
         } else {
-            ActivityCompat.requestPermissions(fragment.getActivity(), PERMISSION_STARTLOCATIONUPDATES, REQUEST_STARTLOCATIONUPDATES);
+            fragment.requestPermissions(PERMISSION_STARTLOCATIONUPDATES, REQUEST_STARTLOCATIONUPDATES);
         }
     }
 

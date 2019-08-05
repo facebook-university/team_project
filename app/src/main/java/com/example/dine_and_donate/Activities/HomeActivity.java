@@ -6,9 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +26,8 @@ import com.example.dine_and_donate.HomeFragments.ProfileFragment;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.NotifyWorker;
 import com.example.dine_and_donate.R;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -37,6 +36,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.parceler.Parcels;
 
 import java.util.Calendar;
+import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -61,7 +61,6 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
         mDrawerNav = findViewById(R.id.drawerNav);
 
         currentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
@@ -102,7 +101,6 @@ public class HomeActivity extends AppCompatActivity {
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
@@ -243,5 +241,10 @@ public class HomeActivity extends AppCompatActivity {
             // Enqueue our work to manager
             workManager.enqueue(OneTimeWorkRequest.from(NotifyWorker.class));
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
