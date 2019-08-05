@@ -38,7 +38,15 @@ public class UploadUtil {
                     // Continue with the task to get the download URL
                     return ref.getDownloadUrl();
                 }
-            }).addOnCompleteListener(onCompleteListener);
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        downloadUri[0] = task.getResult();
+                        String s = downloadUri[0].toString();
+                    }
+                }
+            });
         }
     }
 

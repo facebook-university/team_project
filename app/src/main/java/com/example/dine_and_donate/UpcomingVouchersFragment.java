@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Adapters.StaggeredRecyclerViewAdapter;
+import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,24 +28,21 @@ import java.util.Map;
 public class UpcomingVouchersFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
-    private ArrayList<String> mImageUrls = new ArrayList<>();
-    private ArrayList<String> mNames = new ArrayList<>();
     private Map<String, String> mSavedEventsIDs;
     private User mCurrUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForEvent;
     private View mView;
     private StaggeredRecyclerViewAdapter mStaggeredRecyclerViewAdapter;
+    private ArrayList<Event> mEvents = new ArrayList<>();
 
     //create view based on data in array lists, inflates the layout of the fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.tab_fragment, container, false);
         mRecyclerView = mView.findViewById(R.id.rv_vouchers);
-        mStaggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mNames, mImageUrls);
+        mStaggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
-        mImageUrls.clear();
-        mNames.clear();
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
         return mView;
@@ -82,8 +80,11 @@ public class UpcomingVouchersFragment extends Fragment {
 
     //add images and descriptions to respective arrayLists
     private void initBitmapsUpcomingEvents(String mUrls, String mDescriptions) {
-        mImageUrls.add(mUrls);
-        mNames.add(mDescriptions);
+        //test events
+        Event newEvent = new Event();
+        newEvent.locationString = mDescriptions;
+        newEvent.imageUrl = mUrls;
+        mEvents.add(newEvent);
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
     }
 }
