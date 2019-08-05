@@ -61,6 +61,7 @@ public class VoucherDetailFragment extends Fragment {
                     intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUserModel));
                     intent.putExtra(Event.class.getSimpleName(), Parcels.wrap(mEvent));
                     intent.putExtra("yelpId", mEvent.yelpID);
+                    intent.putExtra("location", mEvent.locationString);
                     startActivity(intent);
                 }
             });
