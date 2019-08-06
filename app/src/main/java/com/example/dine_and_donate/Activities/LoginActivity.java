@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -42,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefChild;
+    private ImageView mIvSplashScreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +54,20 @@ public class LoginActivity extends AppCompatActivity {
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference();
         mRefChild = mRef.child("users");
-        //if someone is already signed in, skip sign in process
-        if(mFbUser != null) {
-            createUserModel();
-        }
 
         mEmail = findViewById(R.id.et_email);
         mPassword = findViewById(R.id.et_password);
         mLogin = findViewById(R.id.login_btn);
         mSignup = findViewById(R.id.signup_btn);
+        mIvSplashScreen = findViewById(R.id.ivSplashScreen);
+
+        //if someone is already signed in, skip sign in process
+        if(mFbUser != null) {
+            showSplash();
+            createUserModel();
+        } else {
+            hideSplash();
+        }
 
         //action for login button
         mLogin.setOnClickListener(new View.OnClickListener() {
@@ -143,5 +150,21 @@ public class LoginActivity extends AppCompatActivity {
         }
         startActivity(intent);
         finish();
+    }
+
+    private void showSplash() {
+        mIvSplashScreen.setVisibility(View.VISIBLE);
+        mEmail.setVisibility(View.GONE);
+        mPassword.setVisibility(View.GONE);
+        mLogin.setVisibility(View.GONE);
+        mSignup.setVisibility(View.GONE);
+    }
+
+    private void hideSplash() {
+        mIvSplashScreen.setVisibility(View.INVISIBLE);
+        mEmail.setVisibility(View.VISIBLE);
+        mPassword.setVisibility(View.VISIBLE);
+        mLogin.setVisibility(View.VISIBLE);
+        mSignup.setVisibility(View.VISIBLE);
     }
 }
