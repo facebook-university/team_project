@@ -31,7 +31,6 @@ public final class MapDemoFragmentPermissionsDispatcher {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     static void startLocationUpdatesWithPermissionCheck(MapFragment fragment) {
         Context target = fragment.getView().getContext();
         if (PermissionUtils.hasSelfPermissions(target, PERMISSION_STARTLOCATIONUPDATES)) {
@@ -41,8 +40,6 @@ public final class MapDemoFragmentPermissionsDispatcher {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    @RequiresApi(api = Build.VERSION_CODES.M)
     static void onRequestPermissionsResult(MapFragment  target, int requestCode,
                                            int[] grantResults) {
         switch (requestCode) {

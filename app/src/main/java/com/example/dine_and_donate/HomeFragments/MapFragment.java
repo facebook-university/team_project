@@ -2,6 +2,7 @@ package com.example.dine_and_donate.HomeFragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -557,16 +559,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             MapDemoFragmentPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
             MapDemoFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
 
-            //map.setOnMapLongClickListener(this);
             map.setInfoWindowAdapter(new CustomWindowAdapter(getLayoutInflater()));
 
             map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         } else {
-            Toast.makeText(mContext, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Sorry, something went wrong!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint("NeedOnRequestPermissionsResult")
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -605,7 +605,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     protected void startLocationUpdates() {
         mLocationRequest = new LocationRequest();
@@ -620,8 +619,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         SettingsClient settingsClient = LocationServices.getSettingsClient(mContext);
         settingsClient.checkLocationSettings(locationSettingsRequest);
         //noinspection MissingPermission
-        if (mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         LocationServices.getFusedLocationProviderClient(mContext).requestLocationUpdates(mLocationRequest, new LocationCallback() {
@@ -640,7 +639,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 Looper.myLooper());
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public void onLocationChanged(Location location) {
         // GPS may be turned off
         if (location == null) {
@@ -694,7 +692,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    public Location getmCurrentLocation() {
+    public Location getCurrentLocation() {
         return mCurrentLocation;
     }
 
