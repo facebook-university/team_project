@@ -91,7 +91,6 @@ public class EventActivity extends AppCompatActivity {
                 mMonth = month;
                 mDay = dayOfMonth;
                 mYear = year;
-                //isCalendarClicked = true;
             }
         });
 
@@ -111,7 +110,7 @@ public class EventActivity extends AppCompatActivity {
         mCreatedEvents = mCurrUser.getSavedEventsIDs();
 
         final Intent intent = getIntent();
-        final String yelp_id = intent.getStringExtra("yelpId");
+        final String yelpId = intent.getStringExtra("yelpId");
         mEditEvent = Parcels.unwrap(intent.getParcelableExtra(Event.class.getSimpleName()));
         mLocationString = intent.getStringExtra("location");
         mTvLocation.setText(mLocationString);
@@ -157,14 +156,14 @@ public class EventActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 downloadUri[0] = task.getResult();
                                 String s = downloadUri[0].toString();
-                                writeEvent(yelp_id, s);
+                                writeEvent(yelpId, s);
                             } else {
                                 // Handle failures
                             }
                         }
                     });
                 } else if(mEditEvent != null) {
-                    writeEvent(yelp_id, mEditEvent.imageUrl);
+                    writeEvent(yelpId, mEditEvent.imageUrl);
                 }
             }
         });
