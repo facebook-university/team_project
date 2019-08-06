@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -453,7 +454,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             String endTime = getDate((long) eventChild.child("endTime").getValue(), "h:mm a");
             User org = mIdToOrg.get((String) eventChild.child("orgId").getValue());
 
-            eventOrg.setText(getString(R.string.main_info_event, org.name, date, startTime, endTime));
+            eventOrg.setText(Html.fromHtml(getString(R.string.main_info_event,
+                    org.name,
+                    date,
+                    startTime.replace("AM", "am").replace("PM","pm"),
+                    endTime.replace("AM", "am").replace("PM","pm"))));
+
             eventInfo.setText(eventChild.child("info").getValue().toString());
 
             RequestOptions requestOptions = new RequestOptions()
