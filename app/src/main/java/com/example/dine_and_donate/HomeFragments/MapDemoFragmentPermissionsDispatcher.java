@@ -27,22 +27,19 @@ public final class MapDemoFragmentPermissionsDispatcher {
         if (PermissionUtils.hasSelfPermissions(target, PERMISSION_GETMYLOCATION)) {
             fragment.getMyLocation();
         } else {
-            ActivityCompat.requestPermissions(fragment.getActivity(), PERMISSION_GETMYLOCATION, REQUEST_GETMYLOCATION);
+            fragment.requestPermissions(PERMISSION_GETMYLOCATION, REQUEST_GETMYLOCATION);
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     static void startLocationUpdatesWithPermissionCheck(MapFragment fragment) {
         Context target = fragment.getView().getContext();
         if (PermissionUtils.hasSelfPermissions(target, PERMISSION_STARTLOCATIONUPDATES)) {
             fragment.startLocationUpdates();
         } else {
-            ActivityCompat.requestPermissions(fragment.getActivity(), PERMISSION_STARTLOCATIONUPDATES, REQUEST_STARTLOCATIONUPDATES);
+            fragment.requestPermissions(PERMISSION_STARTLOCATIONUPDATES, REQUEST_STARTLOCATIONUPDATES);
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    @RequiresApi(api = Build.VERSION_CODES.M)
     static void onRequestPermissionsResult(MapFragment  target, int requestCode,
                                            int[] grantResults) {
         switch (requestCode) {

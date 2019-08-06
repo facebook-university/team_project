@@ -53,7 +53,6 @@ public class NotifyWorker extends Worker {
         super(context, workerParams);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @NonNull
     @Override
     public Result doWork() {
