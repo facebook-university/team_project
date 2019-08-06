@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,24 +38,27 @@ public class LoginActivity extends AppCompatActivity {
     private Button mSignup;
     private FirebaseAuth mAuth;
     private User mCurrentUserModel;
-    private BottomNavigationView bottomNavigationView;
     private FirebaseDatabase mDatabase;
     private FirebaseUser mFbUser;
     private DatabaseReference mRef;
-    private DatabaseReference mRefChild;
+    private ImageView mIvSplashScreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
+        mIvSplashScreen = findViewById(R.id.ivSplashScreen);
+        mIvSplashScreen.bringToFront();
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference();
-        mRefChild = mRef.child("users");
         //if someone is already signed in, skip sign in process
         if(mFbUser != null) {
-            createUserModel();
+            mCurrentUserModel = createUserModel(mRef, mFbUser);
+            goToProfile();
+        } else {
+            mIvSplashScreen.setVisibility(View.GONE);
         }
 
         mEmail = findViewById(R.id.et_email);
@@ -92,7 +96,8 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d("signIn", "signInWithEmail:success");
                             mFbUser = FirebaseAuth.getInstance().getCurrentUser();
-                            createUserModel();
+                            mCurrentUserModel = createUserModel(mRef, mFbUser);
+                            goToProfile();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("signIn", "signInWithEmail:failure", task.getException());
@@ -102,31 +107,32 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void createUserModel() {
-        mRefChild.child(mFbUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
+    private User createUserModel(DatabaseReference ref, FirebaseUser user) {
+        final User resUser = new User();
+        DatabaseReference mRefChild = ref.child("users");
+        mRefChild.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() { // called in onCreate and when database has been changed
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
-                mCurrentUserModel = new User();
-                mCurrentUserModel.setName(dataSnapshot.child("name").getValue().toString());
-                mCurrentUserModel.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
-                mCurrentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
-                if(mCurrentUserModel.getIsOrg()) {
-                    mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
+                resUser.setName(dataSnapshot.child("name").getValue().toString());
+                resUser.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
+                resUser.setEmail(dataSnapshot.child("email").getValue().toString());
+                if(resUser.getIsOrg()) {
+                    resUser.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
 
                 // initiate saved events dictionary
-                Map<String, String> events = mCurrentUserModel.getSavedEventsIDs();
+                Map<String, String> events = resUser.getSavedEventsIDs();
                 for (DataSnapshot eventChild : dataSnapshot.child("Events").getChildren()) {
                     events.put(eventChild.getKey(), eventChild.getValue().toString());
                 }
-                mCurrentUserModel.addSavedEventID(events);
-                goToProfile();
+                resUser.addSavedEventID(events);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("tag", "onCancelled", databaseError.toException());
             }
         });
+        return resUser;
     }
 
     private void goToProfile() {

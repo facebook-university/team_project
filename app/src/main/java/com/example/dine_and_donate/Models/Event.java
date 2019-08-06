@@ -4,10 +4,13 @@ package com.example.dine_and_donate.Models;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import org.parceler.Parcel;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
+@Parcel
 @IgnoreExtraProperties
 public class Event {
     public String orgId;
@@ -17,10 +20,11 @@ public class Event {
     public long endTime;
     public String info;
     public String imageUrl;
+    public String eventId;
 
     public Event() {}
 
-    public Event(String orgId, String yelpID, String locationString, long startTime, long endTime, String info, String imageUrl) {
+    public Event(String orgId, String yelpID, String locationString, long startTime, long endTime, String info, String imageUrl, String eventId) {
         this.orgId = orgId;
         this.yelpID = yelpID;
         this.locationString = locationString;
@@ -28,6 +32,7 @@ public class Event {
         this.endTime = endTime;
         this.info = info;
         this.imageUrl = imageUrl;
+        this.eventId = eventId;
     }
 
     public static ArrayList<Event> eventsHappeningAtRestaurant(DataSnapshot ds) {

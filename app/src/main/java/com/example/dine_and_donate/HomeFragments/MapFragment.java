@@ -564,7 +564,7 @@ public class MapFragment extends Fragment {
                     intent.putExtra("location", Restaurant.format(restaurant));
                     intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
                     JSONObject restLocation = restaurant.getJSONObject("coordinates");
-                    intent.putExtra("yelpID", restaurant.getString("id"));
+                    intent.putExtra("yelpId", restaurant.getString("id"));
                     intent.putExtra("isOrg", mCurrentUser.isOrg);
                 } catch (JSONException e) {
                     e.printStackTrace();
