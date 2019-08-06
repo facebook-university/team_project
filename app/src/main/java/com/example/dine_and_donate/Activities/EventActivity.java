@@ -115,8 +115,16 @@ public class EventActivity extends AppCompatActivity {
         mLocationString = intent.getStringExtra("location");
         mTvLocation.setText(mLocationString);
 
+        // setting defaults to what was previously saved
         if(mEditEvent != null) {
-            // todo : set date, times
+            mCalendarView.setDate(mEditEvent.startTime);
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(mEditEvent.startTime);
+            mStartTimePicker.setHour(cal.get(Calendar.HOUR));
+            mStartTimePicker.setMinute(cal.get(Calendar.MINUTE));
+            cal.setTimeInMillis(mEditEvent.endTime);
+            mEndTimePicker.setHour(cal.get(Calendar.HOUR));
+            mEndTimePicker.setMinute(cal.get(Calendar.MINUTE));
             mTvLocation.setText(mEditEvent.locationString);
             mEtEventInfo.setText(mEditEvent.info);
             Glide.with(this)
