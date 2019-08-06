@@ -680,6 +680,7 @@ public class MapFragment extends Fragment {
                 public void onClick(View v) {
                     String eventId = mPagerAdapter.getEventId(pagerPosition);
                     mSavedEvents.put(eventId, snapshot.getKey());
+                    Log.d("newSize", mSavedEvents.size() + "");
                     mRefForUser.child("Events").setValue(mSavedEvents, new DatabaseReference.CompletionListener() {
                         @Override
                         public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
@@ -688,6 +689,7 @@ public class MapFragment extends Fragment {
                             } else {
                                 mBtnEvent.setText(getString(R.string.saved));
                                 mCurrentUser.addSavedEventID(mSavedEvents);
+                                mCurrentUser.savedEventsIDs = mSavedEvents;
                             }
                         }
                     });

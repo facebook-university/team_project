@@ -5,10 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-<<<<<<< HEAD
-=======
 
->>>>>>> 12f5306b93572b8957381f37235cb51514924ab8
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -160,9 +157,6 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.shareFacebook:
-                        navigationHelper(ShareEventActivity.class);
-                        return true;
                     case R.id.editProfile:
                         navigationHelper(EditProfileActivity.class);
                         return true;
@@ -213,7 +207,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.HOUR_OF_DAY, 13);
         calendar.set(Calendar.MINUTE, 00);
         calendar.set(Calendar.SECOND, 00);
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {

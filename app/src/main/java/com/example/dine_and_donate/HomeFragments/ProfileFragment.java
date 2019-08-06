@@ -75,8 +75,5 @@ public class ProfileFragment extends Fragment {
             mLayoutForOrg.setVisibility(View.GONE);
             mLayoutForConsumer.setVisibility(View.VISIBLE);
         }
-        //mUserName.setText(name);
-        //mProfPic.setImageURI(mCurrentUserModel.getProfPic());
-
     }
 }

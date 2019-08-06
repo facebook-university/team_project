@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.UploadUtil;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.parceler.Parcels;
 
@@ -141,34 +142,38 @@ public class EditProfileActivity extends AppCompatActivity {
 
         mSaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
+            public void onClick(final View v) {
                 final String newName = mEditName.getText().toString();
                 mCurrentUser.setName(newName);
                 mRef.child("users").child(mFbUser.getUid()).child("name").setValue(newName);
 
-                if (mLocalImageUri != null) {
-                    OnCompleteListener onCompleteListener = new OnCompleteListener<Uri>() {
+                if(mLocalImageUri != null) {
+                    final StorageReference ref = mStorageRef.child("images/"+mLocalImageUri.getLastPathSegment());
+                    UploadTask uploadTask = ref.putFile(mLocalImageUri);
+
+                    urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                        @Override
+                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                            if (!task.isSuccessful()) {
+                                throw task.getException();
+                            }
+                            // Continue with the task to get the download URL
+                            return ref.getDownloadUrl();
+                        }
+                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                         @Override
                         public void onComplete(@NonNull Task<Uri> task) {
                             if (task.isSuccessful()) {
-                                downloadUri[0] = task.getResult(); // remote image uri
-                                Log.d("task", task.getResult() + "");
-                                Log.d("array", downloadUri[0] + "");
-                                mCurrentUser.setProfPic(downloadUri[0].toString());
-
-                                Log.d("arrayElement", downloadUri[0] + "");
-                                mRefForUser.child("profPic").setValue(downloadUri[0].toString());
+                                downloadUri[0] = task.getResult();
+                                String s = downloadUri[0].toString();
+                                mCurrentUser.setProfPic(s);
+                                mRefForUser.child("profPic").setValue(s);
                                 Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
                                 intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
                                 startActivity(intent);
-
                             }
                         }
-                    };
-
-                    Log.d("changeBtn", mCurrentUser.getProfPic() + "");
-                    uploadUtil.inOnClick(v, mLocalImageUri, downloadUri, mStorageRef, urlTask, onCompleteListener);
+                    });
                 } else {
                     Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
                     intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));

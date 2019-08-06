@@ -81,7 +81,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </FrameLayout>
-    
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs_profile"
         android:layout_width="0dp"

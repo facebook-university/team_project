@@ -112,7 +112,6 @@ public class NotifyWorker extends Worker {
                                     }
                                 }
                             }
-
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) { }
                         });

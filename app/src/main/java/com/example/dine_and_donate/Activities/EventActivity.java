@@ -6,13 +6,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
@@ -24,10 +22,7 @@ import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.UploadUtil;
-<<<<<<< HEAD
-=======
 import com.google.android.gms.tasks.Continuation;
->>>>>>> 12f5306b93572b8957381f37235cb51514924ab8
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,8 +36,6 @@ import com.google.firebase.storage.UploadTask;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -87,15 +80,11 @@ public class EventActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         mCalendarView = findViewById(R.id.cvChooseDate);
-<<<<<<< HEAD
-=======
         mStartTimePicker = findViewById(R.id.startTimePicker);
         mStartTimePicker.setEnabled(true);
         mEndTimePicker = findViewById(R.id.endTimePicker);
         mEndTimePicker.setEnabled(true);
 
-
->>>>>>> 12f5306b93572b8957381f37235cb51514924ab8
         mAcSearch = findViewById(R.id.acSearch);
         mEtEventInfo = findViewById(R.id.etEventInfo);
         mBtnCreate = findViewById(R.id.create_event);
@@ -121,18 +110,6 @@ public class EventActivity extends AppCompatActivity {
             final Uri[] downloadUri = new Uri[1];
             @Override
             public void onClick(View v) {
-<<<<<<< HEAD
-                OnCompleteListener onCompleteListener = new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-                        if (task.isSuccessful()) {
-                            downloadUri[0] = task.getResult();
-                            writeEvent(getIntent(), downloadUri[0].toString(), location);
-                        }
-                    }
-                };
-                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask, onCompleteListener);
-=======
                 if(mSelectedImage != null) {
                     final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
                     UploadTask uploadTask = ref.putFile(mSelectedImage);
@@ -143,7 +120,6 @@ public class EventActivity extends AppCompatActivity {
                             if (!task.isSuccessful()) {
                                 throw task.getException();
                             }
-
                             // Continue with the task to get the download URL
                             return ref.getDownloadUrl();
                         }
@@ -154,14 +130,11 @@ public class EventActivity extends AppCompatActivity {
                                 downloadUri[0] = task.getResult();
                                 String s = downloadUri[0].toString();
                                 writeEvent(intent, s, location);
-                            } else {
-                                // Handle failures
                             }
                         }
                     });
 
                 }
->>>>>>> 12f5306b93572b8957381f37235cb51514924ab8
             }
         });
 
@@ -205,7 +178,6 @@ public class EventActivity extends AppCompatActivity {
                     break;
             }
     }
-
 
     private void pickFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
