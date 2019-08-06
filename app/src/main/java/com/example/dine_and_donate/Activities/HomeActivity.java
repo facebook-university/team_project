@@ -48,7 +48,7 @@ public class HomeActivity extends AppCompatActivity {
 
     public User currentUser;
 
-    private ImageButton mBtnSwap;
+    private Button mBtnSwap;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
     private PendingIntent mPendingIntent;
@@ -70,6 +70,7 @@ public class HomeActivity extends AppCompatActivity {
 
         mBtnSwap = findViewById(R.id.btnSwap);
         mBtnSwap.setVisibility(View.INVISIBLE);
+        mBtnSwap.setText(R.string.swap_list);
         mIsOnMapView = true;
 
         mBtnSwap.setOnClickListener(new View.OnClickListener() {
@@ -199,12 +200,14 @@ public class HomeActivity extends AppCompatActivity {
                         .addToBackStack(null)
                         .commit();
                 mIsOnMapView = false;
+                mBtnSwap.setText(R.string.swap_map);
             } else {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, mMapFragment)
                         .addToBackStack(null)
                         .commit();
                 mIsOnMapView = true;
+                mBtnSwap.setText(R.string.swap_list);
             }
         }
     }
