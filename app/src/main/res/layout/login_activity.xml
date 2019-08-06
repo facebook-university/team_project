@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".Activities.LoginActivity">
 
+    <ImageView
+        android:id="@+id/ivSplashScreen"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/facebook" />
+
     <Button
         android:id="@+id/login_btn"
         android:layout_width="289dp"
@@ -63,4 +73,5 @@
         app:layout_constraintBottom_toTopOf="@+id/login_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
