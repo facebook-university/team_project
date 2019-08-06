@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -58,8 +59,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -82,11 +81,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import in.goodiebag.carouselpicker.CarouselPicker;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -113,9 +110,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private View slideView;
     private View slideViewContent;
+    private ViewPager mViewPager;
     private boolean slideViewIsUp;
     private Button mBtnEvent;
-    private ViewPager mViewPager;
     private EventViewPagerAdapter mPagerAdapter;
 
     private Context mContext;
@@ -148,13 +145,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View mapView = inflater.inflate(R.layout.fragment_map, container, false);
-        if (!loaded) {
-            mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-            mapFragment.getMapAsync(this);
-            loaded = true;
-        }
-        return mapView;
+        return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
     @Override
@@ -165,6 +156,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (!loaded) {
+            mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+            loaded = true;
+        }
 
         homeActivity = (HomeActivity) getActivity();
         mCurrentUser = homeActivity.currentUser;
@@ -197,24 +194,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onSwipeBottom() {
                 super.onSwipeBottom();
                 if(slideViewIsUp) {
-                    slideDownMenu();
+                    slideDownMenu(slideView);
                 }
-            }
-
-            @Override
-            public void onSwipeTop() {
-                super.onSwipeTop();
-                if(slideViewIsUp) {
-                    //TODO: show more detail in view
-
-                }
-            }
-        });
-
-        slideView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO: same as swipe up
             }
         });
     }
@@ -432,21 +413,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         setUpViewPager(snapshot);
     }
 
-    private void slideDownMenu() {
+    public void slideDownMenu(View slider) {
         // todo: make not clickable when it goes away
-        slideView.setVisibility(View.GONE);
+        slider.setVisibility(View.GONE);
         TranslateAnimation animate = new TranslateAnimation(
                 0,
                 0,
                 0,
-                slideView.getY());
+                slider.getY());
         animate.setDuration(500);
         animate.setFillAfter(false);
-        slideView.startAnimation(animate);
+        slider.startAnimation(animate);
     }
 
     // VIEWPAGER
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setUpViewPager(final DataSnapshot snapshot) {
         final PageIndicatorView pageIndicatorView = slideViewContent.findViewById(R.id.pageIndicatorView);
         mSavedEvents = mCurrentUser.getSavedEventsIDs();
@@ -709,7 +691,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public Location getmCurrentLocation() {
         return mCurrentLocation;
     }
-
 
     public JSONArray getRestaurantsNearbyJSON() {
         return restaurantsNearbyJSON;
