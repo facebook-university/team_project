@@ -8,6 +8,10 @@
     <string name="google_maps_api_key">AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg</string>
     <string name="facebook_app_id">443391136243627</string>
 
+    <!--home activity-->
+    <string name="swap_map">Map</string>
+    <string name="swap_list">List</string>
+
     <!--event activity-->
     <string name="createTextView">Create a Fundraiser</string>
     <string name="pickRestaurantTextView">Pick a Restaurant</string>

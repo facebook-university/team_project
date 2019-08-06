@@ -3,24 +3,28 @@ package com.example.dine_and_donate.Activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.UploadUtil;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,11 +33,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,14 +53,13 @@ public class EventActivity extends AppCompatActivity {
     private Event newEvent;
 
     private CalendarView mCalendarView;
+    private int mMonth;
+    private int mDay;
+    private int mYear;
+    private TimePicker mStartTimePicker;
+    private TimePicker mEndTimePicker;
 
-    private AutoCompleteTextView mAcSearch;
-    private Spinner mStartHour;
-    private Spinner mStartMin;
-    private Spinner mStartHalf;
-    private Spinner mEndHour;
-    private Spinner mEndMin;
-    private Spinner mEndHalf;
+    private TextView mTvLocation;
     private EditText mEtEventInfo;
     private Button mBtnCreate;
     private Button mChooseImage;
@@ -66,7 +70,8 @@ public class EventActivity extends AppCompatActivity {
     private Map<String, String> mCreatedEvents;
     private UploadUtil uploadUtil;
     private Task<Uri> urlTask;
-    private Intent mIntent;
+    private Event mEditEvent;
+    private String mLocationString;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,85 +86,98 @@ public class EventActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         mCalendarView = findViewById(R.id.cvChooseDate);
+        mCalendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
+            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+                mMonth = month;
+                mDay = dayOfMonth;
+                mYear = year;
+            }
+        });
 
-        mAcSearch = findViewById(R.id.acSearch);
-        mStartHour = findViewById(R.id.startHour);
-        mStartMin = findViewById(R.id.startMin);
-        mStartHalf = findViewById(R.id.startHalf);
-        mEndHour = findViewById(R.id.endHour);
-        mEndMin = findViewById(R.id.endMin);
-        mEndHalf = findViewById(R.id.endHalf);
+        mStartTimePicker = findViewById(R.id.startTimePicker);
+        mStartTimePicker.setEnabled(true);
+        mEndTimePicker = findViewById(R.id.endTimePicker);
+        mEndTimePicker.setEnabled(true);
+
+
+        mTvLocation = findViewById(R.id.tvLocation);
         mEtEventInfo = findViewById(R.id.etEventInfo);
         mBtnCreate = findViewById(R.id.create_event);
         mChooseImage = findViewById(R.id.btnChoosePhoto);
         mVoucherImageView = findViewById(R.id.ivVoucherImage);
 
-        mIntent = new Intent();
         mCurrUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
         mCreatedEvents = mCurrUser.getSavedEventsIDs();
 
         final Intent intent = getIntent();
-        final String location = intent.getStringExtra("location");
-        mAcSearch.setText(location);
+        final String yelpId = intent.getStringExtra("yelpId");
+        mEditEvent = Parcels.unwrap(intent.getParcelableExtra(Event.class.getSimpleName()));
+        mLocationString = intent.getStringExtra("location");
+        mTvLocation.setText(mLocationString);
 
-        List<String> hoursArray = new ArrayList<>();
-        List<String> minsArray = new ArrayList<>();
-        List<String> halfsArray = new ArrayList<>();
+        if(mEditEvent != null) {
+            // todo : set date, times
+            mTvLocation.setText(mEditEvent.locationString);
+            mEtEventInfo.setText(mEditEvent.info);
+            Glide.with(this)
+                    .load(mEditEvent.imageUrl)
+                    .into(mVoucherImageView);
 
-        halfsArray.add("AM");
-        halfsArray.add("PM");
-
-        for(int i = 0; i < 60; i++) {
-            if(i < 13 && i != 0) {
-                hoursArray.add(Integer.toString(i));
-            }
-            if(i < 10) {
-                minsArray.add("0" + i);
-            } else {
-                minsArray.add(Integer.toString(i));
-            }
         }
-
-        //Todo: make time selection better
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, hoursArray);
-        mStartHour.setAdapter(adapter);
-        mEndHour.setAdapter(adapter);
-
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, minsArray);
-        mStartMin.setAdapter(adapter);
-        mEndMin.setAdapter(adapter);
-
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, halfsArray);
-        mStartHalf.setAdapter(adapter);
-        mEndHalf.setAdapter(adapter);
 
         mChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uploadUtil = new UploadUtil(EventActivity.this);
-                uploadUtil.pickFromGallery(mIntent);
+                pickFromGallery();
             }
         });
 
         mBtnCreate.setOnClickListener(new View.OnClickListener() {
-
             final Uri[] downloadUri = new Uri[1];
             @Override
             public void onClick(View v) {
-                uploadUtil.inOnClick(v, mSelectedImage, downloadUri, mStorageRef, urlTask);
+                if(mSelectedImage != null) {
+                    final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
+                    UploadTask uploadTask = ref.putFile(mSelectedImage);
+
+                    Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                        @Override
+                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                            if (!task.isSuccessful()) {
+                                throw task.getException();
+                            }
+
+                            // Continue with the task to get the download URL
+                            return ref.getDownloadUrl();
+                        }
+                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if (task.isSuccessful()) {
+                                downloadUri[0] = task.getResult();
+                                String s = downloadUri[0].toString();
+                                writeEvent(yelpId, s);
+                            } else {
+                                // Handle failures
+                            }
+                        }
+                    });
+                } else if(mEditEvent != null) {
+                    writeEvent(yelpId, mEditEvent.imageUrl);
+                }
             }
         });
     }
 
-    private void writeEvent(Intent intent, String url, String location) {
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void writeEvent(final String yelpId, String url) {
         String orgId = mFirebaseCurrentUser.getUid();
-        final String yelpId = intent.getStringExtra("yelpID");
-        long eventDate = mCalendarView.getDate();
-        long startTime = convert(eventDate, mStartHour.getSelectedItemPosition()+1, mStartMin.getSelectedItemPosition(), mStartHalf.getSelectedItem().equals("PM"));
-        long endTime = convert(eventDate, mEndHour.getSelectedItemPosition()+1, mEndMin.getSelectedItemPosition(), mEndHalf.getSelectedItem().equals("PM"));
+        Date startTime = dateFromPicker(mStartTimePicker);
+        Date endTime = dateFromPicker(mEndTimePicker);
         String info = mEtEventInfo.getText().toString();
-        newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
-        mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent, new DatabaseReference.CompletionListener() {
+        String id = mEditEvent == null ? UUID.randomUUID().toString() : mEditEvent.eventId;
+        newEvent = new Event(orgId, yelpId, mLocationString, startTime.getTime(), endTime.getTime(), info, url, id);
+        mRef.child("events").child(yelpId).child(id).setValue(newEvent, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 //there is not error, can add event to database
@@ -175,11 +193,11 @@ public class EventActivity extends AppCompatActivity {
         finish();
     }
 
-    public void onActivityResult(int requestCode,int resultCode,Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // Result code is RESULT_OK only if the user selects an Image
         if (resultCode == Activity.RESULT_OK)
-            switch (requestCode){
+            switch (requestCode) {
                 case GALLERY_REQUEST_CODE:
                     //data.getData returns the content URI for the selected Image
                     mSelectedImage = data.getData();
@@ -188,7 +206,21 @@ public class EventActivity extends AppCompatActivity {
             }
     }
 
-    private long convert(long day, int hour, int min, boolean isPM) {
-        return isPM ? (day + (2 * hour * 3600000) + (min * 60000)) : (day + (hour * 3600000) + (min * 60000));
+    private void pickFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        String[] mimeTypes = {"image/jpeg", "image/png"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        startActivityForResult(intent, GALLERY_REQUEST_CODE);
+    }
+
+    private Date dateFromPicker(TimePicker tp) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, mYear);
+        cal.set(Calendar.MONTH, mMonth);
+        cal.set(Calendar.DAY_OF_MONTH, mDay);
+        cal.set(Calendar.HOUR_OF_DAY, tp.getCurrentHour());
+        cal.set(Calendar.MINUTE, tp.getCurrentMinute());
+        return cal.getTime();
     }
 }

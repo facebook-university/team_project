@@ -103,7 +103,8 @@ public class NotifyWorker extends Worker {
                                             String info = eventChild.child("info").getValue().toString();
                                             Long startTime = (long) eventChild.child("startTime").getValue();
                                             String imageURL = eventChild.child("imageUrl").getValue().toString();
-                                            mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL);
+                                            String eventId = eventChild.child("eventId").getValue().toString();
+                                            mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL, eventId);
                                             displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude, eventChild.getKey(), timeNow.toString());
                                             mCounter = restaurantsNearbyJSON.length();
                                             return;

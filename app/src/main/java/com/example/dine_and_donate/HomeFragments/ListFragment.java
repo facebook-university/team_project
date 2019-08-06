@@ -1,5 +1,6 @@
 package com.example.dine_and_donate.HomeFragments;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,7 @@ public class ListFragment extends Fragment {
     private JSONArray mRestaurantsJSON;
     private RecyclerView mRvNearbyList;
     private HomeActivity mActivity;
-    private int mSize;
+    private Location mLocation;
 
     private DataSnapshot mAllEvents;
     private HashMap<String, JSONObject> mIdToRestaurant;
@@ -41,7 +42,6 @@ public class ListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mSize = 0;
         return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
@@ -50,7 +50,7 @@ public class ListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mActivity = (HomeActivity) getActivity();
         if(mActivity.currentUser.isOrg) {
-            mOrgAdapter = new RestaurantListViewAdapter(mRestaurantsJSON);
+            mOrgAdapter = new RestaurantListViewAdapter(mRestaurantsJSON, mLocation);
         } else {
             mUserAdapter = new EventListViewAdapter(mAllEvents,mIdToRestaurant, mIdToOrg);
         }
@@ -63,12 +63,12 @@ public class ListFragment extends Fragment {
         mRvNearbyList.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
         if(mActivity.currentUser.isOrg) {
+            mOrgAdapter.notifyDataSetChanged();
             mRvNearbyList.setAdapter(mOrgAdapter);
         } else {
             // todo: fill rv with event info
             if(mUserAdapter.getItemCount() != 0) {
                 mRvNearbyList.setAdapter(mUserAdapter);
-                mSize = mUserAdapter.getItemCount();
             }
         }
     }
@@ -87,5 +87,9 @@ public class ListFragment extends Fragment {
 
     public void setIdToOrg(HashMap<String, User> mIdToOrg) {
         this.mIdToOrg = mIdToOrg;
+    }
+
+    public void setLocation(Location mLocation) {
+        this.mLocation = mLocation;
     }
 }

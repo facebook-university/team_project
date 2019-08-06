@@ -1,6 +1,7 @@
 package com.example.dine_and_donate.Adapters;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
@@ -20,7 +24,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
+
 
 public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdapter.ViewHolder> {
 
@@ -51,16 +57,23 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = mEvents.get(position);
-        holder.tvOrgName.setText(mIdToOrg.get(event.orgId).name);
-        holder.tvOrgInfo.setText(event.info);
+        User org = mIdToOrg.get(event.orgId);
+        JSONObject restaurant = mIdToRestaurant.get(event.yelpID);
+        //Todo: create / find better default
+        String profilePicUrl = org.imageUrl != null ? org.imageUrl : "https://cdn2.iconfinder.com/data/icons/wedding-glyph-1/128/44-512.png";
         try {
-            holder.tvRestaurantName.setText(mIdToRestaurant.get(event.yelpID).getString("name"));
+            String orgName = org.name;
+            String restaurantName = restaurant.getString("name");
+            String htmlText = "<b>" + orgName + "</b>" + " is having a Dine and Donate event at " + "<b>" + restaurantName + "</b>";
+            holder.tvEventText.setText(Html.fromHtml(htmlText));
+            holder.tvDateTime.setText(dateFromMills(event.startTime));
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         Glide.with(context)
-                // Todo : change this to real image
-                .load("https://firebasestorage.googleapis.com/v0/b/dine-and-donate.appspot.com/o/images%2F158765210?alt=media&token=be40174f-ed03-4299-8431-410b036a9037")
+                .load(profilePicUrl)
+                .transform(new MultiTransformation<>(new CenterCrop(), new CircleCrop()))
                 .into(holder.ivOrgPic);
     }
 
@@ -69,18 +82,29 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvRestaurantName;
-        TextView tvOrgName;
-        TextView tvOrgInfo;
+        TextView tvEventText;
+        TextView tvDateTime;
         ImageView ivOrgPic;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvRestaurantName = itemView.findViewById(R.id.tvRestaurantName);
             ivOrgPic = itemView.findViewById(R.id.ivOrgImage);
-            tvOrgName = itemView.findViewById(R.id.tvOrgName);
-            tvOrgInfo = itemView.findViewById(R.id.tvEventInfo);
+            tvEventText = itemView.findViewById(R.id.tvEventInfo);
+            tvDateTime = itemView.findViewById(R.id.tvDateTime);
         }
+    }
+
+    private String dateFromMills(long millis) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR);
+        int minute = calendar.get(Calendar.MINUTE);
+        String min = minute < 10 ? "0" + minute : "" + minute;
+        String am = calendar.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM";
+        return month + "/" + day + " - " + hour + ":" + min + " " + am;
     }
 
 }

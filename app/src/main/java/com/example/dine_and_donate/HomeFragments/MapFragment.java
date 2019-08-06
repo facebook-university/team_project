@@ -324,10 +324,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void slideUpAnimation(final JSONObject restaurant) {
         try {
-            TextView restName = slideView.findViewById(R.id.tv_restaurant_name);
+            TextView restName = slideView.findViewById(R.id.tvRestaurantName);
             RatingBar rating = slideView.findViewById(R.id.ratingBar);
-            TextView typeOfFood = slideView.findViewById(R.id.typeOfFood);
-            TextView milesAway = slideView.findViewById(R.id.milesAway);
+            TextView typeOfFood = slideView.findViewById(R.id.tvDescription);
+            TextView milesAway = slideView.findViewById(R.id.tvDistance);
 
             String foodCategories;
 
@@ -378,7 +378,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         slideUpAnimation(restaurant);
         TextView phoneNumber = slideView.findViewById(R.id.phone_number);
 
-        ImageView restaurantImg = slideView.findViewById(R.id.restaurant_image);
+        ImageView restaurantImg = slideView.findViewById(R.id.ivRestaurant);
         RequestOptions requestOptions = new RequestOptions()
                 .placeholder(R.drawable.ic_launcher_background);
 
@@ -401,7 +401,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     intent.putExtra("location", Restaurant.format(restaurant));
                     intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
                     JSONObject restLocation = restaurant.getJSONObject("coordinates");
-                    intent.putExtra("yelpID", restaurant.getString("id"));
+                    intent.putExtra("yelpId", restaurant.getString("id"));
                     intent.putExtra("isOrg", mCurrentUser.isOrg);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -664,7 +664,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return formatter.format(calendar.getTime());
     }
 
-    private static String distance(double lat1, double lon1, double lat2, double lon2) {
+    public static String distance(double lat1, double lon1, double lat2, double lon2) {
         if ((lat1 == lat2) && (lon1 == lon2)) {
             return "0";
         }
