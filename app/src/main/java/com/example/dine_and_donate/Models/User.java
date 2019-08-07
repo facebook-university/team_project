@@ -18,17 +18,17 @@ public class User {
     public String bio;
     public Boolean prefersPhoneContact;
     public Map<String, String> savedEventsIDs = new HashMap<String, String>();
-    public String profPic;
+    public String imageUrl;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String name, String email, String profPic) {
+    public User(String name, String email, String imageUrl) {
         this.name = name;
         this.email = email;
         this.isOrg = false;
-        this.profPic = profPic;
+        this.imageUrl = imageUrl;
     }
 
     public User(String name, String email, String phoneNumber, String profPic) {
@@ -36,7 +36,7 @@ public class User {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.isOrg = true;
-        this.profPic = profPic;
+        this.imageUrl = imageUrl;
     }
 
     public String getName() {
@@ -79,11 +79,11 @@ public class User {
         this.savedEventsIDs = ids;
     }
 
-    public String getProfPic() {
-        return this.profPic;
+    public String getImageUrl() {
+        return this.imageUrl;
     }
 
-    public void setProfPic(String imageUrl) {
-        this.profPic = imageUrl;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

@@ -11,7 +11,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -171,7 +170,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 downloadUri[0] = task.getResult();
                                 String s = downloadUri[0].toString();
-                                mCurrentUser.setProfPic(s);
+                                mCurrentUser.setImageUrl(s);
                                 mRefForUser.child("profPic").setValue(s);
                                 Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
                                 intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
