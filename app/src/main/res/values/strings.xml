@@ -1,12 +1,16 @@
 <resources>
-    <string name="app_name">Dine and Donate</string>
+    <string name="app_name">Dine &amp; Donate</string>
     <string-array name="user_types">
         <item> </item>
-        <item>Consumer</item>
-        <item>Organization</item>
+        <item>Dine and Donate</item>
+        <item>Fundraise</item>
     </string-array>
     <string name="google_maps_api_key">AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg</string>
     <string name="facebook_app_id">443391136243627</string>
+
+    <!--home activity-->
+    <string name="swap_map">Map</string>
+    <string name="swap_list">List</string>
 
     <!--event activity-->
     <string name="createTextView">Create a Fundraiser</string>
@@ -32,12 +36,13 @@
     <string name="help">Help</string>
     <string name="callRestaurant">Call Restaurant</string>
     <string name="userTypeIntro">I am looking to...</string>
-    <string name="haveAcct">Already have an account?.</string>
+    <string name="haveAcct">Already have an account?</string>
     <string name="save">Save Event</string>
     <string name="saved">Event Saved</string>
     <string name="errorMsg">Sorry, something went wrong!</string>
     <string name="choose_photo">Choose photo</string>
     <string name="upload_voucher_image">Upload Voucher Image</string>
-    <string name="main_info_event">%1$s is having a Dine &amp; Donate here on %2$s from %3$s to %4$s</string>
+    <string name="miles">%1$s miles away</string>
+    <string name="main_info_event"><![CDATA[<b>%1$s</b> is having a Dine &amp; Donate here on <b>%2$s</b> from <b>%3$s</b> to <b>%4$s</b>]]></string>
 
 </resources>

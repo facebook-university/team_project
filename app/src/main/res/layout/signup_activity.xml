@@ -3,130 +3,164 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:id="@+id/constraintLayoutSignUp"
+    tools:layout_editor_absoluteY="81dp">
+
+    <ImageView
+        android:id="@+id/backgroundimage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/loginbackground" />
+
+    <ImageView
+        android:id="@+id/whiteBackgroundImg"
+        android:layout_width="0dp"
+        android:layout_height="536dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="40dp"
+        app:layout_constraintBottom_toBottomOf="@+id/backgroundimage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/backgroundimage"
+        app:srcCompat="@color/browser_actions_bg_grey" />
 
     <TextView
         android:id="@+id/tv_iAm"
         android:layout_width="wrap_content"
-        android:layout_height="31dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="20dp"
         android:text="@string/userTypeIntro"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/et_name"
-        app:layout_constraintEnd_toStartOf="@+id/user_options"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/user_options" />
+        app:layout_constraintStart_toStartOf="@+id/et_name"
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
 
     <Spinner
         android:id="@+id/user_options"
-        android:layout_width="202dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="28dp"
-        android:layout_marginRight="28dp"
-        android:layout_marginBottom="76dp"
-        app:layout_constraintBottom_toTopOf="@+id/et_name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="26dp"
+        android:layout_marginLeft="26dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginRight="25dp"
+        app:layout_constraintEnd_toEndOf="@+id/whiteBackgroundImg"
+        app:layout_constraintStart_toStartOf="@+id/whiteBackgroundImg"
+        app:layout_constraintTop_toBottomOf="@+id/tv_iAm" />
 
     <EditText
         android:id="@+id/et_name"
-        android:layout_width="287dp"
-        android:layout_height="43dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/et_email"
         app:layout_constraintEnd_toEndOf="@+id/user_options"
-        app:layout_constraintHorizontal_bias="0.562"
-        app:layout_constraintStart_toStartOf="@+id/tv_iAm" />
+        app:layout_constraintStart_toStartOf="@+id/user_options"
+        app:layout_constraintTop_toBottomOf="@+id/user_options" />
 
     <EditText
         android:id="@+id/et_email"
-        android:layout_width="292dp"
-        android:layout_height="43dp"
-        android:layout_marginBottom="12dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:ems="10"
         android:hint="Email"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/et_password2"
         app:layout_constraintEnd_toEndOf="@+id/et_name"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/et_name" />
+        app:layout_constraintStart_toStartOf="@+id/et_name"
+        app:layout_constraintTop_toBottomOf="@+id/et_name" />
 
     <EditText
         android:id="@+id/et_password2"
-        android:layout_width="292dp"
-        android:layout_height="48dp"
-        android:layout_marginBottom="28dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:ems="10"
         android:hint="Password"
         android:inputType="textPersonName"
         android:password="true"
-        app:layout_constraintBottom_toTopOf="@+id/et_org_phone"
         app:layout_constraintEnd_toEndOf="@+id/et_email"
-        app:layout_constraintStart_toStartOf="@+id/et_email" />
+        app:layout_constraintStart_toStartOf="@+id/et_email"
+        app:layout_constraintTop_toBottomOf="@+id/et_email" />
 
     <EditText
         android:id="@+id/et_org_phone"
-        android:layout_width="292dp"
-        android:layout_height="43dp"
-
-        android:layout_marginBottom="36dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:ems="10"
         android:hint="Phone Number"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/final_signup_btn"
         app:layout_constraintEnd_toEndOf="@+id/et_password2"
-        app:layout_constraintStart_toStartOf="@+id/et_password2" />
+        app:layout_constraintStart_toStartOf="@+id/et_password2"
+        app:layout_constraintTop_toBottomOf="@+id/et_password2" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/final_signup_btn"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="0dp"
-        android:layout_height="35dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="48dp"
-        android:text="@string/signUp"
-        app:layout_constraintBottom_toTopOf="@+id/haveAcct_tv"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@color/maroon"
+        android:text="Sign Up"
+        app:layout_constraintEnd_toEndOf="@+id/whiteBackgroundImg"
+        app:layout_constraintStart_toStartOf="@+id/whiteBackgroundImg"
+        app:layout_constraintTop_toBottomOf="@+id/et_password2" />
 
     <TextView
         android:id="@+id/haveAcct_tv"
         android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:text="@string/haveAcct"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/back_to_login_btn"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/back_to_login_btn" />
+        app:layout_constraintBottom_toBottomOf="@+id/whiteBackgroundImg"
+        app:layout_constraintStart_toStartOf="@+id/final_signup_btn" />
 
-    <Button
+    <TextView
         android:id="@+id/back_to_login_btn"
         android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:layout_marginEnd="72dp"
-        android:layout_marginRight="72dp"
-        android:layout_marginBottom="32dp"
-        android:text="@string/logIn"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="Log In"
+        android:textColor="@color/maroon"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/haveAcct_tv"
+        app:layout_constraintTop_toTopOf="@+id/haveAcct_tv" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/whiteBackgroundImg"
+        app:srcCompat="@drawable/logotransparentbrown" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

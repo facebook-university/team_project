@@ -9,9 +9,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.work.OneTimeWorkRequest;
@@ -42,7 +43,7 @@ public class HomeActivity extends AppCompatActivity {
     private ListFragment mListFragment = new ListFragment();
     private Fragment mDefaultFragment;
     public User currentUser;
-    private ImageButton mBtnSwap;
+    private Button mBtnSwap;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
     private PendingIntent mPendingIntent;
@@ -58,6 +59,9 @@ public class HomeActivity extends AppCompatActivity {
 
         currentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.top_bar);
+
         mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
         String latitude = getIntent().getStringExtra("latitude");
         String longitude = getIntent().getStringExtra("longitude");
@@ -65,6 +69,7 @@ public class HomeActivity extends AppCompatActivity {
 
         mBtnSwap = findViewById(R.id.btnSwap);
         mBtnSwap.setVisibility(View.INVISIBLE);
+        mBtnSwap.setText(R.string.swap_list);
         mIsOnMapView = true;
 
         mBtnSwap.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +98,6 @@ public class HomeActivity extends AppCompatActivity {
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
@@ -176,12 +180,14 @@ public class HomeActivity extends AppCompatActivity {
                         .addToBackStack(null)
                         .commit();
                 mIsOnMapView = false;
+                mBtnSwap.setText(R.string.swap_map);
             } else {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, mMapFragment)
                         .addToBackStack(null)
                         .commit();
                 mIsOnMapView = true;
+                mBtnSwap.setText(R.string.swap_list);
             }
         }
     }
@@ -219,5 +225,10 @@ public class HomeActivity extends AppCompatActivity {
             // Enqueue our work to manager
             workManager.enqueue(OneTimeWorkRequest.from(NotifyWorker.class));
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

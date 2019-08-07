@@ -9,10 +9,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
@@ -35,16 +39,22 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private EditText mPassword;
     private EditText mOrgPhone;
     private Button mSignUpBtn;
-    private Button mBackToLogin;
+    private TextView mBackToLogin;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private User mCreatedUser;
     private DatabaseReference mDatabase;
 
+    private ConstraintLayout constraintLayout;
+    private ConstraintSet constraintSet;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup_activity);
+
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.top_bar);
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -59,31 +69,38 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mSignUpBtn = findViewById(R.id.final_signup_btn);
         mBackToLogin = findViewById(R.id.back_to_login_btn);
 
-        hideView();
+        mName.setVisibility(View.VISIBLE);
+        mEmail.setVisibility(View.VISIBLE);
+        mPassword.setVisibility(View.VISIBLE);
+        mOrgPhone.setVisibility(View.GONE);
+        mSignUpBtn.setVisibility(View.VISIBLE);
+
+        constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayoutSignUp);
 
         //display specific text views depending on user type selected
         mSpinner = findViewById(R.id.user_options);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.user_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinner.setAdapter(adapter);
+        mSpinner.setSelection(1);
 
         //show appropriate text views based on user type selection
         mSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = parent.getSelectedItem().toString();
                 //show all fields except phone number for consumer user type
-                if (selectedItem.equals("Consumer")) {
-                    mName.setVisibility(View.VISIBLE);
-                    mEmail.setVisibility(View.VISIBLE);
-                    mPassword.setVisibility(View.VISIBLE);
-                    mSignUpBtn.setVisibility(View.VISIBLE);
+                if (selectedItem.equals("Dine and Donate")) {
                     mOrgPhone.setVisibility(View.GONE);
-                }  else if(mSpinner.getSelectedItem().toString().equals("Organization")) {
+                    constraintSet = new ConstraintSet();
+                    constraintSet.clone(constraintLayout);
+                    constraintSet.connect(mSignUpBtn.getId(), ConstraintSet.TOP, mPassword.getId(), ConstraintSet.BOTTOM, 30);
+                    constraintSet.applyTo(constraintLayout);
+                }  else if(mSpinner.getSelectedItem().toString().equals("Fundraise")) {
                     mOrgPhone.setVisibility(View.VISIBLE);
-                    mName.setVisibility(View.VISIBLE);
-                    mEmail.setVisibility(View.VISIBLE);
-                    mSignUpBtn.setVisibility(View.VISIBLE);
-                    mPassword.setVisibility(View.VISIBLE);
+                    constraintSet = new ConstraintSet();
+                    constraintSet.clone(constraintLayout);
+                    constraintSet.connect(mSignUpBtn.getId(), ConstraintSet.TOP, mOrgPhone.getId(), ConstraintSet.BOTTOM, 30);
+                    constraintSet.applyTo(constraintLayout);
                 }
             }
 
@@ -144,7 +161,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     if (task.isSuccessful()) {
                         mUser = mAuth.getCurrentUser();
                         Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
-                        mCreatedUser = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"), "");
+                        mCreatedUser = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Fundraise"));
                         navigationHelper(HomeActivity.class);
                     } else {
                         // If sign in fails, display a message to the user.
