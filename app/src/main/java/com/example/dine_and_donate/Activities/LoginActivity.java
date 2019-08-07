@@ -7,9 +7,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Models.User;
@@ -35,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mEmail;
     private EditText mPassword;
     private Button mLogin;
-    private Button mSignup;
+    private TextView mSignup;
     private FirebaseAuth mAuth;
     private User mCurrentUserModel;
     private BottomNavigationView bottomNavigationView;
@@ -48,6 +50,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.top_bar);
+
         setContentView(R.layout.login_activity);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance();
@@ -85,7 +91,6 @@ public class LoginActivity extends AppCompatActivity {
                 //go to Sign Up page
                 Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
     }
