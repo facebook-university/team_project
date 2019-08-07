@@ -384,7 +384,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     Double.parseDouble(restLongitude))));
 
             restName.setText(restaurant.getString("name"));
-            rating.setRating(Math.round(Double.parseDouble(restaurant.getString("rating"))));
+            rating.setRating((float) Double.parseDouble(restaurant.getString("rating")));
             typeOfFood.setText(foodCategories);
 
             slideView.setVisibility(View.VISIBLE);

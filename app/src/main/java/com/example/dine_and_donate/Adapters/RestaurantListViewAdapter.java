@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -57,7 +58,7 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
             JSONObject restaurant = mRestaurants.getJSONObject(position);
             holder.yelpId = restaurant.getString("id");
             holder.tvName.setText(restaurant.getString("name"));
-
+            holder.ratingBar.setRating((float) Double.parseDouble(restaurant.getString("rating")));
             JSONObject coordinates = restaurant.getJSONObject("coordinates");
             String restLatitude = coordinates.getString("latitude");
             String restLongitude = coordinates.getString("longitude");
@@ -85,6 +86,7 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
         public TextView tvDistance;
         public ImageView ivPicture;
         public TextView tvInfo;
+        public RatingBar ratingBar;
         public String yelpId;
 
 
@@ -94,6 +96,7 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
             tvDistance = itemView.findViewById(R.id.tvDistance);
             tvInfo = itemView.findViewById(R.id.tvDescription);
             ivPicture = itemView.findViewById(R.id.ivRestaurant);
+            ratingBar = itemView.findViewById(R.id.ratingBar);
         }
     }
 }
