@@ -14,12 +14,19 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -29,6 +36,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
@@ -139,6 +147,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private DataSnapshot mAllEvents;
     private HashMap<String, JSONObject> mIdToRestaurant = new HashMap<>();
     private HashMap<String, User> mIdToOrg = new HashMap<>();
+    private ArrayList<String> mOrgNames = new ArrayList<String>();
+    private HashMap<String, String> mNameToId = new HashMap<>();
+    private String queryOrgId;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -154,6 +165,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        homeActivity = (HomeActivity) getActivity();
+        mCurrentUser = homeActivity.currentUser;
+
+        if (!mCurrentUser.isOrg) {
+            setHasOptionsMenu(true);
+        }
     }
 
     @Override
@@ -165,9 +182,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mapFragment.getMapAsync(this);
             loaded = true;
         }
-
-        homeActivity = (HomeActivity) getActivity();
-        mCurrentUser = homeActivity.currentUser;
 
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -201,6 +215,54 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.activity_main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.searchEvents:
+                searchOrgs();
+                return true;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    public void searchOrgs() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        View view = getLayoutInflater().inflate(R.layout.search, null);
+        Button searchOrgsButton = view.findViewById(R.id.search_btn);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext,
+                android.R.layout.simple_dropdown_item_1line, mOrgNames);
+        final AutoCompleteTextView searchQuery = (AutoCompleteTextView)
+                view.findViewById(R.id.autoCompleteSearchOrg);
+        searchQuery.setAdapter(adapter);
+
+        builder.setView(view);
+        final AlertDialog dialog = builder.create();
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+        searchOrgsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String query = searchQuery.getText().toString();
+                queryOrgId = mNameToId.get(query);
+                homeActivity.setExploreTab();
+                dialog.dismiss();
+                queryOrgId = null;
+            }
+        });
+
+        dialog.show();
     }
 
     // GENERATE MARKERS //
@@ -683,6 +745,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mIdToOrg.put(id, dataSnapshot.child(id).getValue(User.class));
+                String orgName = dataSnapshot.child(id).child("name").getValue().toString();
+                if (!mOrgNames.contains(orgName)) {
+                    mOrgNames.add(orgName);
+                    mNameToId.put(orgName, id);
+                }
             }
 
             @Override
@@ -710,5 +777,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public HashMap<String, User> getIdToOrg() {
         return mIdToOrg;
+    }
+
+    public String getQueryOrgId() {
+        return queryOrgId;
+    }
+
+    public ArrayList<String> getOrgNames() {
+        return mOrgNames;
+    }
+
+    public HashMap<String, String> getNameToId() {
+        return mNameToId;
     }
 }

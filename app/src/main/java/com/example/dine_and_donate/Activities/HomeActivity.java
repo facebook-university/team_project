@@ -8,6 +8,8 @@ import android.content.Intent;
 
 import android.os.Bundle;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -192,29 +194,31 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void setExploreTab() {
-        if (mShowButton) {
-            if (mIsOnMapView) {
-                mListFragment = new ListFragment();
-                mListFragment.setAllEvents(mMapFragment.getAllEvents());
-                mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
-                mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
-                mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
-                mListFragment.setLocation(mMapFragment.getCurrentLocation());
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.flContainer, mListFragment)
-                        .addToBackStack(null)
-                        .commit();
-                mIsOnMapView = false;
-                mBtnSwap.setText(R.string.swap_map);
-            } else {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.flContainer, mMapFragment)
-                        .addToBackStack(null)
-                        .commit();
-                mIsOnMapView = true;
-                mBtnSwap.setText(R.string.swap_list);
-            }
+    public void setExploreTab() {
+        if (mIsOnMapView || (mMapFragment.getQueryOrgId() != null)) {
+            mListFragment = new ListFragment();
+            mListFragment.setAllEvents(mMapFragment.getAllEvents());
+            mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
+            mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
+            mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
+            mListFragment.setLocation(mMapFragment.getCurrentLocation());
+            mListFragment.setQueryOrgId(mMapFragment.getQueryOrgId());
+            mListFragment.setOrgNames(mMapFragment.getOrgNames());
+            mListFragment.setOrgNameToId(mMapFragment.getNameToId());
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.flContainer, mListFragment)
+                    .addToBackStack(null)
+                    .commit();
+            mIsOnMapView = false;
+            mBtnSwap.setText(R.string.swap_map);
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.flContainer, mMapFragment)
+                    .addToBackStack(null)
+                    .commit();
+            mIsOnMapView = true;
+            mBtnSwap.setText(R.string.swap_list);
         }
     }
 
