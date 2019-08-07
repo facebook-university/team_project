@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -39,6 +40,7 @@ import org.parceler.Parcels;
 
 import java.util.Calendar;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -53,6 +55,7 @@ public class HomeActivity extends AppCompatActivity {
 
     public User currentUser;
 
+    private ProgressBar mProgressSpinner;
     private Button mBtnSwap;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
@@ -76,6 +79,8 @@ public class HomeActivity extends AppCompatActivity {
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
 
+        mProgressSpinner = findViewById(R.id.progressSpinner);
+        setLoading(false);
         mBtnSwap = findViewById(R.id.btnSwap);
         mBtnSwap.setVisibility(View.INVISIBLE);
         mBtnSwap.setText(R.string.swap_list);
@@ -275,11 +280,11 @@ public class HomeActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public MapFragment getMapFragment() {
-        return mMapFragment;
-    }
-
-    public void setMapFragment(MapFragment mMapFragment) {
-        this.mMapFragment = mMapFragment;
+    public void setLoading(boolean isLoading) {
+        if(isLoading) {
+            mProgressSpinner.setVisibility(View.VISIBLE);
+        } else {
+            mProgressSpinner.setVisibility(View.GONE);
+        }
     }
 }

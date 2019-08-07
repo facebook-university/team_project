@@ -249,6 +249,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                     if(restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
                                         clickMarkerRestaurant(marker);
                                         homeActivity.setClickedOnID(null);
+                                        homeActivity.setLoading(false);
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -308,6 +309,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                                 // simulates marker click
                                                 clickMarkerEvent(marker);
                                                 homeActivity.setClickedOnID(null);
+                                                homeActivity.setLoading(false);
                                             }
                                         } catch (JSONException e) {
                                             e.printStackTrace();

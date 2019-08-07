@@ -47,6 +47,7 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
                 HomeActivity homeActivity = (HomeActivity) context;
                 homeActivity.setClickedOnID(viewHolder.yelpId);
                 homeActivity.setExploreTab();
+                homeActivity.setLoading(true);
             }
         });
         return viewHolder;

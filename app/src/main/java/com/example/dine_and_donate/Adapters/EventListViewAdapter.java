@@ -59,6 +59,7 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
                 HomeActivity homeActivity = (HomeActivity) context;
                 homeActivity.setClickedOnID(viewHolder.event.yelpID);
                 homeActivity.setExploreTab();
+                homeActivity.setLoading(true);
             }
         });
         return viewHolder;
