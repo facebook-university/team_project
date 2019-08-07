@@ -30,7 +30,7 @@ public class YelpService {
 
         String url = urlBuilder.build().toString();
 
-        Request request= new Request.Builder()
+        Request request = new Request.Builder()
                 .url(url)
                 .get()
                 .header("Authorization", "Bearer " + YELP_API)
@@ -50,7 +50,7 @@ public class YelpService {
 
         String url = urlBuilder.build().toString();
 
-        Request request= new Request.Builder()
+        Request request = new Request.Builder()
                 .url(url)
                 .get()
                 .header("Authorization", "Bearer " + YELP_API)

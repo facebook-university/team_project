@@ -6,8 +6,9 @@
         android:icon="@drawable/edit"
         android:title="@string/editProf" />
 
-    <item  android:id="@+id/log_out"
-        android:title="@string/logOut"/>
+    <item
+        android:id="@+id/log_out"
+        android:title="@string/logOut" />
 
 </menu>
 

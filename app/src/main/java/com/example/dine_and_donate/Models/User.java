@@ -71,11 +71,19 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public Map<String, String> getSavedEventsIDs() { return savedEventsIDs; }
+    public Map<String, String> getSavedEventsIDs() {
+        return savedEventsIDs;
+    }
 
-    public void addSavedEventID(Map<String, String> ids) { this.savedEventsIDs = ids; }
+    public void addSavedEventID(Map<String, String> ids) {
+        this.savedEventsIDs = ids;
+    }
 
-    public String getProfPic() { return this.profPic; }
+    public String getProfPic() {
+        return this.profPic;
+    }
 
-    public void setProfPic(String imageUrl) { this.profPic = imageUrl; }
+    public void setProfPic(String imageUrl) {
+        this.profPic = imageUrl;
+    }
 }

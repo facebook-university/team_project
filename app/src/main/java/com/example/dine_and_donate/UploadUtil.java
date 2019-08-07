@@ -25,8 +25,8 @@ public class UploadUtil {
     }
 
     public void inOnClick(View v, Uri selectedImage, final Uri[] downloadUri, StorageReference mStorageRef, Task<Uri> urlTask) {
-        if(selectedImage != null) {
-            final StorageReference ref = mStorageRef.child("images/"+selectedImage.getLastPathSegment());
+        if (selectedImage != null) {
+            final StorageReference ref = mStorageRef.child("images/" + selectedImage.getLastPathSegment());
             UploadTask uploadTask = ref.putFile(selectedImage);
 
             urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -49,7 +49,7 @@ public class UploadUtil {
         }
     }
 
-    public void pickFromGallery(Intent intent){
+    public void pickFromGallery(Intent intent) {
         intent.setAction(Intent.ACTION_PICK);
         Log.d("helper method", "gets here");
         intent.setType("image/*");

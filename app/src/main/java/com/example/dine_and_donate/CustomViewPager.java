@@ -42,7 +42,10 @@ public class CustomViewPager extends ViewPager {
 
                 float diffY = y2 - y1;
                 float diffX = x2 - x1;
-                x1 = 0; x2 = 0; y1 = 0; y2 = 0;
+                x1 = 0;
+                x2 = 0;
+                y1 = 0;
+                y2 = 0;
 
                 if (Math.abs(diffX) > Math.abs(diffY)) {
                     result = true;

@@ -1,11 +1,6 @@
 package com.example.dine_and_donate.HomeFragments;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
 
 import permissions.dispatcher.PermissionUtils;
 
@@ -13,11 +8,11 @@ public final class MapDemoFragmentPermissionsDispatcher {
 
     private static final int REQUEST_GETMYLOCATION = 0;
 
-    private static final String[] PERMISSION_GETMYLOCATION = new String[] {"android.permission.ACCESS_FINE_LOCATION","android.permission.ACCESS_COARSE_LOCATION"};
+    private static final String[] PERMISSION_GETMYLOCATION = new String[]{"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"};
 
     private static final int REQUEST_STARTLOCATIONUPDATES = 1;
 
-    private static final String[] PERMISSION_STARTLOCATIONUPDATES = new String[] {"android.permission.ACCESS_FINE_LOCATION","android.permission.ACCESS_COARSE_LOCATION"};
+    private static final String[] PERMISSION_STARTLOCATIONUPDATES = new String[]{"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"};
 
     private MapDemoFragmentPermissionsDispatcher() {
     }
@@ -40,7 +35,7 @@ public final class MapDemoFragmentPermissionsDispatcher {
         }
     }
 
-    static void onRequestPermissionsResult(MapFragment  target, int requestCode,
+    static void onRequestPermissionsResult(MapFragment target, int requestCode,
                                            int[] grantResults) {
         switch (requestCode) {
             case REQUEST_GETMYLOCATION:

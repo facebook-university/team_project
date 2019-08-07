@@ -66,9 +66,10 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 String formattedDate = "<b>" + simple.format(result) + "</b>";
                 holder.mStartDate.setText(Html.fromHtml(formattedDate));
                 final String[] org = {""};
-                String formattedInfo = "<b>" + org[0] + "</b>" + " organized an event at " + "<b>" + getRestaurantName(dataSnapshot.child("locationString").getValue().toString()) +"</b> "  + "!";
+                String formattedInfo = "<b>" + org[0] + "</b>" + " organized an event at " + "<b>" + getRestaurantName(dataSnapshot.child("locationString").getValue().toString()) + "</b> " + "!";
                 holder.mPartner.setText(Html.fromHtml(formattedInfo));
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -105,7 +106,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             mOrgPic = itemView.findViewById(R.id.org_iv);
             mStartDate = itemView.findViewById(R.id.date_tv);
             mPartner = itemView.findViewById(R.id.partnered_with_tv);
-            mItem =  itemView.findViewById(R.id.notification_layout);
+            mItem = itemView.findViewById(R.id.notification_layout);
             mNotifiedAt = itemView.findViewById(R.id.notified_at_tv);
             mItem.setOnClickListener(this);
         }

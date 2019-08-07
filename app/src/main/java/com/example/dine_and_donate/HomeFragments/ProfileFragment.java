@@ -34,7 +34,6 @@ public class ProfileFragment extends Fragment {
     private ConstraintLayout mLayoutForConsumer;
     private User mCurrentUserModel;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +53,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
 
         HomeActivity homeActivity = (HomeActivity) getActivity();
         mCurrentUserModel = homeActivity.currentUser;

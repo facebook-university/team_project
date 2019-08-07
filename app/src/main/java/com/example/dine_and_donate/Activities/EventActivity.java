@@ -92,7 +92,7 @@ public class EventActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         mCalendarView = findViewById(R.id.cvChooseDate);
-        mCalendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
+        mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
                 mMonth = month;
                 mDay = dayOfMonth;
@@ -104,8 +104,6 @@ public class EventActivity extends AppCompatActivity {
         mStartTimePicker.setEnabled(true);
         mEndTimePicker = findViewById(R.id.endTimePicker);
         mEndTimePicker.setEnabled(true);
-
-//        mAcSearch = findViewById(R.id.acSearch);
 
         mTvLocation = findViewById(R.id.tvLocation);
         mEtEventInfo = findViewById(R.id.etEventInfo);
@@ -123,7 +121,7 @@ public class EventActivity extends AppCompatActivity {
         mTvLocation.setText(mLocationString);
 
         // setting defaults to what was previously saved
-        if(mEditEvent != null) {
+        if (mEditEvent != null) {
             mCalendarView.setDate(mEditEvent.startTime);
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(mEditEvent.startTime);
@@ -137,7 +135,6 @@ public class EventActivity extends AppCompatActivity {
             Glide.with(this)
                     .load(mEditEvent.imageUrl)
                     .into(mVoucherImageView);
-
         }
 
         mChooseImage.setOnClickListener(new View.OnClickListener() {
@@ -149,10 +146,11 @@ public class EventActivity extends AppCompatActivity {
 
         mBtnCreate.setOnClickListener(new View.OnClickListener() {
             final Uri[] downloadUri = new Uri[1];
+
             @Override
             public void onClick(View v) {
-                if(mSelectedImage != null) {
-                    final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
+                if (mSelectedImage != null) {
+                    final StorageReference ref = mStorageRef.child("images/" + mSelectedImage.getLastPathSegment());
                     UploadTask uploadTask = ref.putFile(mSelectedImage);
 
                     Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -176,7 +174,7 @@ public class EventActivity extends AppCompatActivity {
                             }
                         }
                     });
-                } else if(mEditEvent != null) {
+                } else if (mEditEvent != null) {
                     writeEvent(yelpId, mEditEvent.imageUrl);
                 }
             }

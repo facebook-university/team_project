@@ -84,7 +84,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
             }
         });
     }
-    
+
     @Override
     //return number of images present held by the adapter
     public int getItemCount() {

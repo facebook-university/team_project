@@ -5,6 +5,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import org.parceler.Parcel;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -20,7 +21,8 @@ public class Event {
     public String imageUrl;
     public String eventId;
 
-    public Event() {}
+    public Event() {
+    }
 
     public Event(String orgId, String yelpID, String locationString, long startTime, long endTime, String info, String imageUrl, String eventId) {
         this.orgId = orgId;
@@ -35,7 +37,7 @@ public class Event {
 
     public static ArrayList<Event> eventsHappeningAtRestaurant(DataSnapshot ds) {
         ArrayList<Event> events = new ArrayList<>();
-        for(DataSnapshot snapshot : ds.getChildren()) {
+        for (DataSnapshot snapshot : ds.getChildren()) {
             events.add(snapshot.getValue(Event.class));
         }
         return events;
@@ -90,7 +92,11 @@ public class Event {
         this.info = info;
     }
 
-    public String getImageUrl() { return imageUrl; }
+    public String getImageUrl() {
+        return imageUrl;
+    }
 
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

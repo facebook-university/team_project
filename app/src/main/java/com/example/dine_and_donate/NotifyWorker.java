@@ -111,8 +111,10 @@ public class NotifyWorker extends Worker {
                                     }
                                 }
                             }
+
                             @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) { }
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                            }
                         });
 
                         mCounter++;
@@ -149,14 +151,14 @@ public class NotifyWorker extends Worker {
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "com.example.dine_and_donate";
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Notification",
                     NotificationManager.IMPORTANCE_DEFAULT);
 
             notificationChannel.setDescription("Dine&Donate Channel");
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.BLUE);
-            notificationChannel.setVibrationPattern(new long[]{0,1000,500,1000});
+            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
             notificationChannel.enableLights(true);
             notificationManager.createNotificationChannel(notificationChannel);
         }
@@ -182,7 +184,7 @@ public class NotifyWorker extends Worker {
 
         notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
-        mRef =  FirebaseDatabase.getInstance().getReference();
+        mRef = FirebaseDatabase.getInstance().getReference();
         //add notification to database here; event id, yelp id and createdAt
         mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt, orgPicUri);
         mNotificationRef = mRef.child("users").child(mFbUser.getUid()).getRef().child("Notifications").push();

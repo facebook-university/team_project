@@ -79,7 +79,7 @@ public class NotificationsFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 //look through all notifications of that user
-                for(DataSnapshot notificationsDs : dataSnapshot.getChildren()) {
+                for (DataSnapshot notificationsDs : dataSnapshot.getChildren()) {
                     Notification notification = notificationsDs.getValue(Notification.class);
                     mNotificationList.add(notification);
                     mNotificationsAdapter.notifyDataSetChanged();
