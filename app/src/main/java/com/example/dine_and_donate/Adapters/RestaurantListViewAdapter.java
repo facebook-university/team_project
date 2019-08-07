@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.R;
 
@@ -37,7 +38,16 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(R.layout.layout_restaurant_list_view, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
+        final ViewHolder viewHolder = new ViewHolder(view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // todo: get location from event, pass to home activity
+                HomeActivity homeActivity = (HomeActivity) context;
+                homeActivity.setClickedOnID(viewHolder.yelpId);
+                homeActivity.setExploreTab();
+            }
+        });
         return viewHolder;
     }
 
@@ -45,6 +55,7 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         try {
             JSONObject restaurant = mRestaurants.getJSONObject(position);
+            holder.yelpId = restaurant.getString("id");
             holder.tvName.setText(restaurant.getString("name"));
 
             JSONObject coordinates = restaurant.getJSONObject("coordinates");
@@ -73,7 +84,9 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
         public TextView tvName;
         public TextView tvDistance;
         public ImageView ivPicture;
-        TextView tvInfo;
+        public TextView tvInfo;
+        public String yelpId;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
