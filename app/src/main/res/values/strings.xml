@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Dine and Donate</string>
+    <string name="app_name">Dine &amp; Donate</string>
     <string-array name="user_types">
         <item> </item>
-        <item>Consumer</item>
-        <item>Organization</item>
+        <item>Dine and Donate</item>
+        <item>Fundraise</item>
     </string-array>
     <string name="google_maps_api_key">AIzaSyBtH_PTSO3ou7pjuknEY-9HdTr3XhDJDeg</string>
     <string name="facebook_app_id">443391136243627</string>
@@ -33,7 +33,7 @@
     <string name="help">Help</string>
     <string name="callRestaurant">Call Restaurant</string>
     <string name="userTypeIntro">I am looking to...</string>
-    <string name="haveAcct">Already have an account?.</string>
+    <string name="haveAcct">Already have an account?</string>
     <string name="save">Save Event</string>
     <string name="saved">Event Saved</string>
     <string name="errorMsg">Sorry, something went wrong!</string>
