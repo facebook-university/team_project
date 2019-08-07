@@ -9,9 +9,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dine_and_donate.Models.User;
@@ -35,7 +37,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private EditText mPassword;
     private EditText mOrgPhone;
     private Button mSignUpBtn;
-    private Button mBackToLogin;
+    private TextView mBackToLogin;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private User mCreatedUser;
@@ -45,6 +47,9 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup_activity);
+
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.top_bar);
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -59,41 +64,36 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mSignUpBtn = findViewById(R.id.final_signup_btn);
         mBackToLogin = findViewById(R.id.back_to_login_btn);
 
-        mName.setVisibility(View.GONE);
-        mEmail.setVisibility(View.GONE);
-        mPassword.setVisibility(View.GONE);
+        mName.setVisibility(View.VISIBLE);
+        mEmail.setVisibility(View.VISIBLE);
+        mPassword.setVisibility(View.VISIBLE);
         mOrgPhone.setVisibility(View.GONE);
-        mSignUpBtn.setVisibility(View.GONE);
+        mSignUpBtn.setVisibility(View.VISIBLE);
 
         //display specific text views depending on user type selected
         mSpinner = findViewById(R.id.user_options);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.user_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinner.setAdapter(adapter);
+        mSpinner.setSelection(1);
 
         //show appropriate text views based on user type selection
         mSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = parent.getSelectedItem().toString();
                 //show all fields except phone number for consumer user type
-                if (selectedItem.equals("Consumer")) {
+                if (selectedItem.equals("Dine and Donate")) {
                     mName.setVisibility(View.VISIBLE);
                     mEmail.setVisibility(View.VISIBLE);
                     mPassword.setVisibility(View.VISIBLE);
                     mSignUpBtn.setVisibility(View.VISIBLE);
                     mOrgPhone.setVisibility(View.GONE);
-                }  else if(mSpinner.getSelectedItem().toString().equals("Organization")) {
+                }  else if(mSpinner.getSelectedItem().toString().equals("Fundraise")) {
                     mOrgPhone.setVisibility(View.VISIBLE);
                     mName.setVisibility(View.VISIBLE);
                     mEmail.setVisibility(View.VISIBLE);
                     mSignUpBtn.setVisibility(View.VISIBLE);
                     mPassword.setVisibility(View.VISIBLE);
-                } else {
-                    mName.setVisibility(View.GONE);
-                    mEmail.setVisibility(View.GONE);
-                    mPassword.setVisibility(View.GONE);
-                    mOrgPhone.setVisibility(View.GONE);
-                    mSignUpBtn.setVisibility(View.GONE);
                 }
             }
 
@@ -154,7 +154,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     if (task.isSuccessful()) {
                         mUser = mAuth.getCurrentUser();
                         Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
-                        mCreatedUser = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Organization"));
+                        mCreatedUser = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Fundraise"));
                         navigationHelper(HomeActivity.class);
                     } else {
                         // If sign in fails, display a message to the user.
