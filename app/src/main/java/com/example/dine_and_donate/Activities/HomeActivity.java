@@ -57,6 +57,7 @@ public class HomeActivity extends AppCompatActivity {
     private boolean mIsOnMapView;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
+    private String mClickedOnID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,7 +189,7 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void setExploreTab() {
+    public void setExploreTab() {
         if (mShowButton) {
             if (mIsOnMapView) {
                 mListFragment = new ListFragment();
@@ -239,6 +240,22 @@ public class HomeActivity extends AppCompatActivity {
         return markerLatLng;
     }
 
+    public void setMarkerLatLng(LatLng markerLatLng) {
+        this.markerLatLng = markerLatLng;
+    }
+
+    public String getClickedOnID() {
+        return mClickedOnID;
+    }
+
+    public void setClickedOnID(String mClickedOnID) {
+        this.mClickedOnID = mClickedOnID;
+    }
+
+    public void setClickedOnIdToNull() {
+        mClickedOnID = null;
+    }
+
     public static class MyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -252,5 +269,13 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    public MapFragment getMapFragment() {
+        return mMapFragment;
+    }
+
+    public void setMapFragment(MapFragment mMapFragment) {
+        this.mMapFragment = mMapFragment;
     }
 }

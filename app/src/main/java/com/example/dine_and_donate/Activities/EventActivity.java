@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -172,6 +173,8 @@ public class EventActivity extends AppCompatActivity {
                     });
                 } else if(mEditEvent != null) {
                     writeEvent(yelpId, mEditEvent.imageUrl);
+                } else {
+                    Toast.makeText(EventActivity.this, "Please select voucher image", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -182,6 +185,14 @@ public class EventActivity extends AppCompatActivity {
         String orgId = mFirebaseCurrentUser.getUid();
         Date startTime = dateFromPicker(mStartTimePicker);
         Date endTime = dateFromPicker(mEndTimePicker);
+        if(startTime.after(endTime)) {
+            Toast.makeText(this, "Start time must be before end time", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if(!startTime.after(new Date())) {
+            Toast.makeText(this, "Date of event must must be after current date", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String info = mEtEventInfo.getText().toString();
         String id = mEditEvent == null ? UUID.randomUUID().toString() : mEditEvent.eventId;
         newEvent = new Event(orgId, yelpId, mLocationString, startTime.getTime(), endTime.getTime(), info, url, id);

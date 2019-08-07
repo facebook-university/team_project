@@ -160,14 +160,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (!loaded) {
+        homeActivity = (HomeActivity) getActivity();
+        mCurrentUser = homeActivity.currentUser;
+
+        if (!loaded || homeActivity.getClickedOnID() != null) {
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
             loaded = true;
         }
-
-        homeActivity = (HomeActivity) getActivity();
-        mCurrentUser = homeActivity.currentUser;
 
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -232,6 +232,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                     @Override
                                     public boolean onMarkerClick(Marker marker) {
+                                        // Todo : move to function
                                         slideUpMenuCreate((JSONObject) marker.getTag());
                                         slideViewIsUp = true;
                                         return false;
@@ -287,9 +288,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                                 return clickMarker(marker);
                                             }
                                         });
-                                        if (marker.getPosition().equals(homeActivity.getMarkerLatLng())) {
-                                            clickMarker(marker);
-                                            homeActivity.setMarkerLatLngToNull();
+                                        try {
+                                            if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
+                                                // simulates marker click
+                                                clickMarker(marker);
+                                                homeActivity.setClickedOnID(null);
+                                            }
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
                                         }
                                     }
                                 });
@@ -311,13 +317,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             DataSnapshot eventsOfRestaurant = mAllEvents.child(restaurantOfMarker.getString("id"));
 
             slideUpMenuSave(restaurantOfMarker, eventsOfRestaurant);
-            marker.showInfoWindow();
+            map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
 
             slideViewIsUp = true;
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return false;
+        return true;
     }
 
     // SLIDE UP VIEW //
@@ -530,7 +536,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onCameraIdle() {
                 Double newLongitude = map.getCameraPosition().target.longitude;
                 Double newLatitude = map.getCameraPosition().target.latitude;
-                if (cameraLatitude == null || cameraLongitude == null) {
+                if (cameraLatitude == null || cameraLongitude == null || map.getCameraPosition().zoom > 10) {
                     cameraLatitude = newLatitude;
                     cameraLongitude = newLongitude;
 
@@ -541,16 +547,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                 }
 
-                if (map.getCameraPosition().zoom > 10) {
-                    cameraLongitude = newLongitude;
-                    cameraLatitude = newLatitude;
-
-                    if (mCurrentUser.isOrg) {
-                        generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
-                    } else {
-                        generateMarkersEvents();
-                    }
-                }
+//                if (map.getCameraPosition().zoom > 10) {
+//                    cameraLongitude = newLongitude;
+//                    cameraLatitude = newLatitude;
+//
+//                    if (mCurrentUser.isOrg) {
+//                        generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+//                    } else {
+//                        generateMarkersEvents();
+//                    }
+//                }
             }
         });
 
