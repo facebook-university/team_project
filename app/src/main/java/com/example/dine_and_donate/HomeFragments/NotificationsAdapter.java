@@ -9,8 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.dine_and_donate.Models.Notification;
@@ -115,11 +113,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         @Override
         //TODO not finished
         public void onClick(View v) {
-            MapFragment mMapFragment = new MapFragment();
-            ProfileFragment mProfileFragment = new ProfileFragment();
-            AppCompatActivity activity = (AppCompatActivity) v.getContext();
-            Fragment fragment = new MapFragment();
-            activity.getSupportFragmentManager().beginTransaction().replace(R.id.bottom_navigation, fragment).addToBackStack(null).commit();
+
         }
     }
 }

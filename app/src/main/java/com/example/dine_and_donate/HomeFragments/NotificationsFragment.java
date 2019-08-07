@@ -2,6 +2,8 @@ package com.example.dine_and_donate.HomeFragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -34,8 +36,6 @@ public class NotificationsFragment extends Fragment {
     private DatabaseReference mRef;
     private DatabaseReference mNotificationsRef;
     private FirebaseDatabase mDatabase;
-    private double mLat;
-    private double mLng;
 
     @Nullable
     @Override
@@ -46,6 +46,12 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
     }
 
     @Override
@@ -85,13 +91,5 @@ public class NotificationsFragment extends Fragment {
 
             }
         });
-    }
-
-    public void setLat(double lat){
-        this.mLat = lat;
-    }
-
-    public void setLng(double lng){
-        this.mLng = lng;
     }
 }

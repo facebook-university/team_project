@@ -5,16 +5,14 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -28,7 +26,6 @@ import com.example.dine_and_donate.NotifyWorker;
 import com.example.dine_and_donate.R;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.parceler.Parcels;
@@ -38,7 +35,7 @@ import java.util.Calendar;
 public class HomeActivity extends AppCompatActivity {
 
     private BottomNavigationView mBottomNavigationView;
-    private DrawerLayout mDrawerNav;
+
     private NotificationsFragment mNotificationsFragment = new NotificationsFragment();
     private MapFragment mMapFragment = new MapFragment();
     private ProfileFragment mProfileFragment = new ProfileFragment();
@@ -50,13 +47,14 @@ public class HomeActivity extends AppCompatActivity {
     private boolean mIsOnMapView;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
+    private boolean mShowMenuOption;
+    private MenuItem mItem;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-        mDrawerNav = findViewById(R.id.drawerNav);
 
         currentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
@@ -81,7 +79,6 @@ public class HomeActivity extends AppCompatActivity {
                 .addToBackStack(null) // TODO: look into if this can cause mem problem
                 .commit();
 
-        createDrawerNav();
         createBottomNav();
         if (!currentUser.isOrg) {
             setUpNotificationWorker();
@@ -100,16 +97,13 @@ public class HomeActivity extends AppCompatActivity {
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
-                        lockDrawer();
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
-                        // Supply index input as an argument.
                         fragment = mNotificationsFragment;
                         mShowButton = false;
                         break;
                     case R.id.action_map:
-                        lockDrawer();
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
@@ -117,7 +111,6 @@ public class HomeActivity extends AppCompatActivity {
                         mShowButton = true;
                         break;
                     case R.id.action_profile:
-                        mDrawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
@@ -129,7 +122,7 @@ public class HomeActivity extends AppCompatActivity {
                         .replace(R.id.flContainer, fragment)
                         .addToBackStack(null) // TODO: look into if this can cause mem problem
                         .commit();
-                if(mShowButton) {
+                if (mShowButton) {
                     mBtnSwap.setVisibility(View.VISIBLE);
                 } else {
                     mBtnSwap.setVisibility(View.INVISIBLE);
@@ -139,39 +132,28 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private void createDrawerNav() {
-        Button logOutBtn = findViewById(R.id.logout);
-
-        logOutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        NavigationView mNavigationView = findViewById(R.id.settings_navigation);
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.editProfile:
-                        navigationHelper(EditProfileActivity.class);
-                        return true;
-                    case R.id.logout:
-                        // TO DO
-                        return true;
-                }
-                return true;
-            }
-        });
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+//        inflater.inflate(R.menu.profile_settings_drawer, menu);  // Use filter.xml from step 1
+        getMenuInflater().inflate(R.menu.profile_settings_drawer, menu);
+        return true;
     }
 
-    private void lockDrawer() {
-        mDrawerNav.closeDrawers();
-        mDrawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.edit_profile:
+                navigationHelper(EditProfileActivity.class);
+                break;
+
+            case R.id.log_out:
+                FirebaseAuth.getInstance().signOut();
+                navigationHelper(LoginActivity.class);
+                break;
+        }
+        return true;
     }
 
     private void navigationHelper(Class navigateToClass) {
@@ -179,7 +161,6 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtra(User.class.getSimpleName(), Parcels.wrap(currentUser));
         startActivity(intent);
     }
-
 
     private void setExploreTab() {
         if (mShowButton) {
@@ -207,16 +188,16 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 13);
-        calendar.set(Calendar.MINUTE, 00);
-        calendar.set(Calendar.SECOND, 00);
+        calendar.set(Calendar.HOUR_OF_DAY, 15);
+        calendar.set(Calendar.MINUTE, 26);
+        calendar.set(Calendar.SECOND, 30);
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
             calendar.add(Calendar.DATE, 1);
         }
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, 0);
-        AlarmManager alarmManageram = (AlarmManager)getSystemService(ALARM_SERVICE);
+        AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, mPendingIntent);
@@ -239,6 +220,4 @@ public class HomeActivity extends AppCompatActivity {
             workManager.enqueue(OneTimeWorkRequest.from(NotifyWorker.class));
         }
     }
-
-
 }

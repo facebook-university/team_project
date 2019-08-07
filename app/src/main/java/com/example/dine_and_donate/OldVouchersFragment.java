@@ -31,7 +31,7 @@ public class OldVouchersFragment extends Fragment {
 
     private View mView;
     private RecyclerView mRecyclerView;
-
+    private TabFragmentHelper mTabFragmentHelper;
     private Context mContext;
     private ArrayList<Event> mEvents;
 
@@ -55,6 +55,7 @@ public class OldVouchersFragment extends Fragment {
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
+        mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter);
         return mView;
     }
 
@@ -79,7 +80,7 @@ public class OldVouchersFragment extends Fragment {
                         if (pastEvents.containsKey(dsEvent.getKey())) {
                             //if event end date is older than today's date, it is a past event
                             if (Long.toString(dateMillis).compareTo(dsEvent.child("endTime").toString()) > 0) {
-                                initBitmapsPastEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
+                                mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
                             }
                         }
                     }
@@ -97,15 +98,5 @@ public class OldVouchersFragment extends Fragment {
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mRecyclerView.setAdapter(staggeredRecyclerViewAdapter);
-    }
-
-    //add images and descriptions to respective arrayLists
-    private void initBitmapsPastEvents(String mUrls, String mDescriptions) {
-        //test events
-        Event newEvent = new Event();
-        newEvent.locationString = mDescriptions;
-        newEvent.imageUrl = mUrls;
-        mEvents.add(newEvent);
-        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
     }
 }

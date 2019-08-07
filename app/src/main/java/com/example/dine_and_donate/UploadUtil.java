@@ -35,7 +35,6 @@ public class UploadUtil {
                     if (!task.isSuccessful()) {
                         throw task.getException();
                     }
-                    // Continue with the task to get the download URL
                     return ref.getDownloadUrl();
                 }
             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
@@ -48,7 +47,6 @@ public class UploadUtil {
                 }
             });
         }
-
     }
 
     public void pickFromGallery(Intent intent){

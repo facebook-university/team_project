@@ -149,7 +149,7 @@ public class EventActivity extends AppCompatActivity {
         long startTime = eventDate + (mStartTimePicker.getHour() * 3600000) + (mStartTimePicker.getMinute() * 60000);
         long endTime = eventDate + (mEndTimePicker.getHour() * 3600000) + (mEndTimePicker.getMinute() * 60000);
         String info = mEtEventInfo.getText().toString();
-        newEvent = new Event(orgId, yelpId, location, startTime, endTime, info, url);
+        newEvent = new Event(orgId, yelpId, location, startTime, endTime, info);
         mRef.child("events").child(yelpId).child(UUID.randomUUID().toString()).setValue(newEvent, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {

@@ -15,9 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.dine_and_donate.Activities.HomeActivity;
+import com.example.dine_and_donate.Adapters.ViewPagerAdapter;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
-import com.example.dine_and_donate.Adapters.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 public class ProfileFragment extends Fragment {
@@ -34,10 +34,17 @@ public class ProfileFragment extends Fragment {
     private ConstraintLayout mLayoutForConsumer;
     private User mCurrentUserModel;
 
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
         mVoucherView = view.findViewById(R.id.viewpager_id);
         mVoucherPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
         mVoucherView.setAdapter(mVoucherPagerAdapter);
@@ -48,6 +55,7 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         HomeActivity homeActivity = (HomeActivity) getActivity();
         mCurrentUserModel = homeActivity.currentUser;
 
@@ -56,7 +64,7 @@ public class ProfileFragment extends Fragment {
         mTabLayout = view.findViewById(R.id.tabs_profile);
         mTabLayout.setupWithViewPager(mVoucherView);
         setUpTopProfile(mCurrentUserModel.name);
-        if(mCurrentUserModel.isOrg) {
+        if (mCurrentUserModel.isOrg) {
             mProfPic = view.findViewById(R.id.org_prof_pic);
             mUserName = view.findViewById(R.id.org_name);
         } else {
@@ -68,7 +76,7 @@ public class ProfileFragment extends Fragment {
     //set up for top of profile page based on user type
     private void setUpTopProfile(String name) {
         //display orgView when user type is an organization
-        if(mCurrentUserModel.isOrg) {
+        if (mCurrentUserModel.isOrg) {
             mLayoutForOrg.setVisibility(View.VISIBLE);
             mLayoutForConsumer.setVisibility(View.GONE);
         } else {

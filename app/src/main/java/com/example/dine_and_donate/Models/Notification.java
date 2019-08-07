@@ -2,41 +2,51 @@ package com.example.dine_and_donate.Models;
 
 public class Notification {
 
-    private String eventId; //event has to take place on that day
-    private String createdAt;
-    private String yelpId;
+    private String mEventId; //event has to take place on that day
+    private String mCreatedAt;
+    private String mYelpId;
+    private String mOrgPicUri;
 
     public Notification() {
 
     }
 
-    public Notification(String eventId, String yelpId, String createdAt) {
-        this.eventId = eventId;
-        this.createdAt = createdAt;
-        this.yelpId = yelpId;
+    public Notification(String eventId, String yelpId, String createdAt, String orgPicUri) {
+        this.mEventId = eventId;
+        this.mCreatedAt = createdAt;
+        this.mYelpId = yelpId;
+        this.mOrgPicUri = orgPicUri;
     }
 
     public String getEventId() {
-        return eventId;
+        return mEventId;
     }
 
     public void setEventId(String eventId) {
-        this.eventId = eventId;
+        this.mEventId = eventId;
     }
 
     public String getCreatedAt() {
-        return createdAt;
+        return mCreatedAt;
     }
 
     public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+        this.mCreatedAt = createdAt;
     }
 
     public String getYelpId() {
-        return yelpId;
+        return mYelpId;
     }
 
     public void setYelpId(String yelpId) {
-        this.yelpId = yelpId;
+        this.mYelpId = yelpId;
+    }
+
+    public String getOrgPicUri() {
+        return mOrgPicUri;
+    }
+
+    public void setOrgPicUri(String orgPicUri) {
+        this.mOrgPicUri = orgPicUri;
     }
 }

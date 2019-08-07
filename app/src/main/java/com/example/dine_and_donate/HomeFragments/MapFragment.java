@@ -12,6 +12,8 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -33,10 +35,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.dine_and_donate.Activities.EventActivity;
 import com.example.dine_and_donate.Activities.HomeActivity;
-
 import com.example.dine_and_donate.EventViewPagerAdapter;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
-
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
@@ -75,9 +75,7 @@ import org.json.JSONObject;
 import org.parceler.Parcels;
 
 import java.io.IOException;
-
 import java.text.DecimalFormat;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -153,18 +151,20 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         loaded = false;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
     }
 
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
         homeActivity = (HomeActivity) getActivity();
         mCurrentUser = homeActivity.currentUser;
-
-
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference(); //need an instance of database reference
@@ -201,7 +201,7 @@ public class MapFragment extends Fragment {
 
         // setting up slide view with restaurant info
         slideView = view.findViewById(R.id.slide_menu);
-        ViewStub stub = (ViewStub) slideView.findViewById(R.id.slide_up_stub);
+        ViewStub stub = slideView.findViewById(R.id.slide_up_stub);
         Integer slide_up_layout = (mCurrentUser.isOrg) ? R.layout.create_slide_up_fragment : R.layout.save_slide_up_fragment;
         stub.setLayoutResource(slide_up_layout);
         slideViewContent = stub.inflate();
@@ -366,7 +366,7 @@ public class MapFragment extends Fragment {
 
     private void generateMarkersRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
-        yelpService.findRestaurants(longitude, latitude, "best_match", "30", new Callback() {
+        YelpService.findRestaurants(longitude, latitude, "best_match", "30", new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -417,7 +417,7 @@ public class MapFragment extends Fragment {
                     for(DataSnapshot event : snapshot.getChildren()) {
                         saveOrg(event.child("orgId").getValue().toString());
                     }
-                    yelpService.findRestaurants(snapshot.getKey(), new Callback() {
+                    YelpService.findRestaurants(snapshot.getKey(), new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
                             e.printStackTrace();

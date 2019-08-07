@@ -147,8 +147,8 @@ public class EditProfileActivity extends AppCompatActivity {
                 mCurrentUser.setName(newName);
                 mRef.child("users").child(mFbUser.getUid()).child("name").setValue(newName);
 
-                if(mLocalImageUri != null) {
-                    final StorageReference ref = mStorageRef.child("images/"+mLocalImageUri.getLastPathSegment());
+                if (mLocalImageUri != null) {
+                    final StorageReference ref = mStorageRef.child("images/" + mLocalImageUri.getLastPathSegment());
                     UploadTask uploadTask = ref.putFile(mLocalImageUri);
 
                     urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {

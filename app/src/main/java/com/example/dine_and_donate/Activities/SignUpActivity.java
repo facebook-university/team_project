@@ -84,8 +84,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     mEmail.setVisibility(View.VISIBLE);
                     mSignUpBtn.setVisibility(View.VISIBLE);
                     mPassword.setVisibility(View.VISIBLE);
-                } else {
-                    hideView();
                 }
             }
 
@@ -159,12 +157,12 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
             });
     }
 
-    private User writeNewUser(String userId, String name, String email, boolean isOrg, String profPic) {
+    private User writeNewUser(String userId, String name, String email, boolean isOrg, String profPicUri) {
         User user;
         if(!isOrg) {
-            user = new User(name, email, profPic);
+            user = new User(name, email, profPicUri);
         } else {
-            user = new User(name, email, mOrgPhone.getText().toString(), profPic);
+            user = new User(name, email, mOrgPhone.getText().toString(), profPicUri);
         }
         mDatabase.child("users").child(userId).setValue(user);
         return user;

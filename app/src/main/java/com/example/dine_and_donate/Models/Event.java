@@ -4,9 +4,7 @@ package com.example.dine_and_donate.Models;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 
 @IgnoreExtraProperties
 public class Event {

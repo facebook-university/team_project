@@ -1,7 +1,6 @@
 package com.example.dine_and_donate;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +35,7 @@ public class UpcomingVouchersFragment extends Fragment {
     private DatabaseReference mRefForEvent;
     private View mView;
     private TextView mEmptyView;
-    private int mSize;
+    private TabFragmentHelper mTabFragmentHelper;
     private StaggeredRecyclerViewAdapter mStaggeredRecyclerViewAdapter;
     private ArrayList<Event> mEvents = new ArrayList<>();
 
@@ -53,37 +52,19 @@ public class UpcomingVouchersFragment extends Fragment {
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
+        mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter);
         return mView;
     }
 
-    //case 1: opens on profile when user first opens app (adapter = 0)
-    //case 2: switch from profile to map then back to map (adapter stays the same)
-    //case 3: save a new event on map and then go back to profile
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(mView, savedInstanceState);
-//        int prevSize = mSavedEventsIDs.size();
-        Log.d("prevSize", mSize + "");
-//        Log.d("currSize", mSavedEventsIDs.size() + "");
-
-        //for the first
-        if(mStaggeredRecyclerViewAdapter.getItemCount() == 0) {
-            mEmptyView.setVisibility(View.GONE);
+        if (mStaggeredRecyclerViewAdapter.getItemCount() == 0) {
+            mEmptyView.setVisibility(View.VISIBLE);
             loadVouchers();
         } else {
-            mEmptyView.setVisibility(View.VISIBLE);
+            mEmptyView.setVisibility(View.GONE);
         }
-
-    }
-
-    //add images and descriptions to respective arrayLists
-    private void initBitmapsUpcomingEvents(String mUrls, String mDescriptions) {
-        //test events
-        Event newEvent = new Event();
-        newEvent.locationString = mDescriptions;
-        newEvent.imageUrl = mUrls;
-        mEvents.add(newEvent);
-        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     private void loadVouchers() {
@@ -91,7 +72,6 @@ public class UpcomingVouchersFragment extends Fragment {
         mRefForEvent = mRef.child("events");
 
         mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
-        //mEvents = new ArrayList<>();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -101,7 +81,7 @@ public class UpcomingVouchersFragment extends Fragment {
                     for (DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
                         if (mSavedEventsIDs.containsKey(dsEvent.getKey())) {
-                            initBitmapsUpcomingEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
+                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
                         }
                     }
                 }
@@ -112,6 +92,5 @@ public class UpcomingVouchersFragment extends Fragment {
 
             }
         });
-        mSize = mSavedEventsIDs.size();
     }
 }
