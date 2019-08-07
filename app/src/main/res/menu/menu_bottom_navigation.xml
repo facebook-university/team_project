@@ -11,12 +11,12 @@
         android:id="@+id/action_map"
         android:enabled="true"
         android:icon="@drawable/icons8_map_50"
-        android:title="Map"
+        android:title="Explore"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_profile"
         android:enabled="true"
         android:icon="@drawable/instagram_user_outline_24"
-        android:title="Profile"
+        android:title="Saved"
         app:showAsAction="ifRoom" />
 </menu>
