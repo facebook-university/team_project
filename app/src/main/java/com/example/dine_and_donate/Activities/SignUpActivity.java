@@ -15,6 +15,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
@@ -43,6 +45,9 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private User mCreatedUser;
     private DatabaseReference mDatabase;
 
+    private ConstraintLayout constraintLayout;
+    private ConstraintSet constraintSet;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +75,8 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mOrgPhone.setVisibility(View.GONE);
         mSignUpBtn.setVisibility(View.VISIBLE);
 
+        constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayoutSignUp);
+
         //display specific text views depending on user type selected
         mSpinner = findViewById(R.id.user_options);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.user_types, android.R.layout.simple_spinner_item);
@@ -83,17 +90,17 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                 String selectedItem = parent.getSelectedItem().toString();
                 //show all fields except phone number for consumer user type
                 if (selectedItem.equals("Dine and Donate")) {
-                    mName.setVisibility(View.VISIBLE);
-                    mEmail.setVisibility(View.VISIBLE);
-                    mPassword.setVisibility(View.VISIBLE);
-                    mSignUpBtn.setVisibility(View.VISIBLE);
                     mOrgPhone.setVisibility(View.GONE);
+                    constraintSet = new ConstraintSet();
+                    constraintSet.clone(constraintLayout);
+                    constraintSet.connect(mSignUpBtn.getId(), ConstraintSet.TOP, mPassword.getId(), ConstraintSet.BOTTOM, 30);
+                    constraintSet.applyTo(constraintLayout);
                 }  else if(mSpinner.getSelectedItem().toString().equals("Fundraise")) {
                     mOrgPhone.setVisibility(View.VISIBLE);
-                    mName.setVisibility(View.VISIBLE);
-                    mEmail.setVisibility(View.VISIBLE);
-                    mSignUpBtn.setVisibility(View.VISIBLE);
-                    mPassword.setVisibility(View.VISIBLE);
+                    constraintSet = new ConstraintSet();
+                    constraintSet.clone(constraintLayout);
+                    constraintSet.connect(mSignUpBtn.getId(), ConstraintSet.TOP, mOrgPhone.getId(), ConstraintSet.BOTTOM, 30);
+                    constraintSet.applyTo(constraintLayout);
                 }
             }
 

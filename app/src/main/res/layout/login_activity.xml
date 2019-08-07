@@ -7,7 +7,7 @@
     tools:context=".Activities.LoginActivity">
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/backgroundImg"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
@@ -18,7 +18,7 @@
         app:srcCompat="@drawable/loginbackground" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/whiteBackgroundImg"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="20dp"
@@ -45,8 +45,8 @@
         android:layout_marginRight="30dp"
         android:background="@color/maroon"
         android:text="Log In"
-        app:layout_constraintEnd_toEndOf="@+id/imageView2"
-        app:layout_constraintStart_toStartOf="@+id/imageView2"
+        app:layout_constraintEnd_toEndOf="@+id/whiteBackgroundImg"
+        app:layout_constraintStart_toStartOf="@+id/whiteBackgroundImg"
         app:layout_constraintTop_toBottomOf="@+id/et_password" />
 
     <EditText
@@ -61,9 +61,9 @@
         android:ems="10"
         android:hint="Email"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="@+id/imageView2"
-        app:layout_constraintStart_toStartOf="@+id/imageView2"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintEnd_toEndOf="@+id/whiteBackgroundImg"
+        app:layout_constraintStart_toStartOf="@+id/whiteBackgroundImg"
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
 
     <EditText
         android:id="@+id/et_password"
@@ -78,7 +78,7 @@
         app:layout_constraintTop_toBottomOf="@+id/et_email" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/logo"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_marginTop="120dp"
@@ -113,11 +113,11 @@
         android:text="Sign Up"
         android:textColor="@color/maroon"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView2"
-        app:layout_constraintStart_toEndOf="@+id/textView5" />
+        app:layout_constraintBottom_toBottomOf="@+id/whiteBackgroundImg"
+        app:layout_constraintStart_toEndOf="@+id/ask_if_has_acc" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/ask_if_has_acc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Don't have an account?"
