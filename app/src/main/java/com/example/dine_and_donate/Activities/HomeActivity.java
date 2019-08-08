@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -214,6 +215,15 @@ public class HomeActivity extends AppCompatActivity {
                 getSupportFragmentManager().popBackStack("map", 0);
                 mIsOnMapView = true;
                 mBtnSwap.setText(R.string.swap_list);
+                // if an item on the list was clicked, generate markers and zoom to selected location
+                if (mClickedOnID != null) {
+                    if (!currentUser.isOrg) {
+                        mMapFragment.generateMarkersEvents();
+                    } else {
+                        Location currentLocation = mMapFragment.getCurrentLocation();
+                        mMapFragment.generateMarkersRestaurants(Double.toString(currentLocation.getLongitude()), Double.toString(currentLocation.getLatitude()));
+                    }
+                }
             }
         }
     }
