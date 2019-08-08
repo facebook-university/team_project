@@ -10,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -34,8 +33,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.parceler.Parcels;
 
 import java.util.Calendar;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -143,7 +140,6 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        inflater.inflate(R.menu.profile_settings_drawer, menu);  // Use filter.xml from step 1
         getMenuInflater().inflate(R.menu.profile_settings_drawer, menu);
         return true;
     }
@@ -199,9 +195,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 15);
-        calendar.set(Calendar.MINUTE, 26);
-        calendar.set(Calendar.SECOND, 30);
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 00);
+        calendar.set(Calendar.SECOND, 00);
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
             calendar.add(Calendar.DATE, 1);
         }

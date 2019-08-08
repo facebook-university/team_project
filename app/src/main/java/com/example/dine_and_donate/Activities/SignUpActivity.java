@@ -165,7 +165,6 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                             navigationHelper(HomeActivity.class);
                         } else {
                             // If sign in fails, display a message to the user.
-                            //Log.w("create", "createUserWithEmail:failure", task.getException());
                             FirebaseAuthException e = (FirebaseAuthException) task.getException();
                             Log.e("LoginActivity", "Failed Registration", e);
                             Toast.makeText(SignUpActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
@@ -190,13 +189,5 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCreatedUser));
         startActivity(intent);
         finish();
-    }
-
-    private void hideView() {
-        mName.setVisibility(View.GONE);
-        mEmail.setVisibility(View.GONE);
-        mPassword.setVisibility(View.GONE);
-        mOrgPhone.setVisibility(View.GONE);
-        mSignUpBtn.setVisibility(View.GONE);
     }
 }
