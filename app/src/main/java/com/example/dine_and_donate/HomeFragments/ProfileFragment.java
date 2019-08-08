@@ -68,6 +68,8 @@ public class ProfileFragment extends Fragment {
             mProfPic = view.findViewById(R.id.cons_prof_pic);
             mUserName = view.findViewById(R.id.cons_name);
         }
+
+        mUserName.setText(mCurrentUserModel.name);
     }
 
     //set up for top of profile page based on user type

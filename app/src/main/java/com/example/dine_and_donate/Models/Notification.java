@@ -49,4 +49,3 @@ public class Notification {
         this.mOrgId = orgId;
     }
 }
-
