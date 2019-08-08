@@ -208,8 +208,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
 
         // if an item on the list was clicked, generate markers and zoom to selected location
-        if(homeActivity.getClickedOnID() != null) {
-            if(!mCurrentUser.isOrg) {
+        if (homeActivity.getClickedOnID() != null) {
+            if (!mCurrentUser.isOrg) {
                 generateMarkersEvents();
             } else {
                 generateMarkersRestaurants(Double.toString(mCurrentLocation.getLongitude()), Double.toString(mCurrentLocation.getLatitude()));
@@ -252,7 +252,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                     }
                                 });
                                 try {
-                                    if(restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
+                                    if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
                                         clickMarkerRestaurant(marker);
                                         homeActivity.setClickedOnID(null);
                                         homeActivity.setLoading(false);
@@ -492,7 +492,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             String date = getDate((long) eventChild.child("startTime").getValue(), "MMM dd, yyyy");
             String startTime = getDate((long) eventChild.child("startTime").getValue(), "h:mm a");
             String endTime = getDate((long) eventChild.child("endTime").getValue(), "h:mm a");
-            User org = mIdToOrg.get((String) eventChild.child("orgId").getValue());
+            User org = mIdToOrg.get(eventChild.child("orgId").getValue());
 
             eventOrg.setText(Html.fromHtml(getString(R.string.main_info_event,
                     org.name,

@@ -75,7 +75,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mOrgPhone.setVisibility(View.GONE);
         mSignUpBtn.setVisibility(View.VISIBLE);
 
-        constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayoutSignUp);
+        constraintLayout = findViewById(R.id.constraintLayoutSignUp);
 
         //display specific text views depending on user type selected
         mSpinner = findViewById(R.id.user_options);
