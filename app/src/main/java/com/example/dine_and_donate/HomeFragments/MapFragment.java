@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -38,7 +39,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
@@ -53,6 +56,7 @@ import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.SearchDialogFragment;
 import com.example.dine_and_donate.YelpService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -63,6 +67,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -94,6 +99,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.Inflater;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -125,6 +131,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private boolean slideViewIsUp;
     private Button mBtnEvent;
     private EventViewPagerAdapter mPagerAdapter;
+    private DialogFragment mDialogFragment;
 
     private Context mContext;
 
@@ -138,7 +145,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<Event> mNearbyEvents;
     private Map<String, String> mSavedEvents;
 
-    private HomeActivity homeActivity;
+    public HomeActivity homeActivity;
 
     public Location mCurrentLocation;
 
@@ -150,6 +157,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<String> mOrgNames = new ArrayList<String>();
     private HashMap<String, String> mNameToId = new HashMap<>();
     private String queryOrgId;
+
+    private AlertDialog dialog;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -165,12 +174,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        homeActivity = (HomeActivity) getActivity();
-        mCurrentUser = homeActivity.currentUser;
-
-        if (!mCurrentUser.isOrg) {
-            setHasOptionsMenu(true);
-        }
     }
 
     @Override
@@ -190,6 +193,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mRefForEvents = mRef.child("events");
         mRefForOrgs = mRef.child("users");
         mContext = view.getContext();
+        homeActivity = (HomeActivity) getContext();
+        mCurrentUser = homeActivity.currentUser;
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -215,54 +220,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-        inflater.inflate(R.menu.activity_main, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.searchEvents:
-                searchOrgs();
-                return true;
-            default:
-                break;
-        }
-        return false;
-    }
-
-    public void searchOrgs() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        View view = getLayoutInflater().inflate(R.layout.search, null);
-        Button searchOrgsButton = view.findViewById(R.id.search_btn);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext,
-                android.R.layout.simple_dropdown_item_1line, mOrgNames);
-        final AutoCompleteTextView searchQuery = (AutoCompleteTextView)
-                view.findViewById(R.id.autoCompleteSearchOrg);
-        searchQuery.setAdapter(adapter);
-
-        builder.setView(view);
-        final AlertDialog dialog = builder.create();
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
-        searchOrgsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String query = searchQuery.getText().toString();
-                queryOrgId = mNameToId.get(query);
-                homeActivity.setExploreTab();
-                dialog.dismiss();
-                queryOrgId = null;
-            }
-        });
-
-        dialog.show();
     }
 
     // GENERATE MARKERS //

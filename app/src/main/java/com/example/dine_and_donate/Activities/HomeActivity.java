@@ -1,13 +1,20 @@
 package com.example.dine_and_donate.Activities;
 
 import android.app.AlarmManager;
+import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Layout;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,7 +26,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
@@ -30,6 +39,7 @@ import com.example.dine_and_donate.HomeFragments.ProfileFragment;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.NotifyWorker;
 import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.SearchDialogFragment;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
@@ -52,6 +62,7 @@ public class HomeActivity extends AppCompatActivity {
     private ProfileFragment mProfileFragment = new ProfileFragment();
     private ListFragment mListFragment = new ListFragment();
     private Fragment mDefaultFragment;
+    private DialogFragment mDialogFragment;
 
     public User currentUser;
 
@@ -60,6 +71,7 @@ public class HomeActivity extends AppCompatActivity {
     private boolean mIsOnMapView;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
+    private String mStack = "map";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,13 +97,13 @@ public class HomeActivity extends AppCompatActivity {
         mBtnSwap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setExploreTab();
+                setExploreTab(null);
             }
         });
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.flContainer, mDefaultFragment)
-                .addToBackStack(null) // TODO: look into if this can cause mem problem
+                .addToBackStack(mStack)
                 .commit();
 
         createDrawerNav();
@@ -118,6 +130,7 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mNotificationsFragment;
                         mShowButton = false;
+                        mStack = "notify";
                         break;
                     case R.id.action_map:
                         lockDrawer();
@@ -125,6 +138,7 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mIsOnMapView ? mMapFragment : mListFragment;
+                        mStack = mIsOnMapView ? "map" : "list";
                         mShowButton = true;
                         break;
                     case R.id.action_profile:
@@ -134,11 +148,12 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
                         fragment = mProfileFragment;
                         mShowButton = false;
+                        mStack = "profile";
                         break;
                 }
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, fragment)
-                        .addToBackStack(null) // TODO: look into if this can cause mem problem
+                        .addToBackStack(mStack)
                         .commit();
                 if(mShowButton) {
                     mBtnSwap.setVisibility(View.VISIBLE);
@@ -194,32 +209,51 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void setExploreTab() {
-        if (mIsOnMapView || (mMapFragment.getQueryOrgId() != null)) {
-            mListFragment = new ListFragment();
-            mListFragment.setAllEvents(mMapFragment.getAllEvents());
-            mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
-            mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
-            mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
-            mListFragment.setLocation(mMapFragment.getCurrentLocation());
-            mListFragment.setQueryOrgId(mMapFragment.getQueryOrgId());
-            mListFragment.setOrgNames(mMapFragment.getOrgNames());
-            mListFragment.setOrgNameToId(mMapFragment.getNameToId());
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.flContainer, mListFragment)
-                    .addToBackStack(null)
-                    .commit();
-            mIsOnMapView = false;
-            mBtnSwap.setText(R.string.swap_map);
-        } else {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.flContainer, mMapFragment)
-                    .addToBackStack(null)
-                    .commit();
-            mIsOnMapView = true;
-            mBtnSwap.setText(R.string.swap_list);
+    public void setExploreTab(final String query) {
+        if (mShowButton) {
+            if (mIsOnMapView || (query != null)) {
+                mListFragment = new ListFragment();
+                mListFragment.setAllEvents(mMapFragment.getAllEvents());
+                mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
+                mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
+                mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
+                mListFragment.setLocation(mMapFragment.getCurrentLocation());
+                mListFragment.setQueryOrgId(mMapFragment.getNameToId().get(query));
+                mListFragment.setOrgNames(mMapFragment.getOrgNames());
+                mStack = "list";
+                if (!getSupportFragmentManager().popBackStackImmediate("list", 0)) {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.flContainer, mListFragment)
+                            .addToBackStack(mStack)
+                            .commit();
+                }
+                mIsOnMapView = false;
+                mBtnSwap.setText(R.string.swap_map);
+            } else {
+                getSupportFragmentManager().popBackStack("map", 0);
+                mIsOnMapView = true;
+                mBtnSwap.setText(R.string.swap_list);
+            }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.searchEvents:
+                mDialogFragment = SearchDialogFragment.newInstance(mMapFragment.getOrgNames());
+                mDialogFragment.show(getSupportFragmentManager(), "dialog");
+                return true;
+            default:
+                break;
+        }
+        return false;
     }
 
     private void setUpNotificationWorker() {
