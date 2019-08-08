@@ -1,6 +1,7 @@
 package com.example.dine_and_donate;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Map;
 
 public class UpcomingVouchersFragment extends Fragment {
@@ -52,7 +54,7 @@ public class UpcomingVouchersFragment extends Fragment {
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
-        mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter);
+        mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter, false);
         return mView;
     }
 
@@ -81,7 +83,12 @@ public class UpcomingVouchersFragment extends Fragment {
                     for (DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
                         if (mSavedEventsIDs.containsKey(dsEvent.getKey())) {
-                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
+                            long currMillis = Calendar.getInstance().getTimeInMillis();
+                            Log.d("today", currMillis + "");
+                            //if event end date is older than today's date, it is a past event
+                            long eventMillis = Long.parseLong(dsEvent.child("endTime").getValue().toString());
+                            Log.d("event end", eventMillis + "");
+                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), currMillis, eventMillis);
                         }
                     }
                 }

@@ -13,7 +13,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.dine_and_donate.Adapters.NotificationsAdapter;
 import com.example.dine_and_donate.Models.Notification;
+import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,7 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class NotificationsFragment extends Fragment {
@@ -36,6 +38,7 @@ public class NotificationsFragment extends Fragment {
     private DatabaseReference mRef;
     private DatabaseReference mNotificationsRef;
     private FirebaseDatabase mDatabase;
+    private HashMap<String, User> mIdToOrg = new HashMap<>();;
 
     @Nullable
     @Override
@@ -60,13 +63,11 @@ public class NotificationsFragment extends Fragment {
 
         mRecyclerView = view.findViewById(R.id.notifications_rv);
         mNotificationList = new ArrayList<>();
-        mNotificationsAdapter = new NotificationsAdapter(mNotificationList);
+        mNotificationsAdapter = new NotificationsAdapter(mNotificationList, mIdToOrg);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mNotificationsAdapter);
-
         loadTopNotifications(0);
-        Collections.reverse(mNotificationList);
     }
 
     private void loadTopNotifications(int page) {
@@ -81,7 +82,7 @@ public class NotificationsFragment extends Fragment {
                 //look through all notifications of that user
                 for (DataSnapshot notificationsDs : dataSnapshot.getChildren()) {
                     Notification notification = notificationsDs.getValue(Notification.class);
-                    mNotificationList.add(notification);
+                    mNotificationList.add(0, notification);
                     mNotificationsAdapter.notifyDataSetChanged();
                 }
             }
@@ -91,5 +92,12 @@ public class NotificationsFragment extends Fragment {
 
             }
         });
+    }
+
+    public void setIdToOrg(HashMap<String, User> mIdToOrg) {
+        this.mIdToOrg = mIdToOrg;
+    }
+    public HashMap<String,User> getIdToOrg() {
+        return mIdToOrg;
     }
 }

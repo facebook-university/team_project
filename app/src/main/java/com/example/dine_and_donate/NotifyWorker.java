@@ -12,7 +12,6 @@ import android.location.LocationManager;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -20,7 +19,6 @@ import androidx.work.WorkerParameters;
 import com.example.dine_and_donate.Activities.LoginActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Notification;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -97,12 +95,12 @@ public class NotifyWorker extends Worker {
                                         Long timeNow = System.currentTimeMillis();
                                         Long millisecondsToCheck = timeNow + (long) 60000 * 60 * 12;
                                         if (dateOfEvent >= timeNow && dateOfEvent <= millisecondsToCheck) {
-                                            String orgId = eventChild.child("orgId").getValue().toString();
                                             String locationString = eventChild.child("locationString").getValue().toString();
                                             String info = eventChild.child("info").getValue().toString();
                                             Long startTime = (long) eventChild.child("startTime").getValue();
                                             String imageURL = eventChild.child("imageUrl").getValue().toString();
                                             String eventId = eventChild.child("eventId").getValue().toString();
+                                            String orgId = eventChild.child("orgId").getValue().toString();
                                             mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL, eventId);
                                             displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude, eventChild.getKey(), timeNow.toString(), "");
                                             mCounter = restaurantsNearbyJSON.length();
@@ -126,28 +124,7 @@ public class NotifyWorker extends Worker {
         });
     }
 
-//    private String getOrgPic(String orgId) {
-//        mOrgUri = new String[1];
-//        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-//        DatabaseReference mRef = mDatabase.getReference();
-//        DatabaseReference ref = mRef.child("users").child(orgId).child("profPic");
-//        ref.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                mOrgUri[0] = dataSnapshot.getValue().toString();
-//                Log.d("url1", mOrgUri[0] + "");
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//        Log.d("url", mOrgUri[0] + "");
-//        return mOrgUri[0];
-//    }
-
-    private void displayNotification(String title, String body, String latitude, String longitude, String eventKey, String createdAt, String orgPicUri) {
+    private void displayNotification(String title, String body, String latitude, String longitude, String eventKey, String createdAt, String orgId) {
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "com.example.dine_and_donate";
 
@@ -183,10 +160,11 @@ public class NotifyWorker extends Worker {
                 .setContentText(body);
 
         notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
-        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
-        mRef = FirebaseDatabase.getInstance().getReference();
+
+//        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+//        mRef = FirebaseDatabase.getInstance().getReference();
         //add notification to database here; event id, yelp id and createdAt
-        mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt, orgPicUri);
+        mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt, orgId);
         mNotificationRef = mRef.child("users").child(mFbUser.getUid()).getRef().child("Notifications").push();
         mRef.child("users").child(mFbUser.getUid()).child("Notifications").addValueEventListener(new ValueEventListener() {
             @Override
