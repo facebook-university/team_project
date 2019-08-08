@@ -3,11 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
-        android:id="@+id/searchEvents"
+        android:id="@+id/miActionProgress"
+        android:title="Loading..."
+        android:visible="false"
         android:orderInCategory="100"
-        android:visible="true"
-        android:title="Search Events"
-        android:icon="@drawable/quantum_ic_search_grey600_24"
-        android:color="@color/brown"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        app:actionLayout="@layout/action_view_progress" />
 </menu>

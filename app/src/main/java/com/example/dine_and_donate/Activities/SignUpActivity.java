@@ -3,6 +3,8 @@ package com.example.dine_and_donate.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -44,6 +46,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private FirebaseUser mUser;
     private User mCreatedUser;
     private DatabaseReference mDatabase;
+    private MenuItem mProgressSpinner;
 
     private ConstraintLayout constraintLayout;
     private ConstraintSet constraintSet;
@@ -122,6 +125,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     if (mPassword.getText().toString().length() < 6) {
                         mPassword.setError("You must have at least 6 characters");
                     } else {
+                        setLoading(true);
                         createAccount(mEmail.getText().toString(), mPassword.getText().toString());
                     }
                 }
@@ -140,6 +144,21 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        mProgressSpinner = menu.findItem(R.id.miActionProgress);
+        return true;
+    }
+
+    public void setLoading(boolean isLoading) {
+        if(isLoading) {
+            mProgressSpinner.setVisible(true);
+        } else {
+            mProgressSpinner.setVisible(false);
+        }
     }
 
     //method to check if fields are empty
@@ -190,6 +209,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         Intent intent = new Intent(SignUpActivity.this, goToClass);
         intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCreatedUser));
         startActivity(intent);
+        setLoading(false);
         finish();
     }
 }

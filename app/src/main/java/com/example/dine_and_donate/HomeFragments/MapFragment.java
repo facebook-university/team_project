@@ -169,19 +169,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         loaded = false;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-        homeActivity = (HomeActivity) getActivity();
-        mCurrentUser = homeActivity.currentUser;
-        if (!mCurrentUser.isOrg) {
-            inflater.inflate(R.menu.activity_main, menu);
-        }
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
