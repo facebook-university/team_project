@@ -48,6 +48,7 @@ public class HomeActivity extends AppCompatActivity {
     private Button mBtnSwap;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
+    private boolean mIsOnNotifications;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
     private String mClickedOnID;
@@ -107,6 +108,7 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mNotificationsFragment;
+                        mIsOnNotifications = true;
                         mShowButton = false;
                         break;
                     case R.id.action_map:
@@ -114,6 +116,7 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mIsOnMapView ? mMapFragment : mListFragment;
+                        mIsOnNotifications = false;
                         mShowButton = true;
                         break;
                     case R.id.action_profile:
@@ -121,6 +124,7 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
                         fragment = mProfileFragment;
+                        mIsOnNotifications = false;
                         mShowButton = false;
                         break;
                 }
@@ -167,6 +171,7 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // todo: this function should be made cleaner
     public void setExploreTab() {
         if (mShowButton) {
             if (mIsOnMapView) {
@@ -190,6 +195,17 @@ public class HomeActivity extends AppCompatActivity {
                 mIsOnMapView = true;
                 mBtnSwap.setText(R.string.swap_list);
             }
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.flContainer, mMapFragment)
+                    .addToBackStack(null)
+                    .commit();
+            mIsOnMapView = true;
+            mIsOnNotifications = false;
+            mBtnSwap.setText(R.string.swap_list);
+            mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+            mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
+            mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
         }
     }
 

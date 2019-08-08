@@ -7,10 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Notification;
 import com.example.dine_and_donate.R;
 import com.google.firebase.database.DataSnapshot;
@@ -56,6 +58,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         Notification notification = mNotifications.get(position);
         String eventId = notification.getEventId();
         String yelpId = notification.getYelpId();
+        holder.yelpId = yelpId;
         mNotificationsRef = mRef.child("events").child(yelpId).child(eventId);
         mNotificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -99,6 +102,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         public TextView mPartner;
         public TextView mNotifiedAt;
         public androidx.constraintlayout.widget.ConstraintLayout mItem;
+        public String yelpId;
 
         //constructor takes in an inflated layout
         public ViewHolder(View itemView) {
@@ -114,7 +118,11 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         @Override
         //TODO not finished
         public void onClick(View v) {
-
+            Toast.makeText(mContext, "hello", Toast.LENGTH_SHORT).show();
+            HomeActivity homeActivity = (HomeActivity) mContext;
+            homeActivity.setClickedOnID(yelpId);
+            homeActivity.setExploreTab();
+            homeActivity.setLoading(true);
         }
     }
 }
