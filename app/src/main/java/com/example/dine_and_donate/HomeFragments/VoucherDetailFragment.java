@@ -68,7 +68,6 @@ public class VoucherDetailFragment extends Fragment {
         }
 
         Glide.with(view.getContext())
-                // Todo: change this to real image, need to add imageUrl field in edit profile
                 .load(mEvent.imageUrl)
                 .into(ivVoucher);
     }

@@ -40,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPassword;
     private Button mLogin;
     private TextView mSignup;
+    private TextView mTvAsk;
     private FirebaseAuth mAuth;
     private User mCurrentUserModel;
     private BottomNavigationView bottomNavigationView;
@@ -69,15 +70,7 @@ public class LoginActivity extends AppCompatActivity {
         mLogin = findViewById(R.id.login_btn);
         mSignup = findViewById(R.id.signup_btn);
         mIvSplashScreen = findViewById(R.id.ivSplashScreen);
-
-        //if someone is already signed in, skip sign in process
-        if (mFbUser != null) {
-            showSplash();
-            setLoading(true);
-            createUserModel();
-        } else {
-            hideSplash();
-        }
+        mTvAsk = findViewById(R.id.ask_if_has_acc);
 
         //action for login button
         mLogin.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +97,14 @@ public class LoginActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         mProgressSpinner = menu.findItem(R.id.miActionProgress);
+        //if someone is already signed in, skip sign in process
+        if (mFbUser != null) {
+            showSplash(true);
+            setLoading(true);
+            createUserModel();
+        } else {
+            showSplash(false);
+        }
         return true;
     }
 
@@ -179,19 +180,15 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void showSplash() {
-        mIvSplashScreen.setVisibility(View.VISIBLE);
-        mEmail.setVisibility(View.GONE);
-        mPassword.setVisibility(View.GONE);
-        mLogin.setVisibility(View.GONE);
-        mSignup.setVisibility(View.GONE);
+    private void showSplash(boolean show) {
+        int visAll = show ? View.GONE : View.VISIBLE;
+        int visSplash = show ? View.VISIBLE : View.GONE;
+        mIvSplashScreen.setVisibility(visSplash);
+        mEmail.setVisibility(visAll);
+        mPassword.setVisibility(visAll);
+        mLogin.setVisibility(visAll);
+        mSignup.setVisibility(visAll);
+        mTvAsk.setVisibility(visAll);
     }
 
-    private void hideSplash() {
-        mIvSplashScreen.setVisibility(View.INVISIBLE);
-        mEmail.setVisibility(View.VISIBLE);
-        mPassword.setVisibility(View.VISIBLE);
-        mLogin.setVisibility(View.VISIBLE);
-        mSignup.setVisibility(View.VISIBLE);
-    }
 }

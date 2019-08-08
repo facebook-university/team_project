@@ -61,6 +61,7 @@ public class HomeActivity extends AppCompatActivity {
     private MenuItem mEditProfile;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
+    private boolean mIsOnNotifications;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
     private String mStack = "map";
@@ -113,6 +114,7 @@ public class HomeActivity extends AppCompatActivity {
                         mLogOut.setVisible(true);
                         mEditProfile.setVisible(true);
                         fragment = mNotificationsFragment;
+                        mIsOnNotifications = true;
                         mShowButton = false;
                         mStack = "notify";
                         break;
@@ -125,6 +127,7 @@ public class HomeActivity extends AppCompatActivity {
                         mLogOut.setVisible(false);
                         mEditProfile.setVisible(false);
                         fragment = mIsOnMapView ? mMapFragment : mListFragment;
+                        mIsOnNotifications = false;
                         mStack = mIsOnMapView ? "map" : "list";
                         mShowButton = true;
                         break;
@@ -137,6 +140,7 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
                         fragment = mProfileFragment;
+                        mIsOnNotifications = false;
                         mShowButton = false;
                         mStack = "profile";
                         break;
@@ -201,7 +205,10 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
+    // todo: this function should be made cleaner
     public void setExploreTab(final String query) {
+
         if (mShowButton) {
             if (mIsOnMapView || (query != null)) {
                 mListFragment = new ListFragment();
