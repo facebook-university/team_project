@@ -2,6 +2,8 @@ package com.example.dine_and_donate.HomeFragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -44,6 +46,12 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
     }
 
     @Override
@@ -54,7 +62,6 @@ public class NotificationsFragment extends Fragment {
         mNotificationList = new ArrayList<>();
         mNotificationsAdapter = new NotificationsAdapter(mNotificationList);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getContext());
-
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mNotificationsAdapter);
 
@@ -72,7 +79,7 @@ public class NotificationsFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 //look through all notifications of that user
-                for(DataSnapshot notificationsDs : dataSnapshot.getChildren()) {
+                for (DataSnapshot notificationsDs : dataSnapshot.getChildren()) {
                     Notification notification = notificationsDs.getValue(Notification.class);
                     mNotificationList.add(notification);
                     mNotificationsAdapter.notifyDataSetChanged();

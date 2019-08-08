@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_share"
-        android:clickable="true"/>
+        android:clickable="true" />
 
     <ImageView
         android:id="@+id/ivEdit"
@@ -40,5 +40,5 @@
         app:layout_constraintEnd_toStartOf="@+id/ivShare"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_edit"
-        android:clickable="true"/>
+        android:clickable="true" />
 </androidx.constraintlayout.widget.ConstraintLayout>

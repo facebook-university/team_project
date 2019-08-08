@@ -48,7 +48,6 @@ public class NotifyWorker extends Worker {
     private DatabaseReference mNotificationRef;
     private Integer mCounter = 0;
 
-
     public NotifyWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
@@ -67,7 +66,7 @@ public class NotifyWorker extends Worker {
 
     private void getEvent(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
-        yelpService.findRestaurants(longitude, latitude, "distance", "50", new Callback() {
+        YelpService.findRestaurants(longitude, latitude, "distance", "50", new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -105,7 +104,7 @@ public class NotifyWorker extends Worker {
                                             String imageURL = eventChild.child("imageUrl").getValue().toString();
                                             String eventId = eventChild.child("eventId").getValue().toString();
                                             mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL, eventId);
-                                            displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude, eventChild.getKey(), timeNow.toString());
+                                            displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude, eventChild.getKey(), timeNow.toString(), "");
                                             mCounter = restaurantsNearbyJSON.length();
                                             return;
                                         }
@@ -114,7 +113,8 @@ public class NotifyWorker extends Worker {
                             }
 
                             @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) { }
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                            }
                         });
 
                         mCounter++;
@@ -126,18 +126,39 @@ public class NotifyWorker extends Worker {
         });
     }
 
-    private void displayNotification(String title, String body, String latitude, String longitude, String eventKey, String createdAt) {
+//    private String getOrgPic(String orgId) {
+//        mOrgUri = new String[1];
+//        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+//        DatabaseReference mRef = mDatabase.getReference();
+//        DatabaseReference ref = mRef.child("users").child(orgId).child("profPic");
+//        ref.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                mOrgUri[0] = dataSnapshot.getValue().toString();
+//                Log.d("url1", mOrgUri[0] + "");
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//        Log.d("url", mOrgUri[0] + "");
+//        return mOrgUri[0];
+//    }
+
+    private void displayNotification(String title, String body, String latitude, String longitude, String eventKey, String createdAt, String orgPicUri) {
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "com.example.dine_and_donate";
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Notification",
                     NotificationManager.IMPORTANCE_DEFAULT);
 
             notificationChannel.setDescription("Dine&Donate Channel");
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.BLUE);
-            notificationChannel.setVibrationPattern(new long[]{0,1000,500,1000});
+            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
             notificationChannel.enableLights(true);
             notificationManager.createNotificationChannel(notificationChannel);
         }
@@ -163,9 +184,9 @@ public class NotifyWorker extends Worker {
 
         notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
-        mRef =  FirebaseDatabase.getInstance().getReference();
+        mRef = FirebaseDatabase.getInstance().getReference();
         //add notification to database here; event id, yelp id and createdAt
-        mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt);
+        mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt, orgPicUri);
         mNotificationRef = mRef.child("users").child(mFbUser.getUid()).getRef().child("Notifications").push();
         mRef.child("users").child(mFbUser.getUid()).child("Notifications").addValueEventListener(new ValueEventListener() {
             @Override

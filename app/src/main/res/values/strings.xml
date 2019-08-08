@@ -30,6 +30,9 @@
     <string name="number">Number</string>
     <string name="changeProfPic">Change Profile Picture</string>
     <string name="logOut">Log Out</string>
+    <string name="editProf">Edit Profile</string>
+    <string name="logIn">Log In</string>
+    <string name="signUp">Sign Up</string>
     <string name="help">Help</string>
     <string name="callRestaurant">Call Restaurant</string>
     <string name="userTypeIntro">I am looking to...</string>

@@ -37,7 +37,7 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
     private HashMap<String, User> mIdToOrg;
 
     public EventListViewAdapter(DataSnapshot allEvents, HashMap<String, JSONObject> mIdToRestaurant, HashMap<String, User> mIdToOrg) {
-        for(DataSnapshot ds : allEvents.getChildren()) {
+        for (DataSnapshot ds : allEvents.getChildren()) {
             mEvents.addAll(Event.eventsHappeningAtRestaurant(ds));
         }
         this.mIdToRestaurant = mIdToRestaurant;
@@ -90,7 +90,9 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
     }
 
     @Override
-    public int getItemCount() { return mEvents.size(); }
+    public int getItemCount() {
+        return mEvents.size();
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 

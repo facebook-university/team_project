@@ -1,60 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
     <item
-        android:id="@+id/createEvent"
-        android:orderInCategory="1"
-        android:visible="true"
-        android:title="@string/launchFundraiser"
-        android:icon="@drawable/icons8_add_64"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/favRestaurants"
-        android:orderInCategory="2"
-        android:visible="true"
-        android:title="Saved Restaurants"
-        android:icon="@drawable/baker"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/editProfile"
-        android:orderInCategory="3"
-        android:visible="true"
-        android:title="Edit Profile"
+        android:id="@+id/edit_profile"
         android:icon="@drawable/edit"
-        app:showAsAction="always" />
+        android:title="@string/editProf" />
+
     <item
-        android:title="Share on..."
-        android:id="@+id/share"
-        android:orderInCategory="4"
-        app:showAsAction="always">
+        android:id="@+id/log_out"
+        android:title="@string/logOut" />
 
-        <menu
-            android:id="@+id/submenu">
-
-            <item
-                android:id="@+id/shareFacebook"
-                android:orderInCategory="1"
-                android:visible="true"
-                android:title="Facebook"
-                android:icon="@drawable/facebook" />
-
-            <item
-                android:id="@+id/shareInstagram"
-                android:orderInCategory="2"
-                android:visible="true"
-                android:title="Instagram"
-                android:icon="@drawable/instagram" />
-
-            <item
-                android:id="@+id/shareTwitter"
-                android:orderInCategory="3"
-                android:visible="true"
-                android:title="Twitter"
-                android:icon="@drawable/twitter" />
-
-        </menu>
-    </item>
 </menu>
+
+

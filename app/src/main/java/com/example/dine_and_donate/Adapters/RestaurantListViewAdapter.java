@@ -79,7 +79,9 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
     }
 
     @Override
-    public int getItemCount() { return mRestaurants.length(); }
+    public int getItemCount() {
+        return mRestaurants.length();
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 

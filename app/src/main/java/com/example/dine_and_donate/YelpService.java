@@ -1,7 +1,5 @@
 package com.example.dine_and_donate;
 
-import android.location.Location;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -33,7 +31,7 @@ public class YelpService {
 
         String url = urlBuilder.build().toString();
 
-        Request request= new Request.Builder()
+        Request request = new Request.Builder()
                 .url(url)
                 .get()
                 .header("Authorization", "Bearer " + YELP_API)
@@ -53,7 +51,7 @@ public class YelpService {
 
         String url = urlBuilder.build().toString();
 
-        Request request= new Request.Builder()
+        Request request = new Request.Builder()
                 .url(url)
                 .get()
                 .header("Authorization", "Bearer " + YELP_API)
