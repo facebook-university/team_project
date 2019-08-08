@@ -176,15 +176,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
-        inflater.inflate(R.menu.activity_main, menu);
+        homeActivity = (HomeActivity) getActivity();
+        mCurrentUser = homeActivity.currentUser;
+        if (!mCurrentUser.isOrg) {
+            inflater.inflate(R.menu.activity_main, menu);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        homeActivity = (HomeActivity) getActivity();
-        mCurrentUser = homeActivity.currentUser;
 
         if (!loaded) {
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -226,20 +228,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
-
-        // if an item on the list was clicked, generate markers and zoom to selected location
-        if (homeActivity.getClickedOnID() != null) {
-            if (!mCurrentUser.isOrg) {
-                generateMarkersEvents();
-            } else {
-                generateMarkersRestaurants(Double.toString(mCurrentLocation.getLongitude()), Double.toString(mCurrentLocation.getLatitude()));
-            }
-        }
     }
 
     // GENERATE MARKERS //
 
-    private void generateMarkersRestaurants(String longitude, String latitude) {
+    public void generateMarkersRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
         YelpService.findRestaurants(longitude, latitude, "best_match", "30", new Callback() {
             @Override
@@ -290,7 +283,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    private void generateMarkersEvents() {
+    public void generateMarkersEvents() {
         final YelpService yelpService = new YelpService();
 
         mRefForEvents.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -602,17 +595,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         generateMarkersEvents();
                     }
                 }
-
-//                if (map.getCameraPosition().zoom > 10) {
-//                    cameraLongitude = newLongitude;
-//                    cameraLatitude = newLatitude;
-//
-//                    if (mCurrentUser.isOrg) {
-//                        generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
-//                    } else {
-//                        generateMarkersEvents();
-//                    }
-//                }
             }
         });
 
