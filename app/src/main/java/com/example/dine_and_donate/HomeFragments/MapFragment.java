@@ -167,7 +167,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             loaded = true;
         }
 
-
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = mDatabase.getReference(); //need an instance of database reference

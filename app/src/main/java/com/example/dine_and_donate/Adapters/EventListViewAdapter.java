@@ -87,7 +87,6 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
                 .load(profilePicUrl)
                 .transform(new MultiTransformation<>(new CenterCrop(), new CircleCrop()))
                 .into(holder.ivOrgPic);
-
     }
 
     @Override

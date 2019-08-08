@@ -90,7 +90,6 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
         public RatingBar ratingBar;
         public String yelpId;
 
-
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvRestaurantName);
