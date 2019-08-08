@@ -60,8 +60,6 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-
         mLayoutForConsumer = view.findViewById(R.id.forConsumer);
         mLayoutForOrg = view.findViewById(R.id.forOrg);
         mTabLayout = view.findViewById(R.id.tabs_profile);

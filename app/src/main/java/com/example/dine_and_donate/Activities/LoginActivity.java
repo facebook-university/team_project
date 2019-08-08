@@ -3,6 +3,8 @@ package com.example.dine_and_donate.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,6 +49,7 @@ public class LoginActivity extends AppCompatActivity {
     private DatabaseReference mRef;
     private DatabaseReference mRefChild;
     private ImageView mIvSplashScreen;
+    private MenuItem mProgressSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,18 +72,11 @@ public class LoginActivity extends AppCompatActivity {
         mIvSplashScreen = findViewById(R.id.ivSplashScreen);
         mTvAsk = findViewById(R.id.ask_if_has_acc);
 
-        //if someone is already signed in, skip sign in process
-        if (mFbUser != null) {
-            showSplash(true);
-            createUserModel();
-        } else {
-            showSplash(false);
-        }
-
         //action for login button
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setLoading(true);
                 signIn(mEmail.getText().toString(), mPassword.getText().toString());
             }
         });
@@ -95,6 +91,29 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        mProgressSpinner = menu.findItem(R.id.miActionProgress);
+        //if someone is already signed in, skip sign in process
+        if (mFbUser != null) {
+            showSplash(true);
+            setLoading(true);
+            createUserModel();
+        } else {
+            showSplash(false);
+        }
+        return true;
+    }
+
+    public void setLoading(boolean isLoading) {
+        if(isLoading) {
+            mProgressSpinner.setVisible(true);
+        } else {
+            mProgressSpinner.setVisible(false);
+        }
     }
 
     private void signIn(String email, String password) {
@@ -158,6 +177,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         startActivity(intent);
         finish();
+        setLoading(false);
     }
 
     private void showSplash(boolean show) {
