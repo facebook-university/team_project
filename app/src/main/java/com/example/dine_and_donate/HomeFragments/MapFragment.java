@@ -13,6 +13,8 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -35,10 +37,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.dine_and_donate.Activities.EventActivity;
 import com.example.dine_and_donate.Activities.HomeActivity;
-
 import com.example.dine_and_donate.EventViewPagerAdapter;
 import com.example.dine_and_donate.Listeners.OnSwipeTouchListener;
-
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
@@ -75,9 +75,7 @@ import org.json.JSONObject;
 import org.parceler.Parcels;
 
 import java.io.IOException;
-
 import java.text.DecimalFormat;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -152,11 +150,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        loaded = false;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
     }
 
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        homeActivity = (HomeActivity) getActivity();
+        mCurrentUser = homeActivity.currentUser;
 
         homeActivity = (HomeActivity) getActivity();
         mCurrentUser = homeActivity.currentUser;
@@ -181,7 +188,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         // setting up slide view with restaurant info
         slideView = view.findViewById(R.id.slide_menu);
-        ViewStub stub = (ViewStub) slideView.findViewById(R.id.slide_up_stub);
+        ViewStub stub = slideView.findViewById(R.id.slide_up_stub);
         Integer slide_up_layout = (mCurrentUser.isOrg) ? R.layout.create_slide_up_fragment : R.layout.save_slide_up_fragment;
         stub.setLayoutResource(slide_up_layout);
         slideViewContent = stub.inflate();
@@ -194,15 +201,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onSwipeBottom() {
                 super.onSwipeBottom();
-                if(slideViewIsUp) {
+                if (slideViewIsUp) {
                     slideDownMenu(slideView);
                 }
             }
         });
 
         // if an item on the list was clicked, generate markers and zoom to selected location
-        if(homeActivity.getClickedOnID() != null) {
-            if(!mCurrentUser.isOrg) {
+        if (homeActivity.getClickedOnID() != null) {
+            if (!mCurrentUser.isOrg) {
                 generateMarkersEvents();
             } else {
                 generateMarkersRestaurants(Double.toString(mCurrentLocation.getLongitude()), Double.toString(mCurrentLocation.getLatitude()));
@@ -214,7 +221,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void generateMarkersRestaurants(String longitude, String latitude) {
         final YelpService yelpService = new YelpService();
-        yelpService.findRestaurants(longitude, latitude, "best_match", "30", new Callback() {
+        YelpService.findRestaurants(longitude, latitude, "best_match", "30", new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -245,7 +252,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                     }
                                 });
                                 try {
-                                    if(restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
+                                    if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
                                         clickMarkerRestaurant(marker);
                                         homeActivity.setClickedOnID(null);
                                         homeActivity.setLoading(false);
@@ -271,10 +278,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 mAllEvents = dataSnapshot;
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    for(DataSnapshot event : snapshot.getChildren()) {
+                    for (DataSnapshot event : snapshot.getChildren()) {
                         saveOrg(event.child("orgId").getValue().toString());
                     }
-                    yelpService.findRestaurants(snapshot.getKey(), new Callback() {
+                    YelpService.findRestaurants(snapshot.getKey(), new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {
                             e.printStackTrace();
@@ -322,8 +329,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     });
                 }
             }
+
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
     }
 
@@ -483,13 +492,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             String date = getDate((long) eventChild.child("startTime").getValue(), "MMM dd, yyyy");
             String startTime = getDate((long) eventChild.child("startTime").getValue(), "h:mm a");
             String endTime = getDate((long) eventChild.child("endTime").getValue(), "h:mm a");
-            User org = mIdToOrg.get((String) eventChild.child("orgId").getValue());
+            User org = mIdToOrg.get(eventChild.child("orgId").getValue());
 
             eventOrg.setText(Html.fromHtml(getString(R.string.main_info_event,
                     org.name,
                     date,
-                    startTime.replace("AM", "am").replace("PM","pm"),
-                    endTime.replace("AM", "am").replace("PM","pm"))));
+                    startTime.replace("AM", "am").replace("PM", "pm"),
+                    endTime.replace("AM", "am").replace("PM", "pm"))));
 
             eventInfo.setText(eventChild.child("info").getValue().toString());
 
@@ -509,7 +518,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int pagerPosition, float positionOffset, int positionOffsetPixels) { }
+            public void onPageScrolled(int pagerPosition, float positionOffset, int positionOffsetPixels) {
+            }
 
             @Override
             public void onPageSelected(int pagerPosition) {
@@ -518,7 +528,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) { }
+            public void onPageScrollStateChanged(int state) {
+            }
         });
     }
 
@@ -532,6 +543,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 public void onClick(View v) {
                     String eventId = mPagerAdapter.getEventId(pagerPosition);
                     mSavedEvents.put(eventId, snapshot.getKey());
+                    Log.d("newSize", mSavedEvents.size() + "");
                     mRefForUser.child("Events").setValue(mSavedEvents, new DatabaseReference.CompletionListener() {
                         @Override
                         public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
@@ -540,6 +552,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             } else {
                                 mBtnEvent.setText(getString(R.string.saved));
                                 mCurrentUser.addSavedEventID(mSavedEvents);
+                                mCurrentUser.savedEventsIDs = mSavedEvents;
                             }
                         }
                     });
@@ -615,7 +628,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     public void onSuccess(Location location) {
                         onLocationChanged(location);
                         if (location != null) {
-                            if(!cameraSet) {
+                            if (!cameraSet) {
                                 LatLng initialLatLng = homeActivity.getMarkerLatLng() != null ? homeActivity.markerLatLng
                                         : new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
                                 map.moveCamera(CameraUpdateFactory.newLatLng(initialLatLng));
@@ -656,7 +669,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
                         onLocationChanged(locationResult.getLastLocation());
-                        if(!cameraSet) {
+                        if (!cameraSet) {
                             LatLng initialLatLng = homeActivity.getMarkerLatLng() != null ? homeActivity.markerLatLng
                                     : new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
                             map.moveCamera(CameraUpdateFactory.newLatLng(initialLatLng));
@@ -696,8 +709,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public static String distance(double lat1, double lon1, double lat2, double lon2) {
         if ((lat1 == lat2) && (lon1 == lon2)) {
             return "0";
-        }
-        else {
+        } else {
             double theta = lon1 - lon2;
             double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
             dist = Math.acos(dist);

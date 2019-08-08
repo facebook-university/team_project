@@ -1,7 +1,6 @@
 package com.example.dine_and_donate.Adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.transition.Fade;
 import android.util.Log;
@@ -10,11 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -63,6 +60,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
                 .load(event.imageUrl)
                 .apply(requestOptions)
                 .into(holder.image);
+
         holder.name.setText(event.locationString.split("\\r?\\n")[0]);
         holder.image.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -86,7 +84,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
             }
         });
     }
-    
+
     @Override
     //return number of images present held by the adapter
     public int getItemCount() {

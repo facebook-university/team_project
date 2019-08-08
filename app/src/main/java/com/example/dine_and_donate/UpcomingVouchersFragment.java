@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,50 +33,64 @@ public class UpcomingVouchersFragment extends Fragment {
     private User mCurrUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForEvent;
+    private View mView;
+    private TextView mEmptyView;
+    private TabFragmentHelper mTabFragmentHelper;
+    private StaggeredRecyclerViewAdapter mStaggeredRecyclerViewAdapter;
     private ArrayList<Event> mEvents = new ArrayList<>();
 
     //create view based on data in array lists, inflates the layout of the fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.tab_fragment, container, false);
+        HomeActivity homeActivity = (HomeActivity) getActivity();
+        mCurrUser = homeActivity.currentUser;
+
+        mView = inflater.inflate(R.layout.tab_fragment, container, false);
+        mRecyclerView = mView.findViewById(R.id.rv_vouchers);
+        mEmptyView = mView.findViewById(R.id.empty_view);
+        mStaggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
+        mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
+        mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter);
+        return mView;
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(mView, savedInstanceState);
+        if (mStaggeredRecyclerViewAdapter.getItemCount() == 0) {
+            mEmptyView.setVisibility(View.VISIBLE);
+            loadVouchers();
+        } else {
+            mEmptyView.setVisibility(View.GONE);
+        }
+    }
+
+    private void loadVouchers() {
         mRef = FirebaseDatabase.getInstance().getReference();
         mRefForEvent = mRef.child("events");
 
-        HomeActivity homeActivity = (HomeActivity) getActivity();
-        mCurrUser = homeActivity.currentUser;
         mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 //look through all restaurants
-                for(DataSnapshot dsRestaurant : dataSnapshot.getChildren()) {
+                for (DataSnapshot dsRestaurant : dataSnapshot.getChildren()) {
                     //iterate through all events at that restaurant
-                    for(DataSnapshot dsEvent : dsRestaurant.getChildren()) {
+                    for (DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
-                        if(mSavedEventsIDs.containsKey(dsEvent.getKey())) {
-                            initBitmapsUpcomingEvents(dsEvent.getValue(Event.class));
+                        if (mSavedEventsIDs.containsKey(dsEvent.getKey())) {
+                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
                         }
                     }
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
-        mRecyclerView = view.findViewById(R.id.rv_vouchers);
-        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
-        mRecyclerView.setAdapter(staggeredRecyclerViewAdapter);
-    }
-
-    //add images and descriptions to respective arrayLists
-    private void initBitmapsUpcomingEvents(Event event) {
-        mEvents.add(event);
     }
 }

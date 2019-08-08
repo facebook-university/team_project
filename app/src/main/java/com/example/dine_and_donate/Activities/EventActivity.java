@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
@@ -70,6 +71,7 @@ public class EventActivity extends AppCompatActivity {
     private Uri mSelectedImage;
     private FirebaseUser mFirebaseCurrentUser;
     private Map<String, String> mCreatedEvents;
+
     private UploadUtil uploadUtil;
     private Task<Uri> urlTask;
     private Event mEditEvent;
@@ -91,7 +93,7 @@ public class EventActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         mCalendarView = findViewById(R.id.cvChooseDate);
-        mCalendarView.setOnDateChangeListener( new CalendarView.OnDateChangeListener() {
+        mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
                 mMonth = month;
                 mDay = dayOfMonth;
@@ -103,7 +105,6 @@ public class EventActivity extends AppCompatActivity {
         mStartTimePicker.setEnabled(true);
         mEndTimePicker = findViewById(R.id.endTimePicker);
         mEndTimePicker.setEnabled(true);
-
 
         mTvLocation = findViewById(R.id.tvLocation);
         mEtEventInfo = findViewById(R.id.etEventInfo);
@@ -121,7 +122,7 @@ public class EventActivity extends AppCompatActivity {
         mTvLocation.setText(mLocationString);
 
         // setting defaults to what was previously saved
-        if(mEditEvent != null) {
+        if (mEditEvent != null) {
             mCalendarView.setDate(mEditEvent.startTime);
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(mEditEvent.startTime);
@@ -135,7 +136,6 @@ public class EventActivity extends AppCompatActivity {
             Glide.with(this)
                     .load(mEditEvent.imageUrl)
                     .into(mVoucherImageView);
-
         }
 
         mChooseImage.setOnClickListener(new View.OnClickListener() {
@@ -147,10 +147,11 @@ public class EventActivity extends AppCompatActivity {
 
         mBtnCreate.setOnClickListener(new View.OnClickListener() {
             final Uri[] downloadUri = new Uri[1];
+
             @Override
             public void onClick(View v) {
-                if(mSelectedImage != null) {
-                    final StorageReference ref = mStorageRef.child("images/"+mSelectedImage.getLastPathSegment());
+                if (mSelectedImage != null) {
+                    final StorageReference ref = mStorageRef.child("images/" + mSelectedImage.getLastPathSegment());
                     UploadTask uploadTask = ref.putFile(mSelectedImage);
 
                     Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -159,7 +160,6 @@ public class EventActivity extends AppCompatActivity {
                             if (!task.isSuccessful()) {
                                 throw task.getException();
                             }
-
                             // Continue with the task to get the download URL
                             return ref.getDownloadUrl();
                         }
@@ -175,7 +175,7 @@ public class EventActivity extends AppCompatActivity {
                             }
                         }
                     });
-                } else if(mEditEvent != null) {
+                } else if (mEditEvent != null) {
                     writeEvent(yelpId, mEditEvent.imageUrl);
                 } else {
                     Toast.makeText(EventActivity.this, "Please select voucher image", Toast.LENGTH_SHORT).show();
@@ -198,6 +198,7 @@ public class EventActivity extends AppCompatActivity {
             return;
         }
         String info = mEtEventInfo.getText().toString();
+
         String id = mEditEvent == null ? UUID.randomUUID().toString() : mEditEvent.eventId;
         newEvent = new Event(orgId, yelpId, mLocationString, startTime.getTime(), endTime.getTime(), info, url, id);
         mRef.child("events").child(yelpId).child(id).setValue(newEvent, new DatabaseReference.CompletionListener() {

@@ -4,7 +4,6 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 import org.parceler.Parcel;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ public class User {
     public String email;
     public boolean isOrg;
     public String phoneNumber;
-    public File profileImage;
     public String bio;
     public Boolean prefersPhoneContact;
     public Map<String, String> savedEventsIDs = new HashMap<String, String>();
@@ -26,17 +24,19 @@ public class User {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String name, String email) {
+    public User(String name, String email, String imageUrl) {
         this.name = name;
         this.email = email;
         this.isOrg = false;
+        this.imageUrl = imageUrl;
     }
 
-    public User(String name, String email, String phoneNumber) {
+    public User(String name, String email, String phoneNumber, String profPic) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.isOrg = true;
+        this.imageUrl = imageUrl;
     }
 
     public String getName() {
@@ -71,11 +71,19 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public Map<String, String> getSavedEventsIDs() { return savedEventsIDs; }
+    public Map<String, String> getSavedEventsIDs() {
+        return savedEventsIDs;
+    }
 
-    public void addSavedEventID(Map<String, String> ids) { this.savedEventsIDs = ids; }
+    public void addSavedEventID(Map<String, String> ids) {
+        this.savedEventsIDs = ids;
+    }
 
-    public String getImageUrl() { return imageUrl; }
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
 
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

@@ -75,7 +75,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         mOrgPhone.setVisibility(View.GONE);
         mSignUpBtn.setVisibility(View.VISIBLE);
 
-        constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayoutSignUp);
+        constraintLayout = findViewById(R.id.constraintLayoutSignUp);
 
         //display specific text views depending on user type selected
         mSpinner = findViewById(R.id.user_options);
@@ -95,7 +95,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                     constraintSet.clone(constraintLayout);
                     constraintSet.connect(mSignUpBtn.getId(), ConstraintSet.TOP, mPassword.getId(), ConstraintSet.BOTTOM, 30);
                     constraintSet.applyTo(constraintLayout);
-                }  else if(mSpinner.getSelectedItem().toString().equals("Fundraise")) {
+                } else if (mSpinner.getSelectedItem().toString().equals("Fundraise")) {
                     mOrgPhone.setVisibility(View.VISIBLE);
                     constraintSet = new ConstraintSet();
                     constraintSet.clone(constraintLayout);
@@ -115,9 +115,9 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
             public void onClick(View v) {
                 boolean validInfo = !(emptyField(mName) && emptyField(mEmail) && emptyField(mPassword) && emptyField(mOrgPhone));
                 //if none of the fields are empty, then sign up information is valid
-                if(validInfo) {
+                if (validInfo) {
                     //if password length is less than 5, then user can not successfully sign up
-                    if(mPassword.getText().toString().length() < 6) {
+                    if (mPassword.getText().toString().length() < 6) {
                         mPassword.setError("You must have at least 6 characters");
                     } else {
                         createAccount(mEmail.getText().toString(), mPassword.getText().toString());
@@ -144,7 +144,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
     private boolean emptyField(EditText text) {
         String userEmail = text.getText().toString().trim();
         //return true if field is empty
-        if(userEmail.isEmpty()) {
+        if (userEmail.isEmpty()) {
             text.setError("Field can not be empty");
             return true;
         } else {
@@ -155,31 +155,30 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
 
     private void createAccount(final String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        mUser = mAuth.getCurrentUser();
-                        Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
-                        mCreatedUser = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Fundraise"));
-                        navigationHelper(HomeActivity.class);
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        //Log.w("create", "createUserWithEmail:failure", task.getException());
-                        FirebaseAuthException e = (FirebaseAuthException )task.getException();
-                        Log.e("LoginActivity", "Failed Registration", e);
-                        Toast.makeText(SignUpActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            mUser = mAuth.getCurrentUser();
+                            Toast.makeText(SignUpActivity.this, "Account created", Toast.LENGTH_SHORT).show();
+                            mCreatedUser = writeNewUser(mUser.getUid(), mName.getText().toString(), email, mSpinner.getSelectedItem().toString().equals("Fundraise"), "");
+                            navigationHelper(HomeActivity.class);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            FirebaseAuthException e = (FirebaseAuthException) task.getException();
+                            Log.e("LoginActivity", "Failed Registration", e);
+                            Toast.makeText(SignUpActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
-            });
+                });
     }
 
-    private User writeNewUser(String userId, String name, String email, boolean isOrg) {
+    private User writeNewUser(String userId, String name, String email, boolean isOrg, String profPicUri) {
         User user;
-        if(!isOrg) {
-            user = new User(name, email);
+        if (!isOrg) {
+            user = new User(name, email, profPicUri);
         } else {
-            user = new User(name, email, mOrgPhone.getText().toString());
+            user = new User(name, email, mOrgPhone.getText().toString(), profPicUri);
         }
         mDatabase.child("users").child(userId).setValue(user);
         return user;

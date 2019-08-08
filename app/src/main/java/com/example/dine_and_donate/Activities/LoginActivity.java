@@ -68,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
         mIvSplashScreen = findViewById(R.id.ivSplashScreen);
 
         //if someone is already signed in, skip sign in process
-        if(mFbUser != null) {
+        if (mFbUser != null) {
             showSplash();
             createUserModel();
         } else {
@@ -122,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
                 mCurrentUserModel.setName(dataSnapshot.child("name").getValue().toString());
                 mCurrentUserModel.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
                 mCurrentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
-                if(mCurrentUserModel.getIsOrg()) {
+                if (mCurrentUserModel.getIsOrg()) {
                     mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
 
@@ -134,6 +134,7 @@ public class LoginActivity extends AppCompatActivity {
                 mCurrentUserModel.addSavedEventID(events);
                 goToProfile();
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("tag", "onCancelled", databaseError.toException());
