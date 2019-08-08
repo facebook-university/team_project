@@ -27,7 +27,7 @@ import java.util.HashMap;
 public class SearchDialogFragment extends DialogFragment {
 
     public static final String ORGS = "orgNames";
-    public HomeActivity mHomeActivity;
+    public HomeActivity homeActivity;
 
     public static SearchDialogFragment newInstance(ArrayList<String> orgNames) {
         SearchDialogFragment frag = new SearchDialogFragment();
@@ -57,7 +57,7 @@ public class SearchDialogFragment extends DialogFragment {
 
         builder.setView(view);
         final Dialog dialog = builder.create();
-        mHomeActivity = ((HomeActivity) getContext());
+        homeActivity = ((HomeActivity) getContext());
 
         searchOrgsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,7 +65,7 @@ public class SearchDialogFragment extends DialogFragment {
                 final String query = searchQuery.getText().toString();
                 searchQuery.setCursorVisible(false);
                 dialog.dismiss();
-                mHomeActivity.setExploreTab(query);
+                homeActivity.setExploreTab(query);
             }
         });
 
