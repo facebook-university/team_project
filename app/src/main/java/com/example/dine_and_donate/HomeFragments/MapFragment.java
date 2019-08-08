@@ -3,6 +3,7 @@ package com.example.dine_and_donate.HomeFragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -15,11 +16,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -29,8 +36,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
@@ -43,6 +53,7 @@ import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Restaurant;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.SearchDialogFragment;
 import com.example.dine_and_donate.YelpService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -53,6 +64,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -82,6 +94,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.Inflater;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -113,6 +126,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private boolean slideViewIsUp;
     private Button mBtnEvent;
     private EventViewPagerAdapter mPagerAdapter;
+    private DialogFragment mDialogFragment;
 
     private Context mContext;
 
@@ -126,7 +140,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<Event> mNearbyEvents;
     private Map<String, String> mSavedEvents;
 
-    private HomeActivity homeActivity;
+    public HomeActivity homeActivity;
 
     public Location mCurrentLocation;
 
@@ -135,6 +149,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private DataSnapshot mAllEvents;
     private HashMap<String, JSONObject> mIdToRestaurant = new HashMap<>();
     private HashMap<String, User> mIdToOrg = new HashMap<>();
+    private ArrayList<String> mOrgNames = new ArrayList<String>();
+    private HashMap<String, String> mNameToId = new HashMap<>();
+    private String queryOrgId;
+
+    private AlertDialog dialog;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -157,14 +176,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
+        inflater.inflate(R.menu.activity_main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        homeActivity = (HomeActivity) getActivity();
-        mCurrentUser = homeActivity.currentUser;
-
         homeActivity = (HomeActivity) getActivity();
         mCurrentUser = homeActivity.currentUser;
 
@@ -181,6 +199,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mRefForEvents = mRef.child("events");
         mRefForOrgs = mRef.child("users");
         mContext = view.getContext();
+        homeActivity = (HomeActivity) getContext();
+        mCurrentUser = homeActivity.currentUser;
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -724,6 +744,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mIdToOrg.put(id, dataSnapshot.child(id).getValue(User.class));
+                String orgName = dataSnapshot.child(id).child("name").getValue().toString();
+                if (!mOrgNames.contains(orgName)) {
+                    mOrgNames.add(orgName);
+                    mNameToId.put(orgName, id);
+                }
             }
 
             @Override
@@ -751,5 +776,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public HashMap<String, User> getIdToOrg() {
         return mIdToOrg;
+    }
+
+    public String getQueryOrgId() {
+        return queryOrgId;
+    }
+
+    public ArrayList<String> getOrgNames() {
+        return mOrgNames;
+    }
+
+    public HashMap<String, String> getNameToId() {
+        return mNameToId;
     }
 }

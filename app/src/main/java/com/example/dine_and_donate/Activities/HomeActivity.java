@@ -1,12 +1,15 @@
 package com.example.dine_and_donate.Activities;
 
 import android.app.AlarmManager;
+import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -15,7 +18,9 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
@@ -26,6 +31,9 @@ import com.example.dine_and_donate.HomeFragments.ProfileFragment;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.NotifyWorker;
 import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.SearchDialogFragment;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
     private ProfileFragment mProfileFragment = new ProfileFragment();
     private ListFragment mListFragment = new ListFragment();
     private Fragment mDefaultFragment;
+    private DialogFragment mDialogFragment;
     public User currentUser;
     private ProgressBar mProgressSpinner;
     private Button mBtnSwap;
@@ -50,7 +59,9 @@ public class HomeActivity extends AppCompatActivity {
     private boolean mIsOnMapView;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
+    private String mStack = "map";
     private String mClickedOnID;
+    private Boolean mIsOnProfileView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,17 +84,18 @@ public class HomeActivity extends AppCompatActivity {
         mBtnSwap.setVisibility(View.INVISIBLE);
         mBtnSwap.setText(R.string.swap_list);
         mIsOnMapView = true;
+        mIsOnProfileView = true;
 
         mBtnSwap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setExploreTab();
+                setExploreTab(null);
             }
         });
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.flContainer, mDefaultFragment)
-                .addToBackStack(null) // TODO: look into if this can cause mem problem
+                .addToBackStack(mStack)
                 .commit();
 
         createBottomNav();
@@ -103,30 +115,36 @@ public class HomeActivity extends AppCompatActivity {
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
+                        mIsOnProfileView = false;
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mNotificationsFragment;
                         mShowButton = false;
+                        mStack = "notify";
                         break;
                     case R.id.action_map:
+                        mIsOnProfileView = false;
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mIsOnMapView ? mMapFragment : mListFragment;
+                        mStack = mIsOnMapView ? "map" : "list";
                         mShowButton = true;
                         break;
                     case R.id.action_profile:
+                        mIsOnProfileView = true;
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
                         fragment = mProfileFragment;
                         mShowButton = false;
+                        mStack = "profile";
                         break;
                 }
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.flContainer, fragment)
-                        .addToBackStack(null) // TODO: look into if this can cause mem problem
+                        .addToBackStack(mStack)
                         .commit();
                 if (mShowButton) {
                     mBtnSwap.setVisibility(View.VISIBLE);
@@ -157,6 +175,11 @@ public class HomeActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 navigationHelper(LoginActivity.class);
                 break;
+
+            case R.id.searchEvents:
+                mDialogFragment = SearchDialogFragment.newInstance(mMapFragment.getOrgNames());
+                mDialogFragment.show(getSupportFragmentManager(), "dialog");
+                break;
         }
         return true;
     }
@@ -167,26 +190,28 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void setExploreTab() {
+    public void setExploreTab(final String query) {
         if (mShowButton) {
-            if (mIsOnMapView) {
+            if (mIsOnMapView || (query != null)) {
                 mListFragment = new ListFragment();
                 mListFragment.setAllEvents(mMapFragment.getAllEvents());
                 mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
                 mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
                 mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
                 mListFragment.setLocation(mMapFragment.getCurrentLocation());
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.flContainer, mListFragment)
-                        .addToBackStack(null)
-                        .commit();
+                mListFragment.setQueryOrgId(mMapFragment.getNameToId().get(query));
+                mListFragment.setOrgNames(mMapFragment.getOrgNames());
+                mStack = "list";
+                if (!getSupportFragmentManager().popBackStackImmediate("list", 0)) {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.flContainer, mListFragment)
+                            .addToBackStack(mStack)
+                            .commit();
+                }
                 mIsOnMapView = false;
                 mBtnSwap.setText(R.string.swap_map);
             } else {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.flContainer, mMapFragment)
-                        .addToBackStack(null)
-                        .commit();
+                getSupportFragmentManager().popBackStack("map", 0);
                 mIsOnMapView = true;
                 mBtnSwap.setText(R.string.swap_list);
             }
