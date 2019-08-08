@@ -35,10 +35,15 @@ public class Event {
         this.eventId = eventId;
     }
 
-    public static ArrayList<Event> eventsHappeningAtRestaurant(DataSnapshot ds) {
+    public static ArrayList<Event> eventsHappeningAtRestaurant(DataSnapshot ds, String id) {
         ArrayList<Event> events = new ArrayList<>();
-        for (DataSnapshot snapshot : ds.getChildren()) {
-            events.add(snapshot.getValue(Event.class));
+        for(DataSnapshot snapshot : ds.getChildren()) {
+            Event eventToAdd = snapshot.getValue(Event.class);
+            if (id == null) {
+                events.add(eventToAdd);
+            } else if (eventToAdd.orgId.equals(id)) {
+                events.add(snapshot.getValue(Event.class));
+            }
         }
         return events;
     }

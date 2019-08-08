@@ -121,7 +121,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             Toast.makeText(mContext, "hello", Toast.LENGTH_SHORT).show();
             HomeActivity homeActivity = (HomeActivity) mContext;
             homeActivity.setClickedOnID(yelpId);
-            homeActivity.setExploreTab();
+            homeActivity.setExploreTab(null);
             homeActivity.setLoading(true);
         }
     }

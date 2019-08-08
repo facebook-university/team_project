@@ -91,12 +91,14 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
                 //show all fields except phone number for consumer user type
                 if (selectedItem.equals("Dine and Donate")) {
                     mOrgPhone.setVisibility(View.GONE);
+                    mName.setHint("Name");
                     constraintSet = new ConstraintSet();
                     constraintSet.clone(constraintLayout);
                     constraintSet.connect(mSignUpBtn.getId(), ConstraintSet.TOP, mPassword.getId(), ConstraintSet.BOTTOM, 30);
                     constraintSet.applyTo(constraintLayout);
                 } else if (mSpinner.getSelectedItem().toString().equals("Fundraise")) {
                     mOrgPhone.setVisibility(View.VISIBLE);
+                    mName.setHint("Organization Name");
                     constraintSet = new ConstraintSet();
                     constraintSet.clone(constraintLayout);
                     constraintSet.connect(mSignUpBtn.getId(), ConstraintSet.TOP, mOrgPhone.getId(), ConstraintSet.BOTTOM, 30);
