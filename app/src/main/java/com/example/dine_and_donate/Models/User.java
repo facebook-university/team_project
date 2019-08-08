@@ -31,7 +31,7 @@ public class User {
         this.imageUrl = imageUrl;
     }
 
-    public User(String name, String email, String phoneNumber, String profPic) {
+    public User(String name, String email, String phoneNumber, String imageUrl) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;

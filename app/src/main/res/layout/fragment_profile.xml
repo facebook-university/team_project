@@ -66,7 +66,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintVertical_bias="0.162"
-                            app:srcCompat="@drawable/instagram_user_outline_24" />
+                             />
 
                         <ImageView
                             android:id="@+id/blurred_consumer_pic"
@@ -86,7 +86,7 @@
                             android:layout_height="wrap_content"
                             android:text="TextView"
                             android:textColor="#000000"
-                            android:textSize="20sp"
+                            android:textSize="15sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -170,7 +170,6 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
-
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewpager_id"
