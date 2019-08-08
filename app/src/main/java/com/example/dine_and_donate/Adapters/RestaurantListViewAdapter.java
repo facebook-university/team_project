@@ -6,12 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.R;
 
@@ -37,7 +39,17 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(R.layout.layout_restaurant_list_view, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
+        final ViewHolder viewHolder = new ViewHolder(view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // todo: get location from event, pass to home activity
+                HomeActivity homeActivity = (HomeActivity) context;
+                homeActivity.setClickedOnID(viewHolder.yelpId);
+                homeActivity.setExploreTab();
+                homeActivity.setLoading(true);
+            }
+        });
         return viewHolder;
     }
 
@@ -45,8 +57,9 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         try {
             JSONObject restaurant = mRestaurants.getJSONObject(position);
+            holder.yelpId = restaurant.getString("id");
             holder.tvName.setText(restaurant.getString("name"));
-
+            holder.ratingBar.setRating((float) Double.parseDouble(restaurant.getString("rating")));
             JSONObject coordinates = restaurant.getJSONObject("coordinates");
             String restLatitude = coordinates.getString("latitude");
             String restLongitude = coordinates.getString("longitude");
@@ -73,7 +86,9 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
         public TextView tvName;
         public TextView tvDistance;
         public ImageView ivPicture;
-        TextView tvInfo;
+        public TextView tvInfo;
+        public RatingBar ratingBar;
+        public String yelpId;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -81,6 +96,7 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
             tvDistance = itemView.findViewById(R.id.tvDistance);
             tvInfo = itemView.findViewById(R.id.tvDescription);
             ivPicture = itemView.findViewById(R.id.ivRestaurant);
+            ratingBar = itemView.findViewById(R.id.ratingBar);
         }
     }
 }
