@@ -171,7 +171,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                 downloadUri[0] = task.getResult();
                                 String s = downloadUri[0].toString();
                                 mCurrentUser.setImageUrl(s);
-                                mRefForUser.child("profPic").setValue(s);
+                                mRefForUser.child("imageUrl").setValue(s);
                                 Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
                                 intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
                                 startActivity(intent);

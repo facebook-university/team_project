@@ -87,8 +87,12 @@ public class HomeActivity extends AppCompatActivity {
                 .commit();
 
         createBottomNav();
+
         if (!currentUser.isOrg) {
+            //createConsumerBottomNav();
             setUpNotificationWorker();
+        } else {
+
         }
     }
 
@@ -96,6 +100,13 @@ public class HomeActivity extends AppCompatActivity {
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
         Integer iconFilledDefault = (mDefaultFragment.equals(mMapFragment)) ? R.drawable.icons8_map_filled_50
                 : R.drawable.instagram_user_filled_24;
+        if(currentUser.isOrg) {
+            mBottomNavigationView.getMenu().findItem(R.id.action_notify).setVisible(false);
+        } else {
+            mBottomNavigationView.getMenu().findItem(R.id.action_notify).setVisible(true);
+
+        }
+
         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(iconFilledDefault);
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -103,21 +114,25 @@ public class HomeActivity extends AppCompatActivity {
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
-                        mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mNotificationsFragment;
                         mShowButton = false;
+                        mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
                         break;
                     case R.id.action_map:
-                        mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+                        if(!currentUser.isOrg) {
+                            mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+                        }
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mIsOnMapView ? mMapFragment : mListFragment;
                         mShowButton = true;
                         break;
                     case R.id.action_profile:
-                        mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+                        if(!currentUser.isOrg) {
+                            mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+                        }
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
                         fragment = mProfileFragment;
@@ -156,6 +171,7 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.log_out:
                 FirebaseAuth.getInstance().signOut();
                 navigationHelper(LoginActivity.class);
+                finish();
                 break;
         }
         return true;
@@ -194,9 +210,12 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setUpNotificationWorker() {
+
+//        mNotificationsFragment = new NotificationsFragment();
+//        mNotificationsFragment.setIdToOrg(mNotificationsFragment.getIdToOrg());
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 00);
+        calendar.set(Calendar.MINUTE, 17);
         calendar.set(Calendar.SECOND, 00);
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
             calendar.add(Calendar.DATE, 1);
@@ -207,7 +226,7 @@ public class HomeActivity extends AppCompatActivity {
         AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, mPendingIntent);
+                AlarmManager.INTERVAL_FIFTEEN_MINUTES, mPendingIntent);
     }
 
     public void setMarkerLatLngToNull() {

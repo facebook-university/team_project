@@ -121,5 +121,4 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
         String am = calendar.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM";
         return month + "/" + day + " - " + hour + ":" + min + " " + am;
     }
-
 }
