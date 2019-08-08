@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
@@ -45,18 +46,29 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        View view = inflater.inflate(R.layout.layout_event_list_view, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
+        final View view = inflater.inflate(R.layout.layout_event_list_view, parent, false);
+        final ViewHolder viewHolder = new ViewHolder(view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // todo: get location from event, pass to home activity
+                HomeActivity homeActivity = (HomeActivity) context;
+                homeActivity.setClickedOnID(viewHolder.event.yelpID);
+                homeActivity.setExploreTab();
+                homeActivity.setLoading(true);
+            }
+        });
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = mEvents.get(position);
+        holder.event = event;
         User org = mIdToOrg.get(event.orgId);
         JSONObject restaurant = mIdToRestaurant.get(event.yelpID);
         //Todo: create / find better default
@@ -87,6 +99,7 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
         TextView tvEventText;
         TextView tvDateTime;
         ImageView ivOrgPic;
+        Event event;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

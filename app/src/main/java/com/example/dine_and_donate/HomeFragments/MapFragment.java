@@ -165,14 +165,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         homeActivity = (HomeActivity) getActivity();
         mCurrentUser = homeActivity.currentUser;
 
+        homeActivity = (HomeActivity) getActivity();
+        mCurrentUser = homeActivity.currentUser;
+
         if (!loaded) {
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
             loaded = true;
         }
-
-        homeActivity = (HomeActivity) getActivity();
-        mCurrentUser = homeActivity.currentUser;
 
         mDatabase = FirebaseDatabase.getInstance();
         mFbUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -206,6 +206,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
+
+        // if an item on the list was clicked, generate markers and zoom to selected location
+        if(homeActivity.getClickedOnID() != null) {
+            if(!mCurrentUser.isOrg) {
+                generateMarkersEvents();
+            } else {
+                generateMarkersRestaurants(Double.toString(mCurrentLocation.getLongitude()), Double.toString(mCurrentLocation.getLatitude()));
+            }
+        }
     }
 
     // GENERATE MARKERS //
@@ -233,15 +242,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName)).setTag(restaurantJSON);
+                                Marker marker = map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName));
+                                marker.setTag(restaurantJSON);
                                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                     @Override
                                     public boolean onMarkerClick(Marker marker) {
-                                        slideUpMenuCreate((JSONObject) marker.getTag());
-                                        slideViewIsUp = true;
-                                        return false;
+                                        // Todo : move to function
+                                        return clickMarkerRestaurant(marker);
                                     }
                                 });
+                                try {
+                                    if(restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
+                                        clickMarkerRestaurant(marker);
+                                        homeActivity.setClickedOnID(null);
+                                        homeActivity.setLoading(false);
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }
@@ -289,12 +307,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                             @Override
                                             public boolean onMarkerClick(Marker marker) {
-                                                return clickMarker(marker);
+                                                return clickMarkerEvent(marker);
                                             }
                                         });
-                                        if (marker.getPosition().equals(homeActivity.getMarkerLatLng())) {
-                                            clickMarker(marker);
-                                            homeActivity.setMarkerLatLngToNull();
+                                        try {
+                                            if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
+                                                // simulates marker click
+                                                clickMarkerEvent(marker);
+                                                homeActivity.setClickedOnID(null);
+                                                homeActivity.setLoading(false);
+                                            }
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
                                         }
                                     }
                                 });
@@ -312,19 +336,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    private boolean clickMarker(final Marker marker) {
+    private boolean clickMarkerRestaurant(Marker marker) {
+        slideUpMenuCreate((JSONObject) marker.getTag());
+        map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
+        slideViewIsUp = true;
+        return true;
+    }
+
+    private boolean clickMarkerEvent(final Marker marker) {
         try {
             final JSONObject restaurantOfMarker = (JSONObject) marker.getTag();
             DataSnapshot eventsOfRestaurant = mAllEvents.child(restaurantOfMarker.getString("id"));
 
             slideUpMenuSave(restaurantOfMarker, eventsOfRestaurant);
-            marker.showInfoWindow();
+            map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
 
             slideViewIsUp = true;
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return false;
+        return true;
     }
 
     // SLIDE UP VIEW //
@@ -363,7 +394,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     Double.parseDouble(restLongitude))));
 
             restName.setText(restaurant.getString("name"));
-            rating.setRating(Math.round(Double.parseDouble(restaurant.getString("rating"))));
+            rating.setRating((float) Double.parseDouble(restaurant.getString("rating")));
             typeOfFood.setText(foodCategories);
 
             slideView.setVisibility(View.VISIBLE);
@@ -541,7 +572,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onCameraIdle() {
                 Double newLongitude = map.getCameraPosition().target.longitude;
                 Double newLatitude = map.getCameraPosition().target.latitude;
-                if (cameraLatitude == null || cameraLongitude == null) {
+                if (cameraLatitude == null || cameraLongitude == null || map.getCameraPosition().zoom > 10) {
                     cameraLatitude = newLatitude;
                     cameraLongitude = newLongitude;
 
@@ -552,16 +583,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                 }
 
-                if (map.getCameraPosition().zoom > 10) {
-                    cameraLongitude = newLongitude;
-                    cameraLatitude = newLatitude;
-
-                    if (mCurrentUser.isOrg) {
-                        generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
-                    } else {
-                        generateMarkersEvents();
-                    }
-                }
+//                if (map.getCameraPosition().zoom > 10) {
+//                    cameraLongitude = newLongitude;
+//                    cameraLatitude = newLatitude;
+//
+//                    if (mCurrentUser.isOrg) {
+//                        generateMarkersRestaurants(Double.toString(cameraLongitude), Double.toString(cameraLatitude));
+//                    } else {
+//                        generateMarkersEvents();
+//                    }
+//                }
             }
         });
 

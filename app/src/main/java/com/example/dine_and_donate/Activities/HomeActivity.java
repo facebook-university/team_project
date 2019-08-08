@@ -10,6 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -32,6 +34,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.parceler.Parcels;
 
 import java.util.Calendar;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -43,14 +47,13 @@ public class HomeActivity extends AppCompatActivity {
     private ListFragment mListFragment = new ListFragment();
     private Fragment mDefaultFragment;
     public User currentUser;
+    private ProgressBar mProgressSpinner;
     private Button mBtnSwap;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
-    private boolean mShowMenuOption;
-    private MenuItem mItem;
-
+    private String mClickedOnID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,8 @@ public class HomeActivity extends AppCompatActivity {
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
 
+        mProgressSpinner = findViewById(R.id.progressSpinner);
+        setLoading(false);
         mBtnSwap = findViewById(R.id.btnSwap);
         mBtnSwap.setVisibility(View.INVISIBLE);
         mBtnSwap.setText(R.string.swap_list);
@@ -166,7 +171,7 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void setExploreTab() {
+    public void setExploreTab() {
         if (mShowButton) {
             if (mIsOnMapView) {
                 mListFragment = new ListFragment();
@@ -217,6 +222,22 @@ public class HomeActivity extends AppCompatActivity {
         return markerLatLng;
     }
 
+    public void setMarkerLatLng(LatLng markerLatLng) {
+        this.markerLatLng = markerLatLng;
+    }
+
+    public String getClickedOnID() {
+        return mClickedOnID;
+    }
+
+    public void setClickedOnID(String mClickedOnID) {
+        this.mClickedOnID = mClickedOnID;
+    }
+
+    public void setClickedOnIdToNull() {
+        mClickedOnID = null;
+    }
+
     public static class MyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -230,5 +251,13 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    public void setLoading(boolean isLoading) {
+        if(isLoading) {
+            mProgressSpinner.setVisibility(View.VISIBLE);
+        } else {
+            mProgressSpinner.setVisibility(View.GONE);
+        }
     }
 }
