@@ -54,8 +54,11 @@ public class HomeActivity extends AppCompatActivity {
     private Fragment mDefaultFragment;
     private DialogFragment mDialogFragment;
     public User currentUser;
-    private ProgressBar mProgressSpinner;
-    private Button mBtnSwap;
+    private MenuItem mProgressSpinner;
+    private MenuItem mBtnSwap;
+    private MenuItem mLogOut;
+    private MenuItem mSearch;
+    private MenuItem mEditProfile;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
     private boolean mIsOnNotifications;
@@ -63,7 +66,6 @@ public class HomeActivity extends AppCompatActivity {
     public LatLng markerLatLng;
     private String mStack = "map";
     private String mClickedOnID;
-    private Boolean mIsOnProfileView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,20 +82,7 @@ public class HomeActivity extends AppCompatActivity {
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
 
-        mProgressSpinner = findViewById(R.id.progressSpinner);
-        setLoading(false);
-        mBtnSwap = findViewById(R.id.btnSwap);
-        mBtnSwap.setVisibility(View.INVISIBLE);
-        mBtnSwap.setText(R.string.swap_list);
         mIsOnMapView = true;
-        mIsOnProfileView = true;
-
-        mBtnSwap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setExploreTab(null);
-            }
-        });
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.flContainer, mDefaultFragment)
@@ -109,7 +98,7 @@ public class HomeActivity extends AppCompatActivity {
     private void createBottomNav() {
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
         Integer iconFilledDefault = (mDefaultFragment.equals(mMapFragment)) ? R.drawable.icons8_map_filled_50
-                : R.drawable.instagram_user_filled_24;
+                : R.drawable.like_filled;
         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(iconFilledDefault);
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -117,30 +106,39 @@ public class HomeActivity extends AppCompatActivity {
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
-                        mIsOnProfileView = false;
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
-                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like);
+                        mBtnSwap.setVisible(false);
+                        mSearch.setVisible(false);
+                        mLogOut.setVisible(true);
+                        mEditProfile.setVisible(true);
                         fragment = mNotificationsFragment;
                         mIsOnNotifications = true;
                         mShowButton = false;
                         mStack = "notify";
                         break;
                     case R.id.action_map:
-                        mIsOnProfileView = false;
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
-                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like);
+                        mBtnSwap.setVisible(true);
+                        mSearch.setVisible(!currentUser.isOrg);
+                        mLogOut.setVisible(false);
+                        mEditProfile.setVisible(false);
                         fragment = mIsOnMapView ? mMapFragment : mListFragment;
                         mIsOnNotifications = false;
                         mStack = mIsOnMapView ? "map" : "list";
                         mShowButton = true;
                         break;
                     case R.id.action_profile:
-                        mIsOnProfileView = true;
+                        mBtnSwap.setVisible(false);
+                        mSearch.setVisible(false);
+                        mLogOut.setVisible(true);
+                        mEditProfile.setVisible(true);
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
-                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like_filled);
                         fragment = mProfileFragment;
                         mIsOnNotifications = false;
                         mShowButton = false;
@@ -151,11 +149,6 @@ public class HomeActivity extends AppCompatActivity {
                         .replace(R.id.flContainer, fragment)
                         .addToBackStack(mStack)
                         .commit();
-                if (mShowButton) {
-                    mBtnSwap.setVisibility(View.VISIBLE);
-                } else {
-                    mBtnSwap.setVisibility(View.INVISIBLE);
-                }
                 return true;
             }
         });
@@ -164,6 +157,19 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.profile_settings_drawer, menu);
+        mProgressSpinner = menu.findItem(R.id.miActionProgress);
+        mBtnSwap = menu.findItem(R.id.btnSwap);
+        mSearch = menu.findItem(R.id.searchEvents);
+        mLogOut = menu.findItem(R.id.log_out);
+        mEditProfile = menu.findItem(R.id.edit_profile);
+        mBtnSwap.setTitle(R.string.swap_list);
+        mBtnSwap.setIcon(R.drawable.list);
+        if (!mShowButton) {
+            mBtnSwap.setVisible(false);
+            mSearch.setVisible(false);
+            mLogOut.setVisible(true);
+            mEditProfile.setVisible(true);
+        }
         return true;
     }
 
@@ -184,6 +190,10 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.searchEvents:
                 mDialogFragment = SearchDialogFragment.newInstance(mMapFragment.getOrgNames());
                 mDialogFragment.show(getSupportFragmentManager(), "dialog");
+                break;
+
+            case R.id.btnSwap:
+                setExploreTab(null);
                 break;
         }
         return true;
@@ -217,31 +227,22 @@ public class HomeActivity extends AppCompatActivity {
                             .commit();
                 }
                 mIsOnMapView = false;
-                mBtnSwap.setText(R.string.swap_map);
+                mBtnSwap.setTitle(R.string.swap_map);
+                mBtnSwap.setIcon(R.drawable.map);
             } else {
                 getSupportFragmentManager().popBackStack("map", 0);
                 mIsOnMapView = true;
-                mBtnSwap.setText(R.string.swap_list);
-            }
-        } else {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.flContainer, mMapFragment)
-                    .addToBackStack(null)
-                    .commit();
-            mIsOnMapView = true;
-            mIsOnNotifications = false;
-            mBtnSwap.setText(R.string.swap_list);
-            mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
-            mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
-            mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
-        }
-        // if an item on the list was clicked, generate markers and zoom to selected location
-        if (mClickedOnID != null) {
-            if (!currentUser.isOrg) {
-                mMapFragment.generateMarkersEvents();
-            } else {
-                Location currentLocation = mMapFragment.getCurrentLocation();
-                mMapFragment.generateMarkersRestaurants(Double.toString(currentLocation.getLongitude()), Double.toString(currentLocation.getLatitude()));
+                mBtnSwap.setTitle(R.string.swap_list);
+                mBtnSwap.setIcon(R.drawable.list);
+                // if an item on the list was clicked, generate markers and zoom to selected location
+                if (mClickedOnID != null) {
+                    if (!currentUser.isOrg) {
+                        mMapFragment.generateMarkersEvents();
+                    } else {
+                        Location currentLocation = mMapFragment.getCurrentLocation();
+                        mMapFragment.generateMarkersRestaurants(Double.toString(currentLocation.getLongitude()), Double.toString(currentLocation.getLatitude()));
+                    }
+                }
             }
         }
     }
@@ -304,9 +305,9 @@ public class HomeActivity extends AppCompatActivity {
 
     public void setLoading(boolean isLoading) {
         if(isLoading) {
-            mProgressSpinner.setVisibility(View.VISIBLE);
+            mProgressSpinner.setVisible(true);
         } else {
-            mProgressSpinner.setVisibility(View.GONE);
+            mProgressSpinner.setVisible(false);
         }
     }
 }
