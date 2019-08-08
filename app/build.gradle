@@ -85,6 +85,8 @@ dependencies {
 
     // Page Indicator
     implementation 'com.romandanylyk:pageindicatorview:1.0.3@aar'
+
+    implementation 'com.google.android.material:material:1.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

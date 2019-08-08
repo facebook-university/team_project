@@ -51,7 +51,7 @@ public class VoucherDetailFragment extends Fragment {
         ivShare = view.findViewById(R.id.ivShare);
         ivEdit = view.findViewById(R.id.ivEdit);
 
-        if(!homeActivity.currentUser.isOrg) {
+        if (!homeActivity.currentUser.isOrg) {
             ivEdit.setVisibility(View.GONE);
         } else {
             ivEdit.setOnClickListener(new View.OnClickListener() {

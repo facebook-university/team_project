@@ -31,7 +31,7 @@ public class OldVouchersFragment extends Fragment {
 
     private View mView;
     private RecyclerView mRecyclerView;
-
+    private TabFragmentHelper mTabFragmentHelper;
     private Context mContext;
     private ArrayList<Event> mEvents;
 
@@ -45,10 +45,17 @@ public class OldVouchersFragment extends Fragment {
     private User mCurrUser;
     private DatabaseReference mRef;
     private DatabaseReference mRefForEvent;
+    private StaggeredRecyclerViewAdapter mStaggeredRecyclerViewAdapter;
 
     //inflates layout of fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.tab_fragment, container, false);
+        mRecyclerView = mView.findViewById(R.id.rv_vouchers);
+        mStaggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+        mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
+        mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter);
         return mView;
     }
 
@@ -73,7 +80,7 @@ public class OldVouchersFragment extends Fragment {
                         if (pastEvents.containsKey(dsEvent.getKey())) {
                             //if event end date is older than today's date, it is a past event
                             if (Long.toString(dateMillis).compareTo(dsEvent.child("endTime").toString()) > 0) {
-                                initBitmapsPastEvents();
+                                mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
                             }
                         }
                     }
@@ -85,24 +92,11 @@ public class OldVouchersFragment extends Fragment {
 
             }
         });
+
         mRecyclerView = view.findViewById(R.id.rv_vouchers);
         StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mRecyclerView.setAdapter(staggeredRecyclerViewAdapter);
-    }
-
-    //add images and descriptions to respective arrayLists
-
-    private void initBitmapsPastEvents() {
-
-        //test events
-        for (int i = 0; i < 10; i++) {
-            Event newEvent = new Event();
-            newEvent.locationString = "test";
-            newEvent.imageUrl = "https://i.redd.it/tpsnoz5bzo501.jpg";
-            mEvents.add(newEvent);
-        }
-
     }
 }

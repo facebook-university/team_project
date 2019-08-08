@@ -7,25 +7,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-
-import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.text.Layout;
-import android.view.GestureDetector;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -44,18 +36,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.parceler.Parcels;
 
 import java.util.Calendar;
-import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity {
 
     private BottomNavigationView mBottomNavigationView;
-    private DrawerLayout mDrawerNav;
 
     private NotificationsFragment mNotificationsFragment = new NotificationsFragment();
     private MapFragment mMapFragment = new MapFragment();
@@ -63,21 +52,21 @@ public class HomeActivity extends AppCompatActivity {
     private ListFragment mListFragment = new ListFragment();
     private Fragment mDefaultFragment;
     private DialogFragment mDialogFragment;
-
     public User currentUser;
-
+    private ProgressBar mProgressSpinner;
     private Button mBtnSwap;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
     private String mStack = "map";
+    private String mClickedOnID;
+    private Boolean mIsOnProfileView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        mDrawerNav = findViewById(R.id.drawerNav);
 
         currentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
 
@@ -89,10 +78,13 @@ public class HomeActivity extends AppCompatActivity {
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
 
+        mProgressSpinner = findViewById(R.id.progressSpinner);
+        setLoading(false);
         mBtnSwap = findViewById(R.id.btnSwap);
         mBtnSwap.setVisibility(View.INVISIBLE);
         mBtnSwap.setText(R.string.swap_list);
         mIsOnMapView = true;
+        mIsOnProfileView = true;
 
         mBtnSwap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +98,6 @@ public class HomeActivity extends AppCompatActivity {
                 .addToBackStack(mStack)
                 .commit();
 
-        createDrawerNav();
         createBottomNav();
         if (!currentUser.isOrg) {
             setUpNotificationWorker();
@@ -124,7 +115,7 @@ public class HomeActivity extends AppCompatActivity {
                 Fragment fragment = null;
                 switch (item.getItemId()) {
                     case R.id.action_notify:
-                        lockDrawer();
+                        mIsOnProfileView = false;
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
@@ -133,7 +124,7 @@ public class HomeActivity extends AppCompatActivity {
                         mStack = "notify";
                         break;
                     case R.id.action_map:
-                        lockDrawer();
+                        mIsOnProfileView = false;
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
@@ -142,7 +133,7 @@ public class HomeActivity extends AppCompatActivity {
                         mShowButton = true;
                         break;
                     case R.id.action_profile:
-                        mDrawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                        mIsOnProfileView = true;
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
@@ -155,7 +146,7 @@ public class HomeActivity extends AppCompatActivity {
                         .replace(R.id.flContainer, fragment)
                         .addToBackStack(mStack)
                         .commit();
-                if(mShowButton) {
+                if (mShowButton) {
                     mBtnSwap.setVisibility(View.VISIBLE);
                 } else {
                     mBtnSwap.setVisibility(View.INVISIBLE);
@@ -165,42 +156,32 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private void createDrawerNav() {
-        Button logOutBtn = findViewById(R.id.logout);
-
-        logOutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        NavigationView mNavigationView = findViewById(R.id.settings_navigation);
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.shareFacebook:
-                        navigationHelper(ShareEventActivity.class);
-                        return true;
-                    case R.id.editProfile:
-                        navigationHelper(EditProfileActivity.class);
-                        return true;
-                    case R.id.logout:
-                        // TO DO
-                        return true;
-                }
-                return true;
-            }
-        });
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.profile_settings_drawer, menu);
+        return true;
     }
 
-    private void lockDrawer() {
-        mDrawerNav.closeDrawers();
-        mDrawerNav.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.edit_profile:
+                navigationHelper(EditProfileActivity.class);
+                break;
+
+            case R.id.log_out:
+                FirebaseAuth.getInstance().signOut();
+                navigationHelper(LoginActivity.class);
+                break;
+
+            case R.id.searchEvents:
+                mDialogFragment = SearchDialogFragment.newInstance(mMapFragment.getOrgNames());
+                mDialogFragment.show(getSupportFragmentManager(), "dialog");
+                break;
+        }
+        return true;
     }
 
     private void navigationHelper(Class navigateToClass) {
@@ -237,25 +218,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.searchEvents:
-                mDialogFragment = SearchDialogFragment.newInstance(mMapFragment.getOrgNames());
-                mDialogFragment.show(getSupportFragmentManager(), "dialog");
-                return true;
-            default:
-                break;
-        }
-        return false;
-    }
-
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 12);
@@ -267,7 +229,7 @@ public class HomeActivity extends AppCompatActivity {
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, 0);
-        AlarmManager alarmManageram = (AlarmManager)getSystemService(ALARM_SERVICE);
+        AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, mPendingIntent);
@@ -279,6 +241,22 @@ public class HomeActivity extends AppCompatActivity {
 
     public LatLng getMarkerLatLng() {
         return markerLatLng;
+    }
+
+    public void setMarkerLatLng(LatLng markerLatLng) {
+        this.markerLatLng = markerLatLng;
+    }
+
+    public String getClickedOnID() {
+        return mClickedOnID;
+    }
+
+    public void setClickedOnID(String mClickedOnID) {
+        this.mClickedOnID = mClickedOnID;
+    }
+
+    public void setClickedOnIdToNull() {
+        mClickedOnID = null;
     }
 
     public static class MyReceiver extends BroadcastReceiver {
@@ -294,5 +272,13 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    public void setLoading(boolean isLoading) {
+        if(isLoading) {
+            mProgressSpinner.setVisibility(View.VISIBLE);
+        } else {
+            mProgressSpinner.setVisibility(View.GONE);
+        }
     }
 }

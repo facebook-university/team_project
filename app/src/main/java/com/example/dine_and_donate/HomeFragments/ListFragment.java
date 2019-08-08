@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Adapters.EventListViewAdapter;
 import com.example.dine_and_donate.Adapters.RestaurantListViewAdapter;
-import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.SearchDialogFragment;
@@ -66,7 +65,7 @@ public class ListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivity = (HomeActivity) getActivity();
-        if(mActivity.currentUser.isOrg) {
+        if (mActivity.currentUser.isOrg) {
             mOrgAdapter = new RestaurantListViewAdapter(mRestaurantsJSON, mLocation);
         } else {
             mUserAdapter = new EventListViewAdapter(mAllEvents,mIdToRestaurant, mIdToOrg, queryOrgId);
@@ -79,13 +78,14 @@ public class ListFragment extends Fragment {
         mRvNearbyList = view.findViewById(R.id.rvNearbyList);
         mRvNearbyList.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
-        if(mActivity.currentUser.isOrg) {
+        if (mActivity.currentUser.isOrg) {
             mOrgAdapter.notifyDataSetChanged();
             mRvNearbyList.setAdapter(mOrgAdapter);
         } else {
-            // todo: fill rv with event info
-            mUserAdapter.notifyDataSetChanged();
-            mRvNearbyList.setAdapter(mUserAdapter);
+            if (mUserAdapter.getItemCount() != 0) {
+                mUserAdapter.notifyDataSetChanged();
+                mRvNearbyList.setAdapter(mUserAdapter);
+            }
         }
     }
 
