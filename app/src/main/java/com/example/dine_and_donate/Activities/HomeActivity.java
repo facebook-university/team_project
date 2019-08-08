@@ -58,6 +58,7 @@ public class HomeActivity extends AppCompatActivity {
     private Button mBtnSwap;
     private boolean mShowButton = false;
     private boolean mIsOnMapView;
+    private boolean mIsOnNotifications;
     private PendingIntent mPendingIntent;
     public LatLng markerLatLng;
     private String mStack = "map";
@@ -121,6 +122,7 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mNotificationsFragment;
+                        mIsOnNotifications = true;
                         mShowButton = false;
                         mStack = "notify";
                         break;
@@ -130,6 +132,7 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
                         fragment = mIsOnMapView ? mMapFragment : mListFragment;
+                        mIsOnNotifications = false;
                         mStack = mIsOnMapView ? "map" : "list";
                         mShowButton = true;
                         break;
@@ -139,6 +142,7 @@ public class HomeActivity extends AppCompatActivity {
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
                         fragment = mProfileFragment;
+                        mIsOnNotifications = false;
                         mShowButton = false;
                         mStack = "profile";
                         break;
@@ -191,7 +195,10 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
+    // todo: this function should be made cleaner
     public void setExploreTab(final String query) {
+
         if (mShowButton) {
             if (mIsOnMapView || (query != null)) {
                 mListFragment = new ListFragment();
@@ -215,15 +222,26 @@ public class HomeActivity extends AppCompatActivity {
                 getSupportFragmentManager().popBackStack("map", 0);
                 mIsOnMapView = true;
                 mBtnSwap.setText(R.string.swap_list);
-                // if an item on the list was clicked, generate markers and zoom to selected location
-                if (mClickedOnID != null) {
-                    if (!currentUser.isOrg) {
-                        mMapFragment.generateMarkersEvents();
-                    } else {
-                        Location currentLocation = mMapFragment.getCurrentLocation();
-                        mMapFragment.generateMarkersRestaurants(Double.toString(currentLocation.getLongitude()), Double.toString(currentLocation.getLatitude()));
-                    }
-                }
+            }
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.flContainer, mMapFragment)
+                    .addToBackStack(null)
+                    .commit();
+            mIsOnMapView = true;
+            mIsOnNotifications = false;
+            mBtnSwap.setText(R.string.swap_list);
+            mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+            mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
+            mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
+        }
+        // if an item on the list was clicked, generate markers and zoom to selected location
+        if (mClickedOnID != null) {
+            if (!currentUser.isOrg) {
+                mMapFragment.generateMarkersEvents();
+            } else {
+                Location currentLocation = mMapFragment.getCurrentLocation();
+                mMapFragment.generateMarkersRestaurants(Double.toString(currentLocation.getLongitude()), Double.toString(currentLocation.getLatitude()));
             }
         }
     }
