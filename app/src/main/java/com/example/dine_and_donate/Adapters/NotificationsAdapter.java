@@ -62,7 +62,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 // todo: get location from event, pass to home activity
                 HomeActivity homeActivity = (HomeActivity) mContext;
 //                homeActivity.setClickedOnID(viewHolder.notification.getEventId());
-                homeActivity.setExploreTab();
+                //homeActivity.setExploreTab();
                 //homeActivity.setLoading(true);
             }
         });
@@ -79,8 +79,9 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         User org = mIdToOrg.get(notification.getOrgId());
         String yelpId = notification.getYelpId();
 
-        mEventsRef = mRef.child("events").child(yelpId).child(eventId);
-        mEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        holder.yelpId = yelpId;
+        mNotificationsRef = mRef.child("events").child(yelpId).child(eventId);
+        mNotificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String formattedInfo = "<b>" + "" + "</b>" + " organized an event at " + "<b>" + getRestaurantName(dataSnapshot.child("locationString").getValue().toString()) + "</b>" + "!";
@@ -141,6 +142,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         public TextView mPartner;
         public TextView mNotifiedAt;
         public Notification notification;
+        public androidx.constraintlayout.widget.ConstraintLayout mItem;
+        public String yelpId;
 
         //constructor takes in an inflated layout
         public ViewHolder(View itemView) {
@@ -154,9 +157,10 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 //        @Override
 //        //TODO not finished
 //        public void onClick(View v) {
+//            Toast.makeText(mContext, "hello", Toast.LENGTH_SHORT).show();
 //            HomeActivity homeActivity = (HomeActivity) mContext;
-////                homeActivity.setClickedOnID(viewHolder.notification.yelpID);
-//            homeActivity.setExploreTab();
+//            homeActivity.setClickedOnID(yelpId);
+//            homeActivity.setExploreTab(null);
 //            homeActivity.setLoading(true);
 //        }
     }

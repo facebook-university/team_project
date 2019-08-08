@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
-        android:id="@+id/createEvent"
+        android:id="@+id/searchEvents"
         android:orderInCategory="100"
         android:visible="true"
-        android:title="Create Event"
-        android:icon="@drawable/icons8_add_64"
-        android:color="#fff"
+        android:title="Search Events"
+        android:icon="@drawable/quantum_ic_search_grey600_24"
+        android:color="@color/brown"
         app:showAsAction="always" />
 </menu>

@@ -36,9 +36,9 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
     private HashMap<String, JSONObject> mIdToRestaurant;
     private HashMap<String, User> mIdToOrg;
 
-    public EventListViewAdapter(DataSnapshot allEvents, HashMap<String, JSONObject> mIdToRestaurant, HashMap<String, User> mIdToOrg) {
-        for (DataSnapshot ds : allEvents.getChildren()) {
-            mEvents.addAll(Event.eventsHappeningAtRestaurant(ds));
+    public EventListViewAdapter(DataSnapshot allEvents, HashMap<String, JSONObject> mIdToRestaurant, HashMap<String, User> mIdToOrg, String id) {
+        for(DataSnapshot ds : allEvents.getChildren()) {
+            mEvents.addAll(Event.eventsHappeningAtRestaurant(ds, id));
         }
         this.mIdToRestaurant = mIdToRestaurant;
         this.mIdToOrg = mIdToOrg;
@@ -58,7 +58,7 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
                 // todo: get location from event, pass to home activity
                 HomeActivity homeActivity = (HomeActivity) context;
                 homeActivity.setClickedOnID(viewHolder.event.yelpID);
-                homeActivity.setExploreTab();
+                homeActivity.setExploreTab(null);
                 homeActivity.setLoading(true);
             }
         });

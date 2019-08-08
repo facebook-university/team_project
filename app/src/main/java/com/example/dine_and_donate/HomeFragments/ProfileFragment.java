@@ -43,7 +43,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-
         mVoucherView = view.findViewById(R.id.viewpager_id);
         mVoucherPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
         mVoucherView.setAdapter(mVoucherPagerAdapter);

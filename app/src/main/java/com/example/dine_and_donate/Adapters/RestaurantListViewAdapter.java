@@ -46,7 +46,7 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
                 // todo: get location from event, pass to home activity
                 HomeActivity homeActivity = (HomeActivity) context;
                 homeActivity.setClickedOnID(viewHolder.yelpId);
-                homeActivity.setExploreTab();
+                homeActivity.setExploreTab(null);
                 homeActivity.setLoading(true);
             }
         });
