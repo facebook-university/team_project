@@ -209,7 +209,7 @@ public class SignUpActivity extends AppCompatActivity implements AdapterView.OnI
         Intent intent = new Intent(SignUpActivity.this, goToClass);
         intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCreatedUser));
         startActivity(intent);
-        setLoading(false);
         finish();
+        setLoading(false);
     }
 }

@@ -52,7 +52,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/instagram_user_outline_24" />
+                    app:srcCompat="@drawable/like" />
 
                 <TextView
                     android:id="@+id/cons_name"
@@ -82,7 +82,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:src="@drawable/instagram_user_outline_24" />
+                    android:src="@drawable/like" />
 
                 <ImageView
                     android:id="@+id/blurred_org_pic"

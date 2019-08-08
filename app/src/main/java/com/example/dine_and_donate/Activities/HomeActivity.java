@@ -98,7 +98,7 @@ public class HomeActivity extends AppCompatActivity {
     private void createBottomNav() {
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
         Integer iconFilledDefault = (mDefaultFragment.equals(mMapFragment)) ? R.drawable.icons8_map_filled_50
-                : R.drawable.instagram_user_filled_24;
+                : R.drawable.like_filled;
         mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(iconFilledDefault);
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -108,7 +108,7 @@ public class HomeActivity extends AppCompatActivity {
                     case R.id.action_notify:
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_filled_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
-                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like);
                         mBtnSwap.setVisible(false);
                         mSearch.setVisible(false);
                         mLogOut.setVisible(true);
@@ -121,7 +121,7 @@ public class HomeActivity extends AppCompatActivity {
                     case R.id.action_map:
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
-                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_outline_24);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like);
                         mBtnSwap.setVisible(true);
                         mSearch.setVisible(!currentUser.isOrg);
                         mLogOut.setVisible(false);
@@ -138,7 +138,7 @@ public class HomeActivity extends AppCompatActivity {
                         mEditProfile.setVisible(true);
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
-                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.instagram_user_filled_24);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like_filled);
                         fragment = mProfileFragment;
                         mIsOnNotifications = false;
                         mShowButton = false;

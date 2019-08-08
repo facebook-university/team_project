@@ -175,9 +175,9 @@ public class LoginActivity extends AppCompatActivity {
             intent.putExtra("longitude", longitude);
             intent.putExtra("defaultFragment", defaultFragment);
         }
-        setLoading(false);
         startActivity(intent);
         finish();
+        setLoading(false);
     }
 
     private void showSplash(boolean show) {
