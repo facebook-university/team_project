@@ -1,10 +1,17 @@
 package com.example.dine_and_donate.Activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -40,14 +47,20 @@ import com.google.firebase.storage.UploadTask;
 
 import org.parceler.Parcels;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class EventActivity extends AppCompatActivity {
 
     final private static int GALLERY_REQUEST_CODE = 100;
+    final private static String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
     private FirebaseAuth mAuth;
     private FirebaseDatabase mDatabase;
@@ -150,7 +163,13 @@ public class EventActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                if (mSelectedImage != null) {
+                if (mEditEvent != null) {
+                    writeEvent(yelpId, mEditEvent.imageUrl);
+                } else {
+                    if (mSelectedImage == null) {
+                        Bitmap bitmap = createVoucher();
+                        mSelectedImage = getImageUri(getApplicationContext(), bitmap);
+                    }
                     final StorageReference ref = mStorageRef.child("images/" + mSelectedImage.getLastPathSegment());
                     UploadTask uploadTask = ref.putFile(mSelectedImage);
 
@@ -175,10 +194,6 @@ public class EventActivity extends AppCompatActivity {
                             }
                         }
                     });
-                } else if (mEditEvent != null) {
-                    writeEvent(yelpId, mEditEvent.imageUrl);
-                } else {
-                    Toast.makeText(EventActivity.this, "Please select voucher image", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -247,4 +262,50 @@ public class EventActivity extends AppCompatActivity {
         cal.set(Calendar.MINUTE, tp.getCurrentMinute());
         return cal.getTime();
     }
+
+    private Bitmap createVoucher() {
+        Bitmap src = BitmapFactory.decodeResource(getResources(), R.drawable.yourimage); // the original file yourimage.jpg i added in resources
+        Bitmap dest = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas cs = new Canvas(dest);
+        Paint tPaint = new Paint();
+        tPaint.setTextSize(30);
+        tPaint.setColor(getResources().getColor(R.color.brown));
+        tPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        tPaint.setTextAlign(Paint.Align.CENTER);
+        cs.drawBitmap(src, 0f, 0f, null);
+
+        float x_coord = src.getWidth()/2;
+        cs.drawText("Come support the Dine & Donate for", x_coord, src.getHeight() /3 , tPaint); // 15f is to put space between top edge and the text, if you want to change it, you can
+        cs.drawText(mCurrUser.name, x_coord, src.getHeight() / 3 + 50, tPaint);
+        String[] location = mLocationString.split("\\r?\\n");
+        cs.drawText("@ " + location[0], x_coord, src.getHeight() / 3 + 100, tPaint);
+        tPaint.setTextSize(20);
+        cs.drawText(location[1], x_coord, src.getHeight() / 3 + 150, tPaint);
+        Date start = dateFromPicker(mStartTimePicker);
+        // todo: get the month/day from calendar not time picker
+        String month = months[start.getMonth() - 1];
+        String day = Integer.toString(start.getDay());
+        int startHour = start.getHours();
+        String startTime = startHour > 12 ? (startHour % 12) + ":" + start.getMinutes() + "pm" : startHour + ":" + start.getMinutes() + "am";
+        Date end = dateFromPicker(mEndTimePicker);
+        int endHour = end.getHours();
+        String endTime = endHour > 12 ? (endHour % 12) + ":" + end.getMinutes() + "pm" : endHour + ":" + end.getMinutes() + "am";
+        cs.drawText(month + " " + day + ", " + startTime + " - " + endTime, x_coord, src.getHeight() / 3 + 200, tPaint);
+        try {
+            dest.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File("/sdcard/ImageAfterAddingText.jpg")));
+            // dest is Bitmap, if you want to preview the final image, you can display it on screen also before saving
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return dest;
+    }
+
+    private Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
 }
