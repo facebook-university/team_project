@@ -65,6 +65,8 @@ public class HomeActivity extends AppCompatActivity {
     public LatLng markerLatLng;
     private String mStack = "map";
     private String mClickedOnID;
+    private Boolean mIsOnProfileView;
+    private boolean mNewSavedEvent = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -285,6 +287,14 @@ public class HomeActivity extends AppCompatActivity {
 
     public void setClickedOnIdToNull() {
         mClickedOnID = null;
+    }
+
+    public boolean isNewSavedEvent() {
+        return mNewSavedEvent;
+    }
+
+    public void setNewSavedEvent(boolean mNewSavedEvent) {
+        this.mNewSavedEvent = mNewSavedEvent;
     }
 
     public static class MyReceiver extends BroadcastReceiver {

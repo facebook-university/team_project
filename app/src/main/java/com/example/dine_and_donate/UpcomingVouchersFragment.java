@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 
 public class UpcomingVouchersFragment extends Fragment {
@@ -38,6 +39,15 @@ public class UpcomingVouchersFragment extends Fragment {
     private TabFragmentHelper mTabFragmentHelper;
     private StaggeredRecyclerViewAdapter mStaggeredRecyclerViewAdapter;
     private ArrayList<Event> mEvents = new ArrayList<>();
+    private HomeActivity mHomeActivity;
+    private HashSet<String> mAlreadyLoaded;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mHomeActivity = (HomeActivity) getActivity();
+        mAlreadyLoaded = new HashSet<>();
+    }
 
     //create view based on data in array lists, inflates the layout of the fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -59,9 +69,10 @@ public class UpcomingVouchersFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(mView, savedInstanceState);
-        if (mStaggeredRecyclerViewAdapter.getItemCount() == 0) {
+        if (mStaggeredRecyclerViewAdapter.getItemCount() == 0 || mHomeActivity.isNewSavedEvent()) {
             mEmptyView.setVisibility(View.VISIBLE);
             loadVouchers();
+            mHomeActivity.setNewSavedEvent(false);
         } else {
             mEmptyView.setVisibility(View.GONE);
         }
@@ -70,7 +81,7 @@ public class UpcomingVouchersFragment extends Fragment {
     private void loadVouchers() {
         mRef = FirebaseDatabase.getInstance().getReference();
         mRefForEvent = mRef.child("events");
-
+        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -80,8 +91,9 @@ public class UpcomingVouchersFragment extends Fragment {
                     //iterate through all events at that restaurant
                     for (DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
-                        if (mSavedEventsIDs.containsKey(dsEvent.getKey())) {
+                        if (mSavedEventsIDs.containsKey(dsEvent.getKey()) && !mAlreadyLoaded.contains(dsEvent.getKey())) {
                             mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
+                            mAlreadyLoaded.add(dsEvent.getKey());
                         }
                     }
                 }
