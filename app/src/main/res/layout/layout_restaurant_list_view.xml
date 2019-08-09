@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.google.android.material.card.MaterialCardView android:id="@+id/cardView"
+<com.google.android.material.card.MaterialCardView xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardElevation="2dp"
@@ -12,9 +13,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="@dimen/list_margin">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,16 +21,15 @@
 
         <TextView
             android:id="@+id/tvRestaurantName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="19dp"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
+            android:ellipsize="end"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
+            android:maxWidth="220dp"
             android:text="Restaurant Name"
             android:textSize="16dp"
-            app:layout_constraintEnd_toStartOf="@+id/ivRestaurant"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -72,13 +70,22 @@
             app:layout_constraintTop_toBottomOf="@+id/tvDistance" />
 
         <ImageView
+            android:id="@+id/isVerified"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginLeft="6dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvRestaurantName"
+            app:layout_constraintStart_toEndOf="@+id/tvRestaurantName"
+            app:layout_constraintTop_toTopOf="@+id/tvRestaurantName"
+            app:srcCompat="@drawable/check" />
+
+        <ImageView
             android:id="@+id/ivRestaurant"
-            android:layout_width="136dp"
+            android:layout_width="135dp"
             android:layout_height="95dp"
-            android:layout_marginStart="268dp"
-            android:layout_marginLeft="268dp"
             android:scaleType="centerCrop"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@color/black" />
 

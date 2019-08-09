@@ -64,12 +64,19 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
             String restLatitude = coordinates.getString("latitude");
             String restLongitude = coordinates.getString("longitude");
 
+            if (Boolean.parseBoolean(restaurant.get("isVerified").toString())) {
+                holder.isVerified.setVisibility(View.VISIBLE);
+            } else {
+                holder.isVerified.setVisibility(View.INVISIBLE);
+            }
+
             holder.tvDistance.setText(MapFragment.distance(mCurrentLocation.getLatitude(),
                     mCurrentLocation.getLongitude(),
                     Double.parseDouble(restLatitude),
                     Double.parseDouble(restLongitude)) + " miles away");
 
             holder.tvInfo.setText(restaurant.getJSONArray("categories").getJSONObject(0).getString("title"));
+
             Glide.with(context)
                     .load(restaurant.getString("image_url"))
                     .into(holder.ivPicture);
@@ -91,6 +98,7 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
         public TextView tvInfo;
         public RatingBar ratingBar;
         public String yelpId;
+        public ImageView isVerified;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -99,6 +107,7 @@ public class RestaurantListViewAdapter extends RecyclerView.Adapter<RestaurantLi
             tvInfo = itemView.findViewById(R.id.tvDescription);
             ivPicture = itemView.findViewById(R.id.ivRestaurant);
             ratingBar = itemView.findViewById(R.id.ratingBar);
+            isVerified = itemView.findViewById(R.id.isVerified);
         }
     }
 }
