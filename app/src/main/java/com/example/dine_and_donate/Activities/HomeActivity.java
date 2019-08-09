@@ -51,7 +51,6 @@ public class HomeActivity extends AppCompatActivity {
     private MapFragment mMapFragment = new MapFragment();
     private ProfileFragment mProfileFragment = new ProfileFragment();
     private ListFragment mListFragment = new ListFragment();
-    private Fragment mDefaultFragment;
     private DialogFragment mDialogFragment;
     public User currentUser;
     private MenuItem mProgressSpinner;
@@ -77,7 +76,6 @@ public class HomeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.top_bar);
 
-        mDefaultFragment = (getIntent().getStringExtra("defaultFragment") != null) ? mMapFragment : mProfileFragment;
         String latitude = getIntent().getStringExtra("latitude");
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
@@ -85,7 +83,7 @@ public class HomeActivity extends AppCompatActivity {
         mIsOnMapView = true;
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.flContainer, mDefaultFragment)
+                .replace(R.id.flContainer, mMapFragment)
                 .addToBackStack(mStack)
                 .commit();
 
@@ -97,9 +95,10 @@ public class HomeActivity extends AppCompatActivity {
 
     private void createBottomNav() {
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
-        Integer iconFilledDefault = (mDefaultFragment.equals(mMapFragment)) ? R.drawable.icons8_map_filled_50
-                : R.drawable.like_filled;
-        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(iconFilledDefault);
+        Integer iconFilledDefault = R.drawable.icons8_map_filled_50;
+        MenuItem defaultMap = mBottomNavigationView.getMenu().findItem(R.id.action_map);
+        defaultMap.setIcon(iconFilledDefault);
+        defaultMap.setChecked(true);
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
