@@ -570,6 +570,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mBtnEvent.setText(getString(R.string.saved));
         } else {
             mBtnEvent.setText(getString(R.string.save));
+            homeActivity.setNewSavedEvent(true);
             mBtnEvent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

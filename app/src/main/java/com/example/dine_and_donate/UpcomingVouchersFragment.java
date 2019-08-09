@@ -23,9 +23,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Map;
 
 public class UpcomingVouchersFragment extends Fragment {
@@ -77,23 +79,23 @@ public class UpcomingVouchersFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(mView, savedInstanceState);
+        mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
+        Log.d("size", mStaggeredRecyclerViewAdapter.getItemCount() + "");
 
-            mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
-            Log.d("size", mStaggeredRecyclerViewAdapter.getItemCount() + "");
         if (mStaggeredRecyclerViewAdapter.getItemCount() == 0 || mHomeActivity.isNewSavedEvent()) {
-                mEmptyView.setVisibility(View.VISIBLE);
-                loadVouchers();
-                mHomeActivity.setNewSavedEvent(false);
-            } else {
-                mEmptyView.setVisibility(View.GONE);
-            }
-
+            mEmptyView.setVisibility(View.VISIBLE);
+            loadVouchers();
+            mHomeActivity.setNewSavedEvent(false);
+        } else {
+            mEmptyView.setVisibility(View.GONE);
+        }
     }
 
     private void loadVouchers() {
         mRef = FirebaseDatabase.getInstance().getReference();
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRefForEvent = mRef.child("events");
+        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
