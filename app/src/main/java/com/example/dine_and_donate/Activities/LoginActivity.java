@@ -99,8 +99,8 @@ public class LoginActivity extends AppCompatActivity {
         mProgressSpinner = menu.findItem(R.id.miActionProgress);
         //if someone is already signed in, skip sign in process
         if (mFbUser != null) {
-            showSplash(true);
             setLoading(true);
+            showSplash(true);
             createUserModel();
         } else {
             showSplash(false);

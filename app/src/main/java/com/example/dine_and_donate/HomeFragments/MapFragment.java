@@ -67,6 +67,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -85,6 +86,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcels;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -243,7 +245,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Marker marker = map.addMarker(new MarkerOptions().position(restaurantPosition).title(restaurantName));
+                                // get restaurant length name
+                                // if divisible by three, make verified
+                                // number of past fundraisers is length of name divided by two
+                                boolean isVerified = ((double) restaurantName.length() % 6.0) == 0.0;
+                                try {
+                                    restaurantJSON.put("isVerified", isVerified);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                Float hue = isVerified ? BitmapDescriptorFactory.HUE_AZURE : BitmapDescriptorFactory.HUE_RED;
+                                Marker marker = map.addMarker(new MarkerOptions()
+                                        .position(restaurantPosition)
+                                        .title(restaurantName)
+                                        .icon(BitmapDescriptorFactory.defaultMarker(hue)));
+
                                 marker.setTag(restaurantJSON);
                                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                     @Override
@@ -367,6 +384,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             RatingBar rating = slideView.findViewById(R.id.ratingBar);
             TextView typeOfFood = slideView.findViewById(R.id.tvDescription);
             TextView milesAway = slideView.findViewById(R.id.tvDistance);
+
+            // set verification
+            if (mCurrentUser.isOrg) {
+                ImageView verfiedBadge = slideView.findViewById(R.id.isVerified);
+                TextView numOfPastEvents = slideView.findViewById(R.id.numOfEvents);
+                if (!Boolean.parseBoolean(restaurant.get("isVerified").toString())) {
+                    verfiedBadge.setVisibility(View.GONE);
+                    numOfPastEvents.setVisibility(View.GONE);
+                } else {
+                    verfiedBadge.setVisibility(View.VISIBLE);
+                    numOfPastEvents.setVisibility(View.VISIBLE);
+                    numOfPastEvents.setText(getString(R.string.past_fundraisers, restName.length() / 2));
+                }
+            }
 
             String foodCategories;
 
