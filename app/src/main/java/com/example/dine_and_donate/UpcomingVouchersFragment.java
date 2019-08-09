@@ -92,7 +92,7 @@ public class UpcomingVouchersFragment extends Fragment {
                     for (DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
                         if (mSavedEventsIDs.containsKey(dsEvent.getKey()) && !mAlreadyLoaded.contains(dsEvent.getKey())) {
-                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
+                            mTabFragmentHelper.initBitmapsEvents(dsEvent.getValue(Event.class));
                             mAlreadyLoaded.add(dsEvent.getKey());
                         }
                     }

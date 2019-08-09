@@ -16,11 +16,8 @@ public class TabFragmentHelper {
     }
 
     //add images and descriptions to respective arrayLists
-    public void initBitmapsEvents(String urls, String descriptions) {
-        Event newEvent = new Event();
-        newEvent.locationString = descriptions;
-        newEvent.imageUrl = urls;
-        mEvents.add(newEvent);
+    public void initBitmapsEvents(Event event) {
+        mEvents.add(event);
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
     }
 }

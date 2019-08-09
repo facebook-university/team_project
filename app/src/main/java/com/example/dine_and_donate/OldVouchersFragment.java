@@ -80,7 +80,7 @@ public class OldVouchersFragment extends Fragment {
                         if (pastEvents.containsKey(dsEvent.getKey())) {
                             //if event end date is older than today's date, it is a past event
                             if (Long.toString(dateMillis).compareTo(dsEvent.child("endTime").toString()) > 0) {
-                                mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
+                                mTabFragmentHelper.initBitmapsEvents(dsEvent.getValue(Event.class));
                             }
                         }
                     }
