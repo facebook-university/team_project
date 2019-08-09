@@ -264,12 +264,12 @@ public class EventActivity extends AppCompatActivity {
     }
 
     private Bitmap createVoucher() {
-        Bitmap src = BitmapFactory.decodeResource(getResources(), R.drawable.yourimage); // the original file yourimage.jpg i added in resources
+        Bitmap src = BitmapFactory.decodeResource(getResources(), R.drawable.background1);
         Bitmap dest = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
 
         Canvas cs = new Canvas(dest);
         Paint tPaint = new Paint();
-        tPaint.setTextSize(30);
+        tPaint.setTextSize(80);
         tPaint.setColor(getResources().getColor(R.color.brown));
         tPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         tPaint.setTextAlign(Paint.Align.CENTER);
@@ -277,21 +277,20 @@ public class EventActivity extends AppCompatActivity {
 
         float x_coord = src.getWidth()/2;
         cs.drawText("Come support the Dine & Donate for", x_coord, src.getHeight() /3 , tPaint); // 15f is to put space between top edge and the text, if you want to change it, you can
-        cs.drawText(mCurrUser.name, x_coord, src.getHeight() / 3 + 50, tPaint);
+        cs.drawText(mCurrUser.name, x_coord, src.getHeight() / 3 + 200, tPaint);
         String[] location = mLocationString.split("\\r?\\n");
-        cs.drawText("@ " + location[0], x_coord, src.getHeight() / 3 + 100, tPaint);
-        tPaint.setTextSize(20);
-        cs.drawText(location[1], x_coord, src.getHeight() / 3 + 150, tPaint);
+        cs.drawText("@ " + location[0], x_coord, src.getHeight() / 3 + 400, tPaint);
+        tPaint.setTextSize(55);
+        cs.drawText(location[1], x_coord, src.getHeight() / 3 + 600, tPaint);
+        String month = months[mMonth];
+        int day = mDay;
         Date start = dateFromPicker(mStartTimePicker);
-        // todo: get the month/day from calendar not time picker
-        String month = months[start.getMonth() - 1];
-        String day = Integer.toString(start.getDay());
         int startHour = start.getHours();
         String startTime = startHour > 12 ? (startHour % 12) + ":" + start.getMinutes() + "pm" : startHour + ":" + start.getMinutes() + "am";
         Date end = dateFromPicker(mEndTimePicker);
         int endHour = end.getHours();
         String endTime = endHour > 12 ? (endHour % 12) + ":" + end.getMinutes() + "pm" : endHour + ":" + end.getMinutes() + "am";
-        cs.drawText(month + " " + day + ", " + startTime + " - " + endTime, x_coord, src.getHeight() / 3 + 200, tPaint);
+        cs.drawText(month + " " + day + ", " + startTime + " - " + endTime, x_coord, src.getHeight() / 3 + 800, tPaint);
         try {
             dest.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File("/sdcard/ImageAfterAddingText.jpg")));
             // dest is Bitmap, if you want to preview the final image, you can display it on screen also before saving
