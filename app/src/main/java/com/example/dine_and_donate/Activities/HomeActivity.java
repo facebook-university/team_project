@@ -135,7 +135,6 @@ public class HomeActivity extends AppCompatActivity {
                         mShowButton = true;
                         break;
                     case R.id.action_profile:
-
                         mBtnSwap.setVisible(false);
                         mSearch.setVisible(false);
                         mLogOut.setVisible(true);
