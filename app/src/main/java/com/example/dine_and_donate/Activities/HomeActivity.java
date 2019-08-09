@@ -58,7 +58,7 @@ public class HomeActivity extends AppCompatActivity {
     private MenuItem mLogOut;
     private MenuItem mSearch;
     private MenuItem mEditProfile;
-    private boolean mShowButton = false;
+    private boolean mShowButton = true;
     private boolean mIsOnMapView;
     private boolean mIsOnNotifications;
     private PendingIntent mPendingIntent;
@@ -163,11 +163,11 @@ public class HomeActivity extends AppCompatActivity {
         mEditProfile = menu.findItem(R.id.edit_profile);
         mBtnSwap.setTitle(R.string.swap_list);
         mBtnSwap.setIcon(R.drawable.list);
-        if (!mShowButton) {
-            mBtnSwap.setVisible(false);
-            mSearch.setVisible(false);
-            mLogOut.setVisible(true);
-            mEditProfile.setVisible(true);
+        if (mShowButton) {
+            mBtnSwap.setVisible(true);
+            mSearch.setVisible(!currentUser.isOrg);
+            mLogOut.setVisible(false);
+            mEditProfile.setVisible(false);
         }
         return true;
     }
