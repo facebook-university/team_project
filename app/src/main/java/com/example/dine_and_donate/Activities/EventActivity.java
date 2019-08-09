@@ -195,10 +195,6 @@ public class EventActivity extends AppCompatActivity {
                         }
                     });
                 }
-                Intent intent = new Intent(EventActivity.this, HomeActivity.class);
-                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
-                startActivity(intent);
-                finish();
             }
         });
     }
@@ -208,14 +204,14 @@ public class EventActivity extends AppCompatActivity {
         String orgId = mFirebaseCurrentUser.getUid();
         Date startTime = dateFromPicker(mStartTimePicker);
         Date endTime = dateFromPicker(mEndTimePicker);
-        if(startTime.after(endTime)) {
+        if (startTime.after(endTime)) {
             Toast.makeText(this, "Start time must be before end time", Toast.LENGTH_LONG).show();
             return;
         }
-//        if(!startTime.after(new Date())) {
-//            Toast.makeText(this, "Date of event must must be after current date", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
+        if (!startTime.after(new Date())) {
+            Toast.makeText(this, "Date of event must must be after current date", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String info = mEtEventInfo.getText().toString();
 
         String id = mEditEvent == null ? UUID.randomUUID().toString() : mEditEvent.eventId;
@@ -227,12 +223,13 @@ public class EventActivity extends AppCompatActivity {
                 if (databaseError == null) {
                     mCreatedEvents.put(databaseReference.getKey(), yelpId);
                     mRef.child("users").child(mFirebaseCurrentUser.getUid()).child("Events").setValue(mCreatedEvents);
-                    Intent intent = new Intent(EventActivity.this, HomeActivity.class);
-                    intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
                 }
+                Intent intent = new Intent(EventActivity.this, HomeActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
+                startActivity(intent);
             }
         });
-
+        finish();
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -278,8 +275,8 @@ public class EventActivity extends AppCompatActivity {
         tPaint.setTextAlign(Paint.Align.CENTER);
         cs.drawBitmap(src, 0f, 0f, null);
 
-        float x_coord = src.getWidth()/2;
-        cs.drawText("Come support the Dine & Donate for", x_coord, src.getHeight() /3 , tPaint);
+        float x_coord = src.getWidth() / 2;
+        cs.drawText("Come support the Dine & Donate for", x_coord, src.getHeight() / 3, tPaint);
         cs.drawText(mCurrUser.name, x_coord, src.getHeight() / 3 + 200, tPaint);
         String[] location = mLocationString.split("\\r?\\n");
         cs.drawText("@ " + location[0], x_coord, src.getHeight() / 3 + 400, tPaint);

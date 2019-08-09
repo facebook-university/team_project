@@ -65,6 +65,8 @@ public class HomeActivity extends AppCompatActivity {
     public LatLng markerLatLng;
     private String mStack = "map";
     private String mClickedOnID;
+    private Boolean mIsOnProfileView;
+    private boolean mNewSavedEvent = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,12 +90,8 @@ public class HomeActivity extends AppCompatActivity {
                 .commit();
 
         createBottomNav();
-
         if (!currentUser.isOrg) {
-            //createConsumerBottomNav();
             setUpNotificationWorker();
-        } else {
-
         }
     }
 
@@ -188,7 +186,6 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.log_out:
                 FirebaseAuth.getInstance().signOut();
                 navigationHelper(LoginActivity.class);
-                finish();
                 break;
 
             case R.id.searchEvents:
@@ -252,13 +249,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setUpNotificationWorker() {
-
-//        mNotificationsFragment = new NotificationsFragment();
-//        mNotificationsFragment.setIdToOrg(mNotificationsFragment.getIdToOrg());
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 9);
-        calendar.set(Calendar.MINUTE, 18);
-        calendar.set(Calendar.SECOND, 40);
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 00);
+        calendar.set(Calendar.SECOND, 00);
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
             calendar.add(Calendar.DATE, 1);
         }
@@ -268,7 +262,7 @@ public class HomeActivity extends AppCompatActivity {
         AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_FIFTEEN_MINUTES, mPendingIntent);
+                AlarmManager.INTERVAL_DAY, mPendingIntent);
     }
 
     public void setMarkerLatLngToNull() {
@@ -295,6 +289,14 @@ public class HomeActivity extends AppCompatActivity {
         mClickedOnID = null;
     }
 
+    public boolean isNewSavedEvent() {
+        return mNewSavedEvent;
+    }
+
+    public void setNewSavedEvent(boolean mNewSavedEvent) {
+        this.mNewSavedEvent = mNewSavedEvent;
+    }
+
     public static class MyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -311,7 +313,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void setLoading(boolean isLoading) {
-        if(isLoading) {
+        if (isLoading) {
             mProgressSpinner.setVisible(true);
         } else {
             mProgressSpinner.setVisible(false);

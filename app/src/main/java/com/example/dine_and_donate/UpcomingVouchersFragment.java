@@ -23,7 +23,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
@@ -40,11 +40,15 @@ public class UpcomingVouchersFragment extends Fragment {
     private TabFragmentHelper mTabFragmentHelper;
     private StaggeredRecyclerViewAdapter mStaggeredRecyclerViewAdapter;
     private ArrayList<Event> mEvents = new ArrayList<>();
+    private HomeActivity mHomeActivity;
+    private HashSet<String> mAlreadyLoaded;
 
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mHomeActivity = (HomeActivity) getActivity();
+        mAlreadyLoaded = new HashSet<>();
     }
 
     //create view based on data in array lists, inflates the layout of the fragment
@@ -58,6 +62,7 @@ public class UpcomingVouchersFragment extends Fragment {
         mStaggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
         mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter, false);
 //        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
@@ -72,18 +77,22 @@ public class UpcomingVouchersFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(mView, savedInstanceState);
-        mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
-        Log.d("size", mStaggeredRecyclerViewAdapter.getItemCount() + "");
-        if (mStaggeredRecyclerViewAdapter.getItemCount() == 0) {
-            mEmptyView.setVisibility(View.VISIBLE);
-            loadVouchers();
-        } else {
-            mEmptyView.setVisibility(View.GONE);
-        }
+
+            mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
+            Log.d("size", mStaggeredRecyclerViewAdapter.getItemCount() + "");
+        if (mStaggeredRecyclerViewAdapter.getItemCount() == 0 || mHomeActivity.isNewSavedEvent()) {
+                mEmptyView.setVisibility(View.VISIBLE);
+                loadVouchers();
+                mHomeActivity.setNewSavedEvent(false);
+            } else {
+                mEmptyView.setVisibility(View.GONE);
+            }
+
     }
 
     private void loadVouchers() {
         mRef = FirebaseDatabase.getInstance().getReference();
+        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRefForEvent = mRef.child("events");
         mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
