@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="left"
     android:id="@+id/lnrTitle"
     android:gravity="center_horizontal">
 
@@ -11,10 +12,10 @@
         android:id="@+id/imgHeader"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal|center"
-        android:gravity="center"
-        android:padding="14dp"
-        android:scaleType="centerInside"
+        android:gravity="left"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:scaleType="fitStart"
         app:srcCompat="@drawable/namebrown" />
 
 </LinearLayout>
