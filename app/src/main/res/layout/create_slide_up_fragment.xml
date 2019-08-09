@@ -101,7 +101,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ivRestaurant" />
 
     <ImageView
-        android:id="@+id/isVerfied"
+        android:id="@+id/isVerified"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginTop="8dp"
@@ -119,9 +119,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:text="3 past fundraisers"
-        app:layout_constraintBottom_toBottomOf="@+id/isVerfied"
-        app:layout_constraintStart_toEndOf="@+id/isVerfied"
-        app:layout_constraintTop_toTopOf="@+id/isVerfied" />
+        app:layout_constraintBottom_toBottomOf="@+id/isVerified"
+        app:layout_constraintStart_toEndOf="@+id/isVerified"
+        app:layout_constraintTop_toTopOf="@+id/isVerified" />
 
     <TextView
         android:id="@+id/phone_number"

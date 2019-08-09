@@ -44,5 +44,5 @@
     <string name="upload_voucher_image">Upload Voucher Image</string>
     <string name="miles">%1$s miles away</string>
     <string name="main_info_event"><![CDATA[<b>%1$s</b> is having a Dine &amp; Donate here on <b>%2$s</b> from <b>%3$s</b> to <b>%4$s</b>]]></string>
-
+    <string name="past_fundraisers">%1$d past fundraisers</string>
 </resources>
