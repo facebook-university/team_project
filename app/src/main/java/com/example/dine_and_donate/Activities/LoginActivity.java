@@ -109,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void setLoading(boolean isLoading) {
-        if(isLoading) {
+        if (isLoading) {
             mProgressSpinner.setVisible(true);
         } else {
             mProgressSpinner.setVisible(false);
@@ -190,5 +190,4 @@ public class LoginActivity extends AppCompatActivity {
         mSignup.setVisibility(visAll);
         mTvAsk.setVisibility(visAll);
     }
-
 }

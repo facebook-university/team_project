@@ -84,7 +84,6 @@ public class ProfileFragment extends Fragment {
                 .load(mCurrentUserModel.getImageUrl())
                 .apply(requestOptions)
                 .into(mProfPic);
-
     }
 
     //set up for top of profile page based on user type

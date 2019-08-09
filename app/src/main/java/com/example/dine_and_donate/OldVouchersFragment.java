@@ -2,6 +2,7 @@ package com.example.dine_and_donate;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Map;
 
 public class OldVouchersFragment extends Fragment {
@@ -34,13 +36,10 @@ public class OldVouchersFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private TabFragmentHelper mTabFragmentHelper;
     private Context mContext;
-    private ArrayList<Event> mEvents;
+    private ArrayList<Event> mEvents = new ArrayList<>();
     private TextView mEmptyView;
-
-    //default constructor
-    public OldVouchersFragment() {
-        mEvents = new ArrayList<>();
-    }
+    private HomeActivity mHomeActivity;
+    private HashSet<String> mAlreadyLoaded;
 
     //inflates layout of fragment
     private Map<String, String> pastEvents;
@@ -49,32 +48,45 @@ public class OldVouchersFragment extends Fragment {
     private DatabaseReference mRefForEvent;
     private StaggeredRecyclerViewAdapter mStaggeredRecyclerViewAdapter;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mHomeActivity = (HomeActivity) getActivity();
+        mAlreadyLoaded = new HashSet<>();
+    }
+
     //inflates layout of fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        HomeActivity homeActivity = (HomeActivity) getActivity();
+        mCurrUser = homeActivity.currentUser;
+        pastEvents = mCurrUser.getSavedEventsIDs();
+
         mView = inflater.inflate(R.layout.tab_fragment, container, false);
-        mEmptyView = mView.findViewById(R.id.empty_view);
         mRecyclerView = mView.findViewById(R.id.rv_vouchers);
+        mEmptyView = mView.findViewById(R.id.empty_view);
         mStaggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
         mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter, true);
         super.onViewCreated(mView, savedInstanceState);
-        return mView;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
-        HomeActivity homeActivity = (HomeActivity) getActivity();
-        mCurrUser = homeActivity.currentUser;
-        super.onViewCreated(mView, savedInstanceState);
-        pastEvents = mCurrUser.getSavedEventsIDs();
         if (pastEvents.size() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
         } else {
             mEmptyView.setVisibility(View.GONE);
         }
-        loadVouchers();
+        return mView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(mView, savedInstanceState);
+        pastEvents = mCurrUser.getSavedEventsIDs();
+        if (mStaggeredRecyclerViewAdapter.getItemCount() == 0 || mHomeActivity.isNewSavedEvent()) {
+            loadVouchers();
+            mHomeActivity.setNewSavedEvent(false);
+        }
     }
 
     public void loadVouchers() {

@@ -45,7 +45,6 @@ public class UpcomingVouchersFragment extends Fragment {
     private HomeActivity mHomeActivity;
     private HashSet<String> mAlreadyLoaded;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,12 +66,11 @@ public class UpcomingVouchersFragment extends Fragment {
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
         mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter, false);
-//        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
-//        if (mSavedEventsIDs.size() == 0) {
-//            mEmptyView.setVisibility(View.VISIBLE);
-//        } else {
-//            mEmptyView.setVisibility(View.GONE);
-//        }
+        if (mSavedEventsIDs.size() == 0) {
+            mEmptyView.setVisibility(View.VISIBLE);
+        } else {
+            mEmptyView.setVisibility(View.GONE);
+        }
         return mView;
     }
 
@@ -83,11 +81,8 @@ public class UpcomingVouchersFragment extends Fragment {
         Log.d("size", mStaggeredRecyclerViewAdapter.getItemCount() + "");
 
         if (mStaggeredRecyclerViewAdapter.getItemCount() == 0 || mHomeActivity.isNewSavedEvent()) {
-            mEmptyView.setVisibility(View.VISIBLE);
             loadVouchers();
             mHomeActivity.setNewSavedEvent(false);
-        } else {
-            mEmptyView.setVisibility(View.GONE);
         }
     }
 

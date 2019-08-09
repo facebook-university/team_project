@@ -206,7 +206,6 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
     // todo: this function should be made cleaner
     public void setExploreTab(final String query) {
 

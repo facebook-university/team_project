@@ -105,7 +105,6 @@ public class EditProfileActivity extends AppCompatActivity {
                     mEditNumber.setText(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 

@@ -168,15 +168,5 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             mPartner = itemView.findViewById(R.id.partnered_with_tv);
             mNotifiedAt = itemView.findViewById(R.id.notified_at_tv);
         }
-
-//        @Override
-//        //TODO not finished
-//        public void onClick(View v) {
-//            Toast.makeText(mContext, "hello", Toast.LENGTH_SHORT).show();
-//            HomeActivity homeActivity = (HomeActivity) mContext;
-//            homeActivity.setClickedOnID(yelpId);
-//            homeActivity.setExploreTab(null);
-//            homeActivity.setLoading(true);
-//        }
     }
 }
