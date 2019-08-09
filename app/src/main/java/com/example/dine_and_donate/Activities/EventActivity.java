@@ -276,7 +276,7 @@ public class EventActivity extends AppCompatActivity {
         cs.drawBitmap(src, 0f, 0f, null);
 
         float x_coord = src.getWidth()/2;
-        cs.drawText("Come support the Dine & Donate for", x_coord, src.getHeight() /3 , tPaint); // 15f is to put space between top edge and the text, if you want to change it, you can
+        cs.drawText("Come support the Dine & Donate for", x_coord, src.getHeight() /3 , tPaint);
         cs.drawText(mCurrUser.name, x_coord, src.getHeight() / 3 + 200, tPaint);
         String[] location = mLocationString.split("\\r?\\n");
         cs.drawText("@ " + location[0], x_coord, src.getHeight() / 3 + 400, tPaint);
@@ -293,7 +293,6 @@ public class EventActivity extends AppCompatActivity {
         cs.drawText(month + " " + day + ", " + startTime + " - " + endTime, x_coord, src.getHeight() / 3 + 800, tPaint);
         try {
             dest.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File("/sdcard/ImageAfterAddingText.jpg")));
-            // dest is Bitmap, if you want to preview the final image, you can display it on screen also before saving
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
