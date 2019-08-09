@@ -3,6 +3,7 @@ package com.example.dine_and_donate.Adapters;
 import android.content.Context;
 import android.text.Html;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Notification;
 import com.example.dine_and_donate.Models.User;
@@ -73,10 +76,12 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     //bind the values based on the position of the element, called as a user scrolls down
     public void onBindViewHolder(final ViewHolder holder, int position) {
         //get data according to position
-        Notification notification = mNotifications.get(position);
+        Notification notification = mNotifications.get(0);
         String eventId = notification.getEventId();
 
+        Log.d("orgId", notification.getOrgId() + "");
         User org = mIdToOrg.get(notification.getOrgId());
+
         String yelpId = notification.getYelpId();
 
         holder.yelpId = yelpId;
@@ -101,6 +106,16 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                         DateUtils.FORMAT_ABBREV_TIME);
 
         holder.mStartDate.setText(relativeDate);
+
+
+        RequestOptions requestOptions = new RequestOptions()
+                .placeholder(R.drawable.instagram_user_outline_24);
+
+//        Glide.with(mContext)
+//                .load(org.getImageUrl())
+//                .apply(requestOptions)
+//                .into(holder.mOrgPic);
+
     }
 
     private String getRestaurantName(String entireLocation) {

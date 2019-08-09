@@ -14,13 +14,13 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:fitsSystemWindows="true"
+        android:layout_marginBottom="10dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/htab_collapse_toolbar"
             android:layout_width="match_parent"
             android:layout_height="240dp"
-            android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:titleEnabled="false">
@@ -36,7 +36,8 @@
             <FrameLayout
                 android:id="@+id/frameLayout"
                 android:layout_width="match_parent"
-                android:layout_height="127dp">
+                android:layout_height="127dp"
+                >
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
@@ -46,27 +47,15 @@
                     android:background="@drawable/background"
                     android:outlineAmbientShadowColor="@color/black"
                     app:cardCornerRadius="5dp"
-                    app:cardElevation="1dp">
+                    app:cardElevation="1dp"
+                    >
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/forConsumer"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
-                        <de.hdodenhof.circleimageview.CircleImageView
-                            android:id="@+id/cons_prof_pic"
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
-                            app:civ_border_color="#FF000000"
-                            app:civ_border_width="1.7dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintCircleRadius="700dp"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintHorizontal_bias="0.481"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_bias="0.162"
-                            app:srcCompat="@drawable/instagram_user_outline_24" />
+
 
                         <ImageView
                             android:id="@+id/blurred_consumer_pic"
@@ -77,23 +66,43 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/background" />
+                            app:srcCompat="@drawable/background"/>
 
+                        <ImageView
+                            android:id="@+id/cons_prof_pic"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="16dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <!--<de.hdodenhof.circleimageview.CircleImageView-->
+                            <!--android:id="@+id/cons_prof_pic"-->
+                            <!--android:layout_width="70dp"-->
+                            <!--android:layout_height="70dp"-->
+                            <!--app:civ_border_color="#FF000000"-->
+                            <!--app:civ_border_width="1.7dp"-->
+                            <!--app:layout_constraintCircleRadius="700dp"-->
+                            <!--app:layout_constraintEnd_toEndOf="parent"-->
+                            <!--app:layout_constraintStart_toStartOf="parent"-->
+                            <!--app:layout_constraintTop_toTopOf="parent"-->
+                            <!--app:srcCompat="@drawable/instagram_user_outline_24" />-->
 
                         <TextView
                             android:id="@+id/cons_name"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="TextView"
+                            android:textAlignment="center"
                             android:textColor="#000000"
                             android:textSize="20sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            android:textAlignment="center"
-                            app:layout_constraintTop_toBottomOf="@+id/cons_prof_pic" />
+                            app:layout_constraintTop_toBottomOf="@+id/cons_prof_pic"
+                             />
                     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/forOrg"
@@ -106,23 +115,22 @@
                             android:layout_height="70dp"
                             android:layout_marginStart="36dp"
                             android:layout_marginLeft="36dp"
-                            android:srcCompat="@drawable/instagram_user_outline_24"
                             app:civ_border_color="#FF000000"
                             app:civ_border_width="1.2dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintBottom_toBottomOf="@+id/forOrg"
+                            app:layout_constraintStart_toStartOf="@+id/forOrg"
+                            app:layout_constraintTop_toTopOf="@+id/forOrg" />
 
-                        <ImageView
-                            android:id="@+id/blurred_org_pic"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:scaleType="centerCrop"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/background" />
+                        <!--<ImageView-->
+                            <!--android:id="@+id/blurred_org_pic"-->
+                            <!--android:layout_width="0dp"-->
+                            <!--android:layout_height="0dp"-->
+                            <!--android:scaleType="centerCrop"-->
+                            <!--app:layout_constraintBottom_toBottomOf="parent"-->
+                            <!--app:layout_constraintEnd_toEndOf="parent"-->
+                            <!--app:layout_constraintStart_toStartOf="parent"-->
+                            <!--app:layout_constraintTop_toTopOf="parent"-->
+                            <!--app:srcCompat="@drawable/background" />-->
 
                         <TextView
                             android:id="@+id/org_name"
@@ -160,6 +168,7 @@
                 android:layout_height="55dp"
                 android:layout_gravity="bottom"
                 android:elevation="60dp"
+                android:layout_marginTop="60dp"
                 android:outlineAmbientShadowColor="@color/black"
                 app:tabGravity="fill"
                 app:tabIndicatorColor="#4089ff"
@@ -171,12 +180,11 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewpager_id"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/seaFoam"
+        android:background="#f2edf0"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

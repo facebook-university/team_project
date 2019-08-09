@@ -180,6 +180,10 @@ public class EventActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(EventActivity.this, "Please select voucher image", Toast.LENGTH_SHORT).show();
                 }
+                Intent intent = new Intent(EventActivity.this, HomeActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
+                startActivity(intent);
+                finish();
             }
         });
     }
@@ -208,13 +212,12 @@ public class EventActivity extends AppCompatActivity {
                 if (databaseError == null) {
                     mCreatedEvents.put(databaseReference.getKey(), yelpId);
                     mRef.child("users").child(mFirebaseCurrentUser.getUid()).child("Events").setValue(mCreatedEvents);
+                    Intent intent = new Intent(EventActivity.this, HomeActivity.class);
+                    intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
                 }
-                Intent intent = new Intent(EventActivity.this, HomeActivity.class);
-                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
-                startActivity(intent);
             }
         });
-        finish();
+
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

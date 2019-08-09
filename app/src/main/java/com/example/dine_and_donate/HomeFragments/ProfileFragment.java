@@ -53,6 +53,7 @@ public class ProfileFragment extends Fragment {
         mVoucherView = view.findViewById(R.id.viewpager_id);
         mVoucherPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
         mVoucherView.setAdapter(mVoucherPagerAdapter);
+        mVoucherPagerAdapter.notifyDataSetChanged();
         return view;
     }
 
@@ -79,9 +80,6 @@ public class ProfileFragment extends Fragment {
                 .placeholder(R.drawable.instagram_user_outline_24);
 
 
-//        app:src="@drawable/instagram_user_outline_24"
-        Log.d("image URL", mCurrentUserModel.name + "");
-        Log.d("image URL", mCurrentUserModel.imageUrl + "");
         Glide.with(getActivity())
                 .load(mCurrentUserModel.getImageUrl())
                 .apply(requestOptions)

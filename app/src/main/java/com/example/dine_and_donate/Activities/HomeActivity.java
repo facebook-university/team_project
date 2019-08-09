@@ -258,9 +258,9 @@ public class HomeActivity extends AppCompatActivity {
 //        mNotificationsFragment = new NotificationsFragment();
 //        mNotificationsFragment.setIdToOrg(mNotificationsFragment.getIdToOrg());
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 17);
-        calendar.set(Calendar.SECOND, 00);
+        calendar.set(Calendar.HOUR_OF_DAY, 9);
+        calendar.set(Calendar.MINUTE, 18);
+        calendar.set(Calendar.SECOND, 40);
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
             calendar.add(Calendar.DATE, 1);
         }

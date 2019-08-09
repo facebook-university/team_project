@@ -59,28 +59,27 @@ public class OldVouchersFragment extends Fragment {
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
         mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter, true);
+        super.onViewCreated(mView, savedInstanceState);
         return mView;
     }
 
-
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
+        HomeActivity homeActivity = (HomeActivity) getActivity();
+        mCurrUser = homeActivity.currentUser;
         super.onViewCreated(mView, savedInstanceState);
-        if (mStaggeredRecyclerViewAdapter.getItemCount() == 0) {
+        pastEvents = mCurrUser.getSavedEventsIDs();
+        if (pastEvents.size() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
-            loadVouchers();
         } else {
             mEmptyView.setVisibility(View.GONE);
         }
+        loadVouchers();
     }
 
     public void loadVouchers() {
         mRef = FirebaseDatabase.getInstance().getReference();
         mRefForEvent = mRef.child("events");
-
-        HomeActivity homeActivity = (HomeActivity) getActivity();
-        mCurrUser = homeActivity.currentUser;
-        pastEvents = mCurrUser.getSavedEventsIDs();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -94,6 +93,7 @@ public class OldVouchersFragment extends Fragment {
                             //if event end date is older than today's date, it is a past event
                             long otherMillis = Long.parseLong(dsEvent.child("endTime").getValue().toString());
                             mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), dateMillis, otherMillis);
+                            mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
                         }
                     }
                 }
@@ -104,10 +104,5 @@ public class OldVouchersFragment extends Fragment {
 
             }
         });
-
-        StaggeredRecyclerViewAdapter staggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
-        mRecyclerView.setAdapter(staggeredRecyclerViewAdapter);
     }
 }

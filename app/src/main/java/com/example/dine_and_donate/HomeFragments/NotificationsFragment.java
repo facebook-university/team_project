@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.dine_and_donate.Adapters.NotificationsAdapter;
 import com.example.dine_and_donate.Models.Notification;
 import com.example.dine_and_donate.Models.User;
@@ -61,6 +63,7 @@ public class NotificationsFragment extends Fragment {
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mNotificationsAdapter);
+
         loadTopNotifications(0);
     }
 
@@ -86,6 +89,7 @@ public class NotificationsFragment extends Fragment {
 
             }
         });
+
     }
 
     public void setIdToOrg(HashMap<String, User> mIdToOrg) {

@@ -41,26 +41,39 @@ public class UpcomingVouchersFragment extends Fragment {
     private StaggeredRecyclerViewAdapter mStaggeredRecyclerViewAdapter;
     private ArrayList<Event> mEvents = new ArrayList<>();
 
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     //create view based on data in array lists, inflates the layout of the fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         HomeActivity homeActivity = (HomeActivity) getActivity();
         mCurrUser = homeActivity.currentUser;
-
+        mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
         mView = inflater.inflate(R.layout.tab_fragment, container, false);
         mRecyclerView = mView.findViewById(R.id.rv_vouchers);
         mEmptyView = mView.findViewById(R.id.empty_view);
         mStaggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
-        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
         mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter, false);
+//        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
+//        if (mSavedEventsIDs.size() == 0) {
+//            mEmptyView.setVisibility(View.VISIBLE);
+//        } else {
+//            mEmptyView.setVisibility(View.GONE);
+//        }
         return mView;
     }
 
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(mView, savedInstanceState);
+        mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
+        Log.d("size", mStaggeredRecyclerViewAdapter.getItemCount() + "");
         if (mStaggeredRecyclerViewAdapter.getItemCount() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
             loadVouchers();
@@ -72,9 +85,6 @@ public class UpcomingVouchersFragment extends Fragment {
     private void loadVouchers() {
         mRef = FirebaseDatabase.getInstance().getReference();
         mRefForEvent = mRef.child("events");
-
-
-
         mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -86,11 +96,10 @@ public class UpcomingVouchersFragment extends Fragment {
                         //that event is saved, should be added to arrayList
                         if (mSavedEventsIDs.containsKey(dsEvent.getKey())) {
                             long currMillis = Calendar.getInstance().getTimeInMillis();
-                            Log.d("today", currMillis + "");
                             //if event end date is older than today's date, it is a past event
                             long eventMillis = Long.parseLong(dsEvent.child("endTime").getValue().toString());
-                            Log.d("event end", eventMillis + "");
                             mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), currMillis, eventMillis);
+                            mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
                         }
                     }
                 }
