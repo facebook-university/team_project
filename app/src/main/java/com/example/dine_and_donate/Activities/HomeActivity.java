@@ -68,7 +68,6 @@ public class HomeActivity extends AppCompatActivity {
     private Boolean mIsOnProfileView;
     private boolean mNewSavedEvent = false;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
