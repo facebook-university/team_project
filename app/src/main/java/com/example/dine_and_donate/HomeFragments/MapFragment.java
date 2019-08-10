@@ -329,11 +329,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                             }
                                         });
                                         try {
-                                            if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
+                                            if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())
+                                                || homeActivity.getMarkerLatLng() != null) {
                                                 // simulates marker click
                                                 clickMarkerEvent(marker);
                                                 homeActivity.setClickedOnID(null);
                                                 homeActivity.setLoading(false);
+                                                homeActivity.setMarkerLatLngToNull();
                                             }
                                         } catch (JSONException e) {
                                             e.printStackTrace();
@@ -570,6 +572,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mBtnEvent.setText(getString(R.string.saved));
         } else {
             mBtnEvent.setText(getString(R.string.save));
+            homeActivity.setNewSavedEvent(true);
             mBtnEvent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

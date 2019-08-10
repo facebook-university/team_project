@@ -128,27 +128,6 @@ public class NotifyWorker extends Worker {
         });
     }
 
-//    private String getOrgPic(String orgId) {
-//        mOrgUri = new String[1];
-//        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-//        DatabaseReference mRef = mDatabase.getReference();
-//        DatabaseReference ref = mRef.child("users").child(orgId).child("profPic");
-//        ref.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                mOrgUri[0] = dataSnapshot.getValue().toString();
-//                Log.d("url1", mOrgUri[0] + "");
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//        Log.d("url", mOrgUri[0] + "");
-//        return mOrgUri[0];
-//    }
-
     private void displayNotification(String title, String body, String latitude, String longitude, String eventKey, String createdAt, String orgPicUri) {
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         String NOTIFICATION_CHANNEL_ID = "com.example.dine_and_donate";

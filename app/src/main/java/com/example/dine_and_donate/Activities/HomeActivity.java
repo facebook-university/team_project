@@ -54,8 +54,9 @@ public class HomeActivity extends AppCompatActivity {
     public LatLng markerLatLng;
     private String mStack = "map";
     private String mClickedOnID;
+    private Boolean mIsOnProfileView;
+    private boolean mNewSavedEvent = false;
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -239,13 +240,13 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 6);
-        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 18);
+        calendar.set(Calendar.MINUTE, 28);
         calendar.set(Calendar.SECOND, 0);
 
-        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
-            calendar.add(Calendar.MINUTE, 15);
-        }
+//        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+//            calendar.add(Calendar.MINUTE, 15);
+//        }
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
         triggerNotification.setAction("com.example.dine_and_donate.Notifications");
@@ -278,6 +279,14 @@ public class HomeActivity extends AppCompatActivity {
 
     public void setClickedOnIdToNull() {
         mClickedOnID = null;
+    }
+
+    public boolean isNewSavedEvent() {
+        return mNewSavedEvent;
+    }
+
+    public void setNewSavedEvent(boolean mNewSavedEvent) {
+        this.mNewSavedEvent = mNewSavedEvent;
     }
 
     @Override
