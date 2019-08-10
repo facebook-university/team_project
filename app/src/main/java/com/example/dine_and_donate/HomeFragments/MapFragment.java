@@ -329,7 +329,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                             }
                                         });
                                         try {
-                                            if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
+                                            if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())
+                                                || homeActivity.getMarkerLatLng() != null) {
                                                 // simulates marker click
                                                 clickMarkerEvent(marker);
                                                 homeActivity.setClickedOnID(null);
@@ -367,7 +368,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             DataSnapshot eventsOfRestaurant = mAllEvents.child(restaurantOfMarker.getString("id"));
 
             slideUpMenuSave(restaurantOfMarker, eventsOfRestaurant);
-            map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
+            if (homeActivity.getMarkerLatLng() != null) {
+                homeActivity.setMarkerLatLngToNull();
+            } else {
+                map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
+            }
 
             slideViewIsUp = true;
         } catch (JSONException e) {
@@ -651,7 +656,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         onLocationChanged(location);
                         if (location != null) {
                             if (!cameraSet) {
-                                LatLng initialLatLng = homeActivity.getMarkerLatLng() != null ? homeActivity.markerLatLng
+                                LatLng initialLatLng = homeActivity.getMarkerLatLng() != null ? homeActivity.getMarkerLatLng()
                                         : new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
                                 map.moveCamera(CameraUpdateFactory.newLatLng(initialLatLng));
                                 map.animateCamera(CameraUpdateFactory.zoomTo(15));
@@ -692,7 +697,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     public void onLocationResult(LocationResult locationResult) {
                         onLocationChanged(locationResult.getLastLocation());
                         if (!cameraSet) {
-                            LatLng initialLatLng = homeActivity.getMarkerLatLng() != null ? homeActivity.markerLatLng
+                            LatLng initialLatLng = homeActivity.getMarkerLatLng() != null ? homeActivity.getMarkerLatLng()
                                     : new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
                             map.moveCamera(CameraUpdateFactory.newLatLng(initialLatLng));
                             map.animateCamera(CameraUpdateFactory.zoomTo(15));

@@ -1,40 +1,29 @@
 package com.example.dine_and_donate.Activities;
 
 import android.app.AlarmManager;
-import android.app.FragmentTransaction;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
 import com.example.dine_and_donate.HomeFragments.ListFragment;
 import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.HomeFragments.NotificationsFragment;
 import com.example.dine_and_donate.HomeFragments.ProfileFragment;
+import com.example.dine_and_donate.Notifications.MyReceiver;
 import com.example.dine_and_donate.Models.User;
-import com.example.dine_and_donate.NotifyWorker;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.SearchDialogFragment;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -82,6 +71,8 @@ public class HomeActivity extends AppCompatActivity {
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
 
+        System.out.println("HERE: " + markerLatLng);
+
         mIsOnMapView = true;
 
         getSupportFragmentManager().beginTransaction()
@@ -90,6 +81,7 @@ public class HomeActivity extends AppCompatActivity {
                 .commit();
 
         createBottomNav();
+        boolean bool = currentUser.isOrg;
         if (!currentUser.isOrg) {
             setUpNotificationWorker();
         }
@@ -250,8 +242,10 @@ public class HomeActivity extends AppCompatActivity {
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 00);
-        calendar.set(Calendar.SECOND, 00);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        // if time already happened, adds one day to trigger notification
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
             calendar.add(Calendar.DATE, 1);
         }
@@ -261,7 +255,7 @@ public class HomeActivity extends AppCompatActivity {
         AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, mPendingIntent);
+                AlarmManager.INTERVAL_FIFTEEN_MINUTES, mPendingIntent);
     }
 
     public void setMarkerLatLngToNull() {
@@ -294,16 +288,6 @@ public class HomeActivity extends AppCompatActivity {
 
     public void setNewSavedEvent(boolean mNewSavedEvent) {
         this.mNewSavedEvent = mNewSavedEvent;
-    }
-
-    public static class MyReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            WorkManager workManager;
-            workManager = WorkManager.getInstance(context);
-            // Enqueue our work to manager
-            workManager.enqueue(OneTimeWorkRequest.from(NotifyWorker.class));
-        }
     }
 
     @Override

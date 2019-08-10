@@ -52,6 +52,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -91,6 +92,7 @@ public class EventActivity extends AppCompatActivity {
     private Event mEditEvent;
     private String mLocationString;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -209,10 +211,12 @@ public class EventActivity extends AppCompatActivity {
             Toast.makeText(this, "Start time must be before end time", Toast.LENGTH_LONG).show();
             return;
         }
-        if (!startTime.after(new Date())) {
-            Toast.makeText(this, "Date of event must must be after current date", Toast.LENGTH_SHORT).show();
-            return;
-        }
+
+//        if (!startTime.after(new Date())) {
+//            Toast.makeText(this, "Date of event must must be after current date", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+
         String info = mEtEventInfo.getText().toString();
 
         String id = mEditEvent == null ? UUID.randomUUID().toString() : mEditEvent.eventId;

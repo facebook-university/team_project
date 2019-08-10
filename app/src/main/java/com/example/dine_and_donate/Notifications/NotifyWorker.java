@@ -1,4 +1,4 @@
-package com.example.dine_and_donate;
+package com.example.dine_and_donate.Notifications;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -17,8 +17,12 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.example.dine_and_donate.Activities.LoginActivity;
+import com.example.dine_and_donate.HomeFragments.MapFragment;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Notification;
+import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.YelpService;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,6 +46,7 @@ public class NotifyWorker extends Worker {
     private Event mEventToday = null;
     private Notification mNewNotification;
     private DatabaseReference mRef;
+    private FirebaseDatabase mDatabase;
     private FirebaseUser mFbUser;
     private DatabaseReference mNotificationRef;
     private Integer mCounter = 0;
@@ -79,11 +84,14 @@ public class NotifyWorker extends Worker {
                     while (mCounter < restaurantsNearbyJSON.length()) {
                         final JSONObject restaurantJSON = restaurantsNearbyJSON.getJSONObject(mCounter);
                         final String yelpID = restaurantJSON.getString("id");
+                        final String restaurantName = restaurantJSON.getString("name");
                         final String latitude = restaurantJSON.getJSONObject("coordinates").getString("latitude");
                         final String longitude = restaurantJSON.getJSONObject("coordinates").getString("longitude");
 
-                        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-                        DatabaseReference mRef = mDatabase.getReference();
+                        mDatabase = FirebaseDatabase.getInstance();
+                        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
+                        mRef = mDatabase.getReference();
+                        mNotificationRef = mRef.child("users").child(mFbUser.getUid()).getRef().child("Notifications").push();
                         DatabaseReference ref = mRef.child("events");
 
                         ref.child(yelpID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -102,7 +110,7 @@ public class NotifyWorker extends Worker {
                                             String eventId = eventChild.child("eventId").getValue().toString();
                                             String orgId = eventChild.child("orgId").getValue().toString();
                                             mEventToday = new Event(orgId, yelpID, locationString, startTime, dateOfEvent, info, imageURL, eventId);
-                                            displayNotification(mEventToday.locationString, mEventToday.info, latitude, longitude, eventChild.getKey(), timeNow.toString(), "");
+                                            displayNotification(latitude, longitude, eventChild.getKey(), timeNow.toString(), restaurantName);
                                             mCounter = restaurantsNearbyJSON.length();
                                             return;
                                         }
@@ -124,9 +132,9 @@ public class NotifyWorker extends Worker {
         });
     }
 
-    private void displayNotification(String title, String body, String latitude, String longitude, String eventKey, String createdAt, String orgId) {
-        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        String NOTIFICATION_CHANNEL_ID = "com.example.dine_and_donate";
+    private void displayNotification(final String latitude, final String longitude, final String eventKey, final String createdAt, final String restaurantName) {
+        final NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        final String NOTIFICATION_CHANNEL_ID = "com.example.dine_and_donate";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Notification",
@@ -140,32 +148,41 @@ public class NotifyWorker extends Worker {
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        Intent seeEventDetails = new Intent(getApplicationContext(), LoginActivity.class);
-        seeEventDetails.putExtra("latitude", latitude);
-        seeEventDetails.putExtra("longitude", longitude);
-        seeEventDetails.putExtra("defaultFragment", "map");
+        mRef.child("users").child(mEventToday.orgId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String orgName = dataSnapshot.child("name").getValue().toString();
 
-        int uniqueInt = (int) (System.currentTimeMillis() & 0xfffffff);
-        PendingIntent pendingIntentEvents = PendingIntent.getActivity(getApplicationContext(), uniqueInt, seeEventDetails, PendingIntent.FLAG_UPDATE_CURRENT);
+                Intent seeEventDetails = new Intent(getApplicationContext(), LoginActivity.class);
+                seeEventDetails.putExtra("latitude", latitude);
+                seeEventDetails.putExtra("longitude", longitude);
+                seeEventDetails.putExtra("defaultFragment", "map");
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
+                int uniqueInt = (int) (System.currentTimeMillis() & 0xfffffff);
 
-        notificationBuilder
-                .setDefaults(android.app.Notification.DEFAULT_ALL)
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.drawable.baker)
-                .setContentIntent(pendingIntentEvents)
-                .setContentTitle(title)
-                .setAutoCancel(true)
-                .setContentText(body);
+                PendingIntent pendingIntentEvents = PendingIntent.getActivity(getApplicationContext(), uniqueInt, seeEventDetails, PendingIntent.FLAG_ONE_SHOT);
+                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
 
-        notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
+                notificationBuilder
+                        .setDefaults(android.app.Notification.DEFAULT_ALL)
+                        .setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.drawable.notification_logo)
+                        .setContentIntent(pendingIntentEvents)
+                        .setContentTitle("Dine & Donate at " + restaurantName + " today!")
+                        .setAutoCancel(true)
+                        .setContentText("Come support " + orgName + " at " + MapFragment.getDate(mEventToday.startTime, "h:mm a"));
 
-//        mFbUser = FirebaseAuth.getInstance().getCurrentUser();
-//        mRef = FirebaseDatabase.getInstance().getReference();
-        //add notification to database here; event id, yelp id and createdAt
-        mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt, orgId);
-        mNotificationRef = mRef.child("users").child(mFbUser.getUid()).getRef().child("Notifications").push();
+                notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt, mEventToday.orgId);
+
         mRef.child("users").child(mFbUser.getUid()).child("Notifications").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

@@ -79,7 +79,6 @@ public class ProfileFragment extends Fragment {
         RequestOptions requestOptions = new RequestOptions()
                 .placeholder(R.drawable.instagram_user_outline_24);
 
-
         Glide.with(getActivity())
                 .load(mCurrentUserModel.getImageUrl())
                 .apply(requestOptions)
