@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -104,7 +105,6 @@ public class EditProfileActivity extends AppCompatActivity {
                     mEditNumber.setText(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -171,6 +171,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                 downloadUri[0] = task.getResult();
                                 String s = downloadUri[0].toString();
                                 mCurrentUser.setImageUrl(s);
+                                Log.d("url", mCurrentUser.getImageUrl());
                                 mRefForUser.child("imageUrl").setValue(s);
                                 Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
                                 intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));
@@ -224,5 +225,4 @@ public class EditProfileActivity extends AppCompatActivity {
         }
     }
 }
-
 

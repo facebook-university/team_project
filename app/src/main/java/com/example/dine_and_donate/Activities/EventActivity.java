@@ -29,6 +29,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.dine_and_donate.HomeFragments.ProfileFragment;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
@@ -204,11 +205,11 @@ public class EventActivity extends AppCompatActivity {
         String orgId = mFirebaseCurrentUser.getUid();
         Date startTime = dateFromPicker(mStartTimePicker);
         Date endTime = dateFromPicker(mEndTimePicker);
-        if(startTime.after(endTime)) {
+        if (startTime.after(endTime)) {
             Toast.makeText(this, "Start time must be before end time", Toast.LENGTH_LONG).show();
             return;
         }
-        if(!startTime.after(new Date())) {
+        if (!startTime.after(new Date())) {
             Toast.makeText(this, "Date of event must must be after current date", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -275,8 +276,8 @@ public class EventActivity extends AppCompatActivity {
         tPaint.setTextAlign(Paint.Align.CENTER);
         cs.drawBitmap(src, 0f, 0f, null);
 
-        float x_coord = src.getWidth()/2;
-        cs.drawText("Come support the Dine & Donate for", x_coord, src.getHeight() /3 , tPaint);
+        float x_coord = src.getWidth() / 2;
+        cs.drawText("Come support the Dine & Donate for", x_coord, src.getHeight() / 3, tPaint);
         cs.drawText(mCurrUser.name, x_coord, src.getHeight() / 3 + 200, tPaint);
         String[] location = mLocationString.split("\\r?\\n");
         cs.drawText("@ " + location[0], x_coord, src.getHeight() / 3 + 400, tPaint);

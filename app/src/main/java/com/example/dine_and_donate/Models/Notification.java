@@ -5,7 +5,7 @@ public class Notification {
     private String mEventId; //event has to take place on that day
     private String mCreatedAt;
     private String mYelpId;
-    private String mOrgPicUri;
+    private String mOrgId;
 
     public Notification() {
 
@@ -15,7 +15,6 @@ public class Notification {
         this.mEventId = eventId;
         this.mCreatedAt = createdAt;
         this.mYelpId = yelpId;
-        this.mOrgPicUri = orgPicUri;
     }
 
     public String getEventId() {
@@ -42,11 +41,11 @@ public class Notification {
         this.mYelpId = yelpId;
     }
 
-    public String getOrgPicUri() {
-        return mOrgPicUri;
+    public String getOrgId() {
+        return mOrgId;
     }
 
-    public void setOrgPicUri(String orgPicUri) {
-        this.mOrgPicUri = orgPicUri;
+    public void setOrgId(String orgId) {
+        this.mOrgId = orgId;
     }
 }

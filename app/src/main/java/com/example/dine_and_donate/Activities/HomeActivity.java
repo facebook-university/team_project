@@ -206,7 +206,6 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
     // todo: this function should be made cleaner
     public void setExploreTab(final String query) {
 
@@ -313,7 +312,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void setLoading(boolean isLoading) {
-        if(isLoading) {
+        if (isLoading) {
             mProgressSpinner.setVisible(true);
         } else {
             mProgressSpinner.setVisible(false);

@@ -1,6 +1,7 @@
 package com.example.dine_and_donate;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashSet;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -53,7 +56,7 @@ public class UpcomingVouchersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         HomeActivity homeActivity = (HomeActivity) getActivity();
         mCurrUser = homeActivity.currentUser;
-
+        mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
         mView = inflater.inflate(R.layout.tab_fragment, container, false);
         mRecyclerView = mView.findViewById(R.id.rv_vouchers);
         mEmptyView = mView.findViewById(R.id.empty_view);
@@ -62,24 +65,30 @@ public class UpcomingVouchersFragment extends Fragment {
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
-        mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter);
+        mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter, false);
+        if (mSavedEventsIDs.size() == 0) {
+            mEmptyView.setVisibility(View.VISIBLE);
+        } else {
+            mEmptyView.setVisibility(View.GONE);
+        }
         return mView;
     }
 
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(mView, savedInstanceState);
+        mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
+        Log.d("size", mStaggeredRecyclerViewAdapter.getItemCount() + "");
+
         if (mStaggeredRecyclerViewAdapter.getItemCount() == 0 || mHomeActivity.isNewSavedEvent()) {
-            mEmptyView.setVisibility(View.VISIBLE);
             loadVouchers();
             mHomeActivity.setNewSavedEvent(false);
-        } else {
-            mEmptyView.setVisibility(View.GONE);
         }
     }
 
     private void loadVouchers() {
         mRef = FirebaseDatabase.getInstance().getReference();
+        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRefForEvent = mRef.child("events");
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
@@ -91,9 +100,12 @@ public class UpcomingVouchersFragment extends Fragment {
                     //iterate through all events at that restaurant
                     for (DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
-                        if (mSavedEventsIDs.containsKey(dsEvent.getKey()) && !mAlreadyLoaded.contains(dsEvent.getKey())) {
-                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
-                            mAlreadyLoaded.add(dsEvent.getKey());
+                        if (mSavedEventsIDs.containsKey(dsEvent.getKey())) {
+                            long currMillis = Calendar.getInstance().getTimeInMillis();
+                            //if event end date is older than today's date, it is a past event
+                            long eventMillis = Long.parseLong(dsEvent.child("endTime").getValue().toString());
+                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), currMillis, eventMillis);
+                            mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
                         }
                     }
                 }
