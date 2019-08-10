@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView android:id="@+id/cardView"
+<com.google.android.material.card.MaterialCardView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardElevation="2dp"
@@ -9,18 +9,18 @@
     app:strokeWidth="1dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="1dp">
+    android:layout_margin="1dp"
+    android:id="@+id/cardView_notification">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#fffafe"
-        android:id="@+id/notification_layout"
-        android:clickable="true">
+        android:id="@+id/notification_layout">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/org_iv"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
@@ -52,7 +52,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:textColor="@color/black"
+            android:textColor="#868686"
+            android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="@+id/org_iv"
             app:layout_constraintEnd_toStartOf="@+id/notified_at_tv"
             app:layout_constraintStart_toStartOf="@+id/partnered_with_tv"

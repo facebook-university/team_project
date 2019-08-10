@@ -71,6 +71,8 @@ public class HomeActivity extends AppCompatActivity {
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
 
+        System.out.println("HERE: " + markerLatLng);
+
         mIsOnMapView = true;
 
         getSupportFragmentManager().beginTransaction()
@@ -196,7 +198,6 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
     // todo: this function should be made cleaner
     public void setExploreTab(final String query) {
 
@@ -240,17 +241,17 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 18);
-        calendar.set(Calendar.MINUTE, 34);
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
+        // if time already happened, adds one day to trigger notification
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
-            calendar.add(Calendar.MINUTE, 15);
+            calendar.add(Calendar.DATE, 1);
         }
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
-        triggerNotification.setAction("com.example.dine_and_donate.Notifications");
-        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, 0);
+        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_ONE_SHOT);
         AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
@@ -295,7 +296,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void setLoading(boolean isLoading) {
-        if(isLoading) {
+        if (isLoading) {
             mProgressSpinner.setVisible(true);
         } else {
             mProgressSpinner.setVisible(false);

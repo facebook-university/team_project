@@ -58,6 +58,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
         //populate recycler view for tab fragment
         Glide.with(mContext)
                 .load(event.imageUrl)
+                .centerCrop()
                 .apply(requestOptions)
                 .into(holder.image);
 

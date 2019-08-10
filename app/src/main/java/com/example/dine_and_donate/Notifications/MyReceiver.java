@@ -12,7 +12,6 @@ public class MyReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         WorkManager workManager;
         workManager = WorkManager.getInstance(context);
-        System.out.println("CALLED");
         // Enqueue our work to manager
         workManager.enqueue(OneTimeWorkRequest.from(NotifyWorker.class));
     }
