@@ -1,4 +1,4 @@
-package com.example.dine_and_donate;
+package com.example.dine_and_donate.Notifications;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -20,6 +20,8 @@ import androidx.work.WorkerParameters;
 import com.example.dine_and_donate.Activities.LoginActivity;
 import com.example.dine_and_donate.Models.Event;
 import com.example.dine_and_donate.Models.Notification;
+import com.example.dine_and_donate.R;
+import com.example.dine_and_donate.YelpService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;

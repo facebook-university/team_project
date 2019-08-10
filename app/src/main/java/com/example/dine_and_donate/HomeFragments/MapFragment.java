@@ -691,6 +691,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     public void onLocationResult(LocationResult locationResult) {
                         onLocationChanged(locationResult.getLastLocation());
                         if (!cameraSet) {
+                            map.getUiSettings().setMyLocationButtonEnabled(true);
                             LatLng initialLatLng = homeActivity.getMarkerLatLng() != null ? homeActivity.markerLatLng
                                     : new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
                             map.moveCamera(CameraUpdateFactory.newLatLng(initialLatLng));
