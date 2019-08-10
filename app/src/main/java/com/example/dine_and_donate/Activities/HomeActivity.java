@@ -251,7 +251,7 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
-        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_ONE_SHOT);
+        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, 0);
         AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
