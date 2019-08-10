@@ -241,12 +241,12 @@ public class HomeActivity extends AppCompatActivity {
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 18);
-        calendar.set(Calendar.MINUTE, 28);
+        calendar.set(Calendar.MINUTE, 34);
         calendar.set(Calendar.SECOND, 0);
 
-//        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
-//            calendar.add(Calendar.MINUTE, 15);
-//        }
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            calendar.add(Calendar.MINUTE, 15);
+        }
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
         triggerNotification.setAction("com.example.dine_and_donate.Notifications");

@@ -157,7 +157,7 @@ public class NotifyWorker extends Worker {
         notificationBuilder
                 .setDefaults(android.app.Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.drawable.baker)
+                .setSmallIcon(R.drawable.notification_logo)
                 .setContentIntent(pendingIntentEvents)
                 .setContentTitle(title)
                 .setAutoCancel(true)
