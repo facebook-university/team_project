@@ -328,12 +328,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                             }
                                         });
                                         try {
-                                            System.out.println("Marker Lat Lng" + homeActivity.getMarkerLatLng());
-                                            System.out.println("Marker position" + marker.getPosition());
                                             if (marker.getPosition().equals(homeActivity.getMarkerLatLng())) {
-                                                clickMarkerEvent(marker);
                                                 homeActivity.setClickedOnID(null);
                                                 homeActivity.setMarkerLatLngToNull();
+                                                clickMarkerEvent(marker);
                                             } else if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
                                                 // simulates marker click
                                                 clickMarkerEvent(marker);
@@ -359,9 +357,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private boolean clickMarkerRestaurant(Marker marker) {
+        map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
         slideUpMenuCreate((JSONObject) marker.getTag());
         homeActivity.setLoading(false);
-        map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
         slideViewIsUp = true;
         return true;
     }
@@ -370,9 +368,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         try {
             final JSONObject restaurantOfMarker = (JSONObject) marker.getTag();
             DataSnapshot eventsOfRestaurant = mAllEvents.child(restaurantOfMarker.getString("id"));
+            map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
             slideUpMenuSave(restaurantOfMarker, eventsOfRestaurant);
             homeActivity.setLoading(false);
-            map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
             slideViewIsUp = true;
         } catch (JSONException e) {
             e.printStackTrace();
