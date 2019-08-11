@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -93,6 +94,10 @@ public class HomeActivity extends AppCompatActivity {
         MenuItem defaultMap = mBottomNavigationView.getMenu().findItem(R.id.action_map);
         defaultMap.setIcon(iconFilledDefault);
         defaultMap.setChecked(true);
+        MenuItem notifications = mBottomNavigationView.getMenu().findItem(R.id.action_notify);
+        if (currentUser.isOrg) {
+            notifications.setVisible(false);
+        }
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -241,8 +246,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 13);
+        calendar.set(Calendar.MINUTE, 20);
         calendar.set(Calendar.SECOND, 0);
 
         // if time already happened, adds one day to trigger notification
@@ -251,11 +256,14 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
-        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
+        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_NO_CREATE);
+        if (mPendingIntent == null) {
+            mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_CANCEL_CURRENT);
+            // start it only it wasn't running already
+            AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-        alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_FIFTEEN_MINUTES, mPendingIntent);
+            alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_FIFTEEN_MINUTES, mPendingIntent);        }
     }
 
     public void setMarkerLatLngToNull() {
