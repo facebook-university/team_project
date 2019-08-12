@@ -15,6 +15,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Notification;
@@ -96,6 +99,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
                 Glide.with(mContext)
                         .load(profilePicUrl)
+                        .transform(new MultiTransformation<>(new CenterCrop(), new CircleCrop()))
                         .apply(requestOptions)
                         .into(holder.mOrgPic);
             }
