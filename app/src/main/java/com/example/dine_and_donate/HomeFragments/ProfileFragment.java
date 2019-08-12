@@ -16,6 +16,9 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Adapters.ViewPagerAdapter;
@@ -81,6 +84,7 @@ public class ProfileFragment extends Fragment {
 
         Glide.with(getActivity())
                 .load(mCurrentUserModel.getImageUrl())
+                .transform(new MultiTransformation<>(new CenterCrop(), new CircleCrop()))
                 .apply(requestOptions)
                 .into(mProfPic);
     }
