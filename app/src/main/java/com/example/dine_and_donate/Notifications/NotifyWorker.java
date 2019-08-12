@@ -181,12 +181,12 @@ public class NotifyWorker extends Worker {
             }
         });
 
-        mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt, mEventToday.orgId);
-
         mRef.child("users").child(mFbUser.getUid()).child("Notifications").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mNewNotification = new Notification(eventKey, mEventToday.getYelpID(), createdAt, mEventToday.orgId);
                 mNotificationRef.setValue(mNewNotification);
+                System.out.println("HERE");
             }
 
             @Override

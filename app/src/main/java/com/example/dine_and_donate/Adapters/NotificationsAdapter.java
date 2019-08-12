@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -19,6 +20,7 @@ import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Notification;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,7 +37,7 @@ import java.util.Locale;
 public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.ViewHolder> {
 
     private List<Notification> mNotifications;
-    private static Context mContext;
+    private Context mContext;
     private DatabaseReference mRef;
     private DatabaseReference mEventsRef;
     private DatabaseReference mNotificationsRef;
@@ -52,45 +54,50 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     //for each row, inflate the layout and cache references into ViewHolder (pass them into ViewHolder class)
     //only invoked when new row needs to be created
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        mDatabase = FirebaseDatabase.getInstance();
+        mRef = mDatabase.getReference(); //need an instance of database reference
         mContext = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        mDatabase = FirebaseDatabase.getInstance();
-        mRef = mDatabase.getReference();
 
-        final View feedView = inflater.inflate(R.layout.item_notification, parent, false);
-        final NotificationsAdapter.ViewHolder viewHolder = new NotificationsAdapter.ViewHolder(feedView);
-        feedView.setOnClickListener(new View.OnClickListener() {
+        final View view = inflater.inflate(R.layout.item_notification, parent, false);
+        final NotificationsAdapter.ViewHolder viewHolder = new NotificationsAdapter.ViewHolder(view);
+        view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // todo: get location from event, pass to home activity
                 HomeActivity homeActivity = (HomeActivity) mContext;
-//                homeActivity.setClickedOnID(viewHolder.notification.getEventId());
-                //homeActivity.setExploreTab();
-                //homeActivity.setLoading(true);
+                homeActivity.setClickedOnID(viewHolder.notification.getYelpId());
+                homeActivity.setExploreTab(null);
+                homeActivity.setLoading(true);
             }
         });
-
         return viewHolder;
     }
 
     //bind the values based on the position of the element, called as a user scrolls down
     public void onBindViewHolder(final ViewHolder holder, int position) {
         //get data according to position
-        Notification notification = mNotifications.get(0);
+        Notification notification = mNotifications.get(position);
         String eventId = notification.getEventId();
-
-        Log.d("orgId", notification.getOrgId() + "");
-        User org = mIdToOrg.get(notification.getOrgId());
-
         String yelpId = notification.getYelpId();
-
-        holder.yelpId = yelpId;
+        holder.notification = notification;
         mNotificationsRef = mRef.child("events").child(yelpId).child(eventId);
         mNotificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String formattedInfo = "<b>" + "" + "</b>" + " organized an event at " + "<b>" + getRestaurantName(dataSnapshot.child("locationString").getValue().toString()) + "</b>" + "!";
+                User org = mIdToOrg.get(dataSnapshot.child("orgId").getValue().toString());
+                String formattedInfo = "<b>" + org.name + "</b>" + " organized an event at " + "<b>" + getRestaurantName(dataSnapshot.child("locationString").getValue().toString()) + "</b>" + "!";
                 holder.mPartner.setText(Html.fromHtml(formattedInfo));
+
+                RequestOptions requestOptions = new RequestOptions()
+                        .placeholder(R.drawable.instagram_user_outline_24);
+
+                String profilePicUrl = org.getImageUrl() != null && !org.getImageUrl().equals("") ? org.imageUrl : "https://cdn2.iconfinder.com/data/icons/wedding-glyph-1/128/44-512.png";
+
+                Glide.with(mContext)
+                        .load(profilePicUrl)
+                        .apply(requestOptions)
+                        .into(holder.mOrgPic);
             }
 
             @Override
@@ -106,16 +113,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                         DateUtils.FORMAT_ABBREV_TIME);
 
         holder.mStartDate.setText(relativeDate);
-
-
-        RequestOptions requestOptions = new RequestOptions()
-                .placeholder(R.drawable.instagram_user_outline_24);
-
-//        Glide.with(mContext)
-//                .load(org.getImageUrl())
-//                .apply(requestOptions)
-//                .into(holder.mOrgPic);
-
     }
 
     private String getRestaurantName(String entireLocation) {
@@ -133,23 +130,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         return mNotifications.size();
     }
 
-    public String getRelativeTimeAgo(String createdAt) {
-        String format = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
-        SimpleDateFormat sf = new SimpleDateFormat(format, Locale.ENGLISH);
-        sf.setLenient(true);
-
-        String relativeDate = "";
-        try {
-            long dateMillis = sf.parse(createdAt).getTime();
-            relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
-                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return relativeDate;
-    }
-
     //create ViewHolder pattern that will contain all the find view by ID lookups
     public class ViewHolder extends RecyclerView.ViewHolder  {
         public ImageView mOrgPic;
@@ -158,7 +138,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         public TextView mNotifiedAt;
         public Notification notification;
         public androidx.constraintlayout.widget.ConstraintLayout mItem;
-        public String yelpId;
 
         //constructor takes in an inflated layout
         public ViewHolder(View itemView) {

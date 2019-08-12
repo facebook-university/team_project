@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -31,6 +33,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.parceler.Parcels;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -56,6 +59,7 @@ public class HomeActivity extends AppCompatActivity {
     private String mClickedOnID;
     private Boolean mIsOnProfileView;
     private boolean mNewSavedEvent = false;
+    private HashMap<String, User> mIdToOrg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +74,6 @@ public class HomeActivity extends AppCompatActivity {
         String latitude = getIntent().getStringExtra("latitude");
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
-
-        System.out.println("HERE: " + markerLatLng);
 
         mIsOnMapView = true;
 
@@ -93,6 +95,10 @@ public class HomeActivity extends AppCompatActivity {
         MenuItem defaultMap = mBottomNavigationView.getMenu().findItem(R.id.action_map);
         defaultMap.setIcon(iconFilledDefault);
         defaultMap.setChecked(true);
+        MenuItem notifications = mBottomNavigationView.getMenu().findItem(R.id.action_notify);
+        if (currentUser.isOrg) {
+            notifications.setVisible(false);
+        }
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -200,40 +206,49 @@ public class HomeActivity extends AppCompatActivity {
 
     // todo: this function should be made cleaner
     public void setExploreTab(final String query) {
-
-        if (mShowButton) {
-            if (mIsOnMapView || (query != null)) {
-                mListFragment = new ListFragment();
-                mListFragment.setAllEvents(mMapFragment.getAllEvents());
-                mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
-                mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
-                mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
-                mListFragment.setLocation(mMapFragment.getCurrentLocation());
-                mListFragment.setQueryOrgId(mMapFragment.getNameToId().get(query));
-                mListFragment.setOrgNames(mMapFragment.getOrgNames());
-                mStack = "list";
-                if (!getSupportFragmentManager().popBackStackImmediate("list", 0)) {
-                    getSupportFragmentManager().beginTransaction()
-                            .add(R.id.flContainer, mListFragment)
-                            .addToBackStack(mStack)
-                            .commit();
-                }
-                mIsOnMapView = false;
-                mBtnSwap.setTitle(R.string.swap_map);
-                mBtnSwap.setIcon(R.drawable.map);
-            } else {
-                getSupportFragmentManager().popBackStack("map", 0);
-                mIsOnMapView = true;
-                mBtnSwap.setTitle(R.string.swap_list);
-                mBtnSwap.setIcon(R.drawable.list);
-                // if an item on the list was clicked, generate markers and zoom to selected location
-                if (mClickedOnID != null) {
-                    if (!currentUser.isOrg) {
-                        mMapFragment.generateMarkersEvents();
-                    } else {
-                        Location currentLocation = mMapFragment.getCurrentLocation();
-                        mMapFragment.generateMarkersRestaurants(Double.toString(currentLocation.getLongitude()), Double.toString(currentLocation.getLatitude()));
-                    }
+        if ((mIsOnMapView || (query != null)) && (!mIsOnNotifications)) {
+            mListFragment = new ListFragment();
+            mListFragment.setAllEvents(mMapFragment.getAllEvents());
+            mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
+            mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
+            mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
+            mListFragment.setLocation(mMapFragment.getCurrentLocation());
+            mListFragment.setQueryOrgId(mMapFragment.getNameToId().get(query));
+            mListFragment.setOrgNames(mMapFragment.getOrgNames());
+            mStack = "list";
+            if (!getSupportFragmentManager().popBackStackImmediate("list", 0)) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.flContainer, mListFragment)
+                        .addToBackStack(mStack)
+                        .commit();
+            }
+            mIsOnMapView = false;
+            mBtnSwap.setTitle(R.string.swap_map);
+            mBtnSwap.setIcon(R.drawable.map);
+        } else {
+            getSupportFragmentManager().popBackStack("map", 0);
+            mIsOnMapView = true;
+            if (mIsOnNotifications) {
+                mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+                mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
+                mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like);
+                MenuItem map = mBottomNavigationView.getMenu().findItem(R.id.action_map);
+                map.setChecked(true);
+                mBtnSwap.setVisible(true);
+                mSearch.setVisible(!currentUser.isOrg);
+                mLogOut.setVisible(false);
+                mEditProfile.setVisible(false);
+                mIsOnNotifications = false;
+            }
+            mBtnSwap.setTitle(R.string.swap_list);
+            mBtnSwap.setIcon(R.drawable.list);
+            // if an item on the list was clicked, generate markers and zoom to selected location
+            if (mClickedOnID != null) {
+                if (!currentUser.isOrg) {
+                    mMapFragment.generateMarkersEvents();
+                } else {
+                    Location currentLocation = mMapFragment.getCurrentLocation();
+                    mMapFragment.generateMarkersRestaurants(Double.toString(currentLocation.getLongitude()), Double.toString(currentLocation.getLatitude()));
                 }
             }
         }
@@ -241,7 +256,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        calendar.set(Calendar.HOUR_OF_DAY, 9);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
@@ -251,11 +266,14 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
-        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, 0);
-        AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-        alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_FIFTEEN_MINUTES, mPendingIntent);
+        mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_NO_CREATE);
+        if (mPendingIntent == null) {
+            AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
+            mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_CANCEL_CURRENT);
+            // start it only it wasn't running already
+            alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_HOUR, mPendingIntent);
+        }
     }
 
     public void setMarkerLatLngToNull() {
@@ -264,6 +282,14 @@ public class HomeActivity extends AppCompatActivity {
 
     public LatLng getMarkerLatLng() {
         return markerLatLng;
+    }
+
+    public void setIdToOrg(HashMap<String, User> idToOrg) {
+        this.mIdToOrg = idToOrg;
+    }
+
+    public HashMap<String, User> getIdToOrg() {
+        return mIdToOrg;
     }
 
     public void setMarkerLatLng(LatLng markerLatLng) {
