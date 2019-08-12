@@ -272,7 +272,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 9);
-        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.MINUTE, 35);
         calendar.set(Calendar.SECOND, 0);
 
         // if time already happened, adds one day to trigger notification
@@ -287,7 +287,7 @@ public class HomeActivity extends AppCompatActivity {
             mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_CANCEL_CURRENT);
             // start it only it wasn't running already
             alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                    AlarmManager.INTERVAL_HOUR, mPendingIntent);
+                    AlarmManager.INTERVAL_FIFTEEN_MINUTES, mPendingIntent);
         }
     }
 

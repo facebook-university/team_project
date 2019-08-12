@@ -141,20 +141,21 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) { // called when database read is successful
                 mCurrentUserModel = new User();
-                mCurrentUserModel.setName(dataSnapshot.child("name").getValue().toString());
-                mCurrentUserModel.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
-                mCurrentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
-                mCurrentUserModel.setImageUrl(dataSnapshot.child("imageUrl").getValue().toString());
-                if (mCurrentUserModel.getIsOrg()) {
-                    mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
-                }
-
-                // initiate saved events dictionary
-                Map<String, String> events = mCurrentUserModel.getSavedEventsIDs();
-                for (DataSnapshot eventChild : dataSnapshot.child("Events").getChildren()) {
-                    events.put(eventChild.getKey(), eventChild.getValue().toString());
-                }
-                mCurrentUserModel.addSavedEventID(events);
+//                mCurrentUserModel.setName(dataSnapshot.child("name").getValue().toString());
+//                mCurrentUserModel.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
+//                mCurrentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
+//                mCurrentUserModel.setImageUrl(dataSnapshot.child("imageUrl").getValue().toString());
+//                if (mCurrentUserModel.getIsOrg()) {
+//                    mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
+//                }
+//
+//                // initiate saved events dictionary
+//                Map<String, String> events = mCurrentUserModel.getSavedEventsIDs();
+//                for (DataSnapshot eventChild : dataSnapshot.child("Events").getChildren()) {
+//                    events.put(eventChild.getKey(), eventChild.getValue().toString());
+//                }
+//                mCurrentUserModel.addSavedEventID(events);
+                mCurrentUserModel = dataSnapshot.getValue(User.class);
                 goToProfile();
             }
 
