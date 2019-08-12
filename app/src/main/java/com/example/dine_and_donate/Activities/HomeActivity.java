@@ -98,6 +98,9 @@ public class HomeActivity extends AppCompatActivity {
         MenuItem notifications = mBottomNavigationView.getMenu().findItem(R.id.action_notify);
         if (currentUser.isOrg) {
             notifications.setVisible(false);
+            MenuItem profile = mBottomNavigationView.getMenu().findItem(R.id.action_profile);
+            profile.setTitle("My Events");
+            profile.setIcon(R.drawable.icons8_event_50);
         }
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -118,9 +121,13 @@ public class HomeActivity extends AppCompatActivity {
                         mStack = "notify";
                         break;
                     case R.id.action_map:
-                        mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+                        if (currentUser.isOrg) {
+                            mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.icons8_event_50);
+                        } else {
+                            mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like);
+                        }
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
-                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like);
+                        mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBtnSwap.setVisible(true);
                         mSearch.setVisible(!currentUser.isOrg);
                         mLogOut.setVisible(false);
@@ -137,7 +144,11 @@ public class HomeActivity extends AppCompatActivity {
                         mEditProfile.setVisible(true);
                         mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                         mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_50);
-                        mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like_filled);
+                        if (currentUser.isOrg) {
+                            mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.icons8_event_50_filled);
+                        } else {
+                            mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like_filled);
+                        }
                         fragment = mProfileFragment;
                         mIsOnNotifications = false;
                         mShowButton = false;
@@ -231,7 +242,11 @@ public class HomeActivity extends AppCompatActivity {
             if (mIsOnNotifications) {
                 mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
                 mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
-                mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like);
+                if (currentUser.isOrg) {
+                    mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.icons8_event_50);
+                } else {
+                    mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like);
+                }
                 MenuItem map = mBottomNavigationView.getMenu().findItem(R.id.action_map);
                 map.setChecked(true);
                 mBtnSwap.setVisible(true);
