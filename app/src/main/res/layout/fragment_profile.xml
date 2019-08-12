@@ -64,8 +64,8 @@
 
                         <ImageView
                             android:id="@+id/cons_prof_pic"
-                            android:layout_width="67dp"
-                            android:layout_height="67dp"
+                            android:layout_width="65dp"
+                            android:layout_height="65dp"
                             android:layout_marginTop="16dp"
                             app:layout_constraintDimensionRatio="1:1"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -79,7 +79,7 @@
                             android:text="TextView"
                             android:textAlignment="center"
                             android:textColor="#000000"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -91,15 +91,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
-                        <ImageView
-                            android:id="@+id/org_prof_pic"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_marginTop="16dp"
-                            app:layout_constraintBottom_toBottomOf="@+id/forOrg"
-                            app:layout_constraintDimensionRatio="1:1"
-                            app:layout_constraintStart_toStartOf="@+id/forOrg"
-                            app:layout_constraintTop_toTopOf="@+id/forOrg" />
 
                         <ImageView
                             android:id="@+id/blurred_org_pic"
@@ -112,19 +103,30 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/background" />
 
+                        <ImageView
+                            android:id="@+id/org_prof_pic"
+                            android:layout_width="65dp"
+                            android:layout_height="65dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginBottom="8dp"
+                            app:layout_constraintBottom_toTopOf="@+id/blurred_org_pic"
+                            app:layout_constraintDimensionRatio="1:1"
+                            app:layout_constraintStart_toStartOf="@+id/forOrg"
+                            app:layout_constraintTop_toBottomOf="@+id/blurred_org_pic" />
+
                         <TextView
                             android:id="@+id/org_name"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="20dp"
-                            android:layout_marginLeft="20dp"
+                            android:layout_marginLeft="16dp"
                             android:layout_marginEnd="30dp"
-                            android:layout_marginRight="30dp"
-                            android:layout_marginBottom="8dp"
+                            android:layout_marginRight="16dp"
                             android:text="TextView"
                             android:textColor="#000000"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
+                            android:textSize="18sp"
+                            app:layout_constraintBottom_toBottomOf="@+id/org_prof_pic"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/org_prof_pic"
                             app:layout_constraintTop_toTopOf="@+id/org_prof_pic" />
