@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.parceler.Parcels;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -57,6 +59,7 @@ public class HomeActivity extends AppCompatActivity {
     private String mClickedOnID;
     private Boolean mIsOnProfileView;
     private boolean mNewSavedEvent = false;
+    private HashMap<String, User> mIdToOrg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +74,6 @@ public class HomeActivity extends AppCompatActivity {
         String latitude = getIntent().getStringExtra("latitude");
         String longitude = getIntent().getStringExtra("longitude");
         markerLatLng = (latitude != null && longitude != null) ? new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude)) : null;
-
-        System.out.println("HERE: " + markerLatLng);
 
         mIsOnMapView = true;
 
@@ -246,8 +247,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 13);
-        calendar.set(Calendar.MINUTE, 20);
+        calendar.set(Calendar.HOUR_OF_DAY, 18);
+        calendar.set(Calendar.MINUTE, 25);
         calendar.set(Calendar.SECOND, 0);
 
         // if time already happened, adds one day to trigger notification
@@ -258,12 +259,12 @@ public class HomeActivity extends AppCompatActivity {
         Intent triggerNotification = new Intent(HomeActivity.this, MyReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_NO_CREATE);
         if (mPendingIntent == null) {
+            AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
             mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_CANCEL_CURRENT);
             // start it only it wasn't running already
-            AlarmManager alarmManageram = (AlarmManager) getSystemService(ALARM_SERVICE);
-
             alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                    AlarmManager.INTERVAL_FIFTEEN_MINUTES, mPendingIntent);        }
+                    AlarmManager.INTERVAL_FIFTEEN_MINUTES, mPendingIntent);
+        }
     }
 
     public void setMarkerLatLngToNull() {
@@ -272,6 +273,14 @@ public class HomeActivity extends AppCompatActivity {
 
     public LatLng getMarkerLatLng() {
         return markerLatLng;
+    }
+
+    public void setIdToOrg(HashMap<String, User> idToOrg) {
+        this.mIdToOrg = idToOrg;
+    }
+
+    public HashMap<String, User> getIdToOrg() {
+        return mIdToOrg;
     }
 
     public void setMarkerLatLng(LatLng markerLatLng) {

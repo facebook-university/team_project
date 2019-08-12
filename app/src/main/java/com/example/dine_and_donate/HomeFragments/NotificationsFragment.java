@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Adapters.NotificationsAdapter;
 import com.example.dine_and_donate.Models.Notification;
 import com.example.dine_and_donate.Models.User;
@@ -40,7 +41,6 @@ public class NotificationsFragment extends Fragment {
     private DatabaseReference mRef;
     private DatabaseReference mNotificationsRef;
     private FirebaseDatabase mDatabase;
-    private HashMap<String, User> mIdToOrg = new HashMap<>();;
 
     @Nullable
     @Override
@@ -56,10 +56,10 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         mRecyclerView = view.findViewById(R.id.notifications_rv);
         mNotificationList = new ArrayList<>();
-        mNotificationsAdapter = new NotificationsAdapter(mNotificationList, mIdToOrg);
+        HomeActivity homeActivity = (HomeActivity) getContext();
+        mNotificationsAdapter = new NotificationsAdapter(mNotificationList, homeActivity.getIdToOrg());
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mNotificationsAdapter);
@@ -90,12 +90,5 @@ public class NotificationsFragment extends Fragment {
             }
         });
 
-    }
-
-    public void setIdToOrg(HashMap<String, User> mIdToOrg) {
-        this.mIdToOrg = mIdToOrg;
-    }
-    public HashMap<String,User> getIdToOrg() {
-        return mIdToOrg;
     }
 }

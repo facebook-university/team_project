@@ -72,7 +72,7 @@ public class EventListViewAdapter extends RecyclerView.Adapter<EventListViewAdap
         User org = mIdToOrg.get(event.orgId);
         JSONObject restaurant = mIdToRestaurant.get(event.yelpID);
         //Todo: create / find better default
-        String profilePicUrl = org.imageUrl != null ? org.imageUrl : "https://cdn2.iconfinder.com/data/icons/wedding-glyph-1/128/44-512.png";
+        String profilePicUrl = org.getImageUrl() != null && !org.getImageUrl().equals("") ? org.imageUrl : "https://cdn2.iconfinder.com/data/icons/wedding-glyph-1/128/44-512.png";
         try {
             String orgName = org.name;
             String restaurantName = restaurant.getString("name");

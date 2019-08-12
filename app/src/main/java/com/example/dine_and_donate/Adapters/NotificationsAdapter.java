@@ -76,21 +76,27 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     //bind the values based on the position of the element, called as a user scrolls down
     public void onBindViewHolder(final ViewHolder holder, int position) {
         //get data according to position
-        Notification notification = mNotifications.get(0);
+        Notification notification = mNotifications.get(position);
         String eventId = notification.getEventId();
-
-        Log.d("orgId", notification.getOrgId() + "");
-        User org = mIdToOrg.get(notification.getOrgId());
-
         String yelpId = notification.getYelpId();
-
         holder.yelpId = yelpId;
         mNotificationsRef = mRef.child("events").child(yelpId).child(eventId);
         mNotificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String formattedInfo = "<b>" + "" + "</b>" + " organized an event at " + "<b>" + getRestaurantName(dataSnapshot.child("locationString").getValue().toString()) + "</b>" + "!";
+                User org = mIdToOrg.get(dataSnapshot.child("orgId").getValue().toString());
+                String formattedInfo = "<b>" + org.name + "</b>" + " organized an event at " + "<b>" + getRestaurantName(dataSnapshot.child("locationString").getValue().toString()) + "</b>" + "!";
                 holder.mPartner.setText(Html.fromHtml(formattedInfo));
+
+                RequestOptions requestOptions = new RequestOptions()
+                        .placeholder(R.drawable.instagram_user_outline_24);
+
+                String profilePicUrl = org.getImageUrl() != null && !org.getImageUrl().equals("") ? org.imageUrl : "https://cdn2.iconfinder.com/data/icons/wedding-glyph-1/128/44-512.png";
+
+                Glide.with(mContext)
+                        .load(profilePicUrl)
+                        .apply(requestOptions)
+                        .into(holder.mOrgPic);
             }
 
             @Override
@@ -106,16 +112,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                         DateUtils.FORMAT_ABBREV_TIME);
 
         holder.mStartDate.setText(relativeDate);
-
-
-        RequestOptions requestOptions = new RequestOptions()
-                .placeholder(R.drawable.instagram_user_outline_24);
-
-//        Glide.with(mContext)
-//                .load(org.getImageUrl())
-//                .apply(requestOptions)
-//                .into(holder.mOrgPic);
-
     }
 
     private String getRestaurantName(String entireLocation) {
@@ -133,30 +129,12 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         return mNotifications.size();
     }
 
-    public String getRelativeTimeAgo(String createdAt) {
-        String format = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
-        SimpleDateFormat sf = new SimpleDateFormat(format, Locale.ENGLISH);
-        sf.setLenient(true);
-
-        String relativeDate = "";
-        try {
-            long dateMillis = sf.parse(createdAt).getTime();
-            relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
-                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return relativeDate;
-    }
-
     //create ViewHolder pattern that will contain all the find view by ID lookups
     public class ViewHolder extends RecyclerView.ViewHolder  {
         public ImageView mOrgPic;
         public TextView mStartDate;
         public TextView mPartner;
         public TextView mNotifiedAt;
-        public Notification notification;
         public androidx.constraintlayout.widget.ConstraintLayout mItem;
         public String yelpId;
 

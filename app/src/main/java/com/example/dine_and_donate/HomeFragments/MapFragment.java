@@ -748,6 +748,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mIdToOrg.put(id, dataSnapshot.child(id).getValue(User.class));
+                homeActivity.setIdToOrg(mIdToOrg);
                 String orgName = dataSnapshot.child(id).child("name").getValue().toString();
                 if (!mOrgNames.contains(orgName)) {
                     mOrgNames.add(orgName);
