@@ -64,8 +64,8 @@
 
                         <ImageView
                             android:id="@+id/cons_prof_pic"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
+                            android:layout_width="67dp"
+                            android:layout_height="67dp"
                             android:layout_marginTop="16dp"
                             app:layout_constraintDimensionRatio="1:1"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -93,8 +93,8 @@
 
                         <ImageView
                             android:id="@+id/org_prof_pic"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:layout_marginTop="16dp"
                             app:layout_constraintBottom_toBottomOf="@+id/forOrg"
                             app:layout_constraintDimensionRatio="1:1"

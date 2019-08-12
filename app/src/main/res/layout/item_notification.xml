@@ -18,16 +18,18 @@
         android:background="@color/browser_actions_bg_grey"
         android:id="@+id/notification_layout">
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <ImageView
             android:id="@+id/org_iv"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="4dp"
-            android:src="@drawable/instagram_user_outline_24"
-            app:civ_border_color="#FF000000"
-            app:civ_border_width="1.2dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/like"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintCircleRadius="700dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/partnered_with_tv" />
