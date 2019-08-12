@@ -66,6 +66,7 @@ public class UpcomingVouchersFragment extends Fragment {
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
         mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter, false);
+        mTabFragmentHelper.filterEvents();
         if (mSavedEventsIDs.size() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
         } else {
@@ -101,14 +102,13 @@ public class UpcomingVouchersFragment extends Fragment {
                     for (DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
                         if (mSavedEventsIDs.containsKey(dsEvent.getKey())) {
-                            long currMillis = Calendar.getInstance().getTimeInMillis();
                             //if event end date is older than today's date, it is a past event
                             long eventMillis = Long.parseLong(dsEvent.child("endTime").getValue().toString());
-                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), currMillis, eventMillis);
-                            mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
+                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), eventMillis);
                         }
                     }
                 }
+                mTabFragmentHelper.filterEvents();
             }
 
             @Override

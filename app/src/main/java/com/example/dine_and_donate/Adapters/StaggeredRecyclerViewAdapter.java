@@ -36,6 +36,11 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
         mEvents = events;
     }
 
+    public void updateEvents (ArrayList<Event> events) {
+        mEvents = events;
+        this.notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

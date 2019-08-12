@@ -67,9 +67,9 @@ public class OldVouchersFragment extends Fragment {
         mStaggeredRecyclerViewAdapter = new StaggeredRecyclerViewAdapter(getActivity(), mEvents);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
-        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
         mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter, true);
+        mTabFragmentHelper.filterEvents();
         super.onViewCreated(mView, savedInstanceState);
         if (pastEvents.size() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
@@ -101,14 +101,13 @@ public class OldVouchersFragment extends Fragment {
                     for (DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
                         if (pastEvents.containsKey(dsEvent.getKey())) {
-                            long dateMillis = Calendar.getInstance().getTimeInMillis();
                             //if event end date is older than today's date, it is a past event
                             long otherMillis = Long.parseLong(dsEvent.child("endTime").getValue().toString());
-                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), dateMillis, otherMillis);
-                            mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
+                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), otherMillis);
                         }
                     }
                 }
+                mTabFragmentHelper.filterEvents();
             }
 
             @Override
