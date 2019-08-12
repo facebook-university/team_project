@@ -12,6 +12,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -86,6 +88,7 @@ public class EventActivity extends AppCompatActivity {
     private Uri mSelectedImage;
     private FirebaseUser mFirebaseCurrentUser;
     private Map<String, String> mCreatedEvents;
+    private MenuItem mProgressSpinner;
 
     private UploadUtil uploadUtil;
     private Task<Uri> urlTask;
@@ -202,8 +205,25 @@ public class EventActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        mProgressSpinner = menu.findItem(R.id.miActionProgress);
+        //if someone is already signed in, skip sign in process
+        return true;
+    }
+
+    public void setLoading(boolean isLoading) {
+        if (isLoading) {
+            mProgressSpinner.setVisible(true);
+        } else {
+            mProgressSpinner.setVisible(false);
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void writeEvent(final String yelpId, String url) {
+        setLoading(true);
         String orgId = mFirebaseCurrentUser.getUid();
         Date startTime = dateFromPicker(mStartTimePicker);
         Date endTime = dateFromPicker(mEndTimePicker);
@@ -232,6 +252,7 @@ public class EventActivity extends AppCompatActivity {
                 Intent intent = new Intent(EventActivity.this, HomeActivity.class);
                 intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrUser));
                 startActivity(intent);
+                setLoading(false);
             }
         });
         finish();
