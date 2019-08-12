@@ -206,40 +206,49 @@ public class HomeActivity extends AppCompatActivity {
 
     // todo: this function should be made cleaner
     public void setExploreTab(final String query) {
-
-        if (mShowButton) {
-            if (mIsOnMapView || (query != null)) {
-                mListFragment = new ListFragment();
-                mListFragment.setAllEvents(mMapFragment.getAllEvents());
-                mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
-                mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
-                mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
-                mListFragment.setLocation(mMapFragment.getCurrentLocation());
-                mListFragment.setQueryOrgId(mMapFragment.getNameToId().get(query));
-                mListFragment.setOrgNames(mMapFragment.getOrgNames());
-                mStack = "list";
-                if (!getSupportFragmentManager().popBackStackImmediate("list", 0)) {
-                    getSupportFragmentManager().beginTransaction()
-                            .add(R.id.flContainer, mListFragment)
-                            .addToBackStack(mStack)
-                            .commit();
-                }
-                mIsOnMapView = false;
-                mBtnSwap.setTitle(R.string.swap_map);
-                mBtnSwap.setIcon(R.drawable.map);
-            } else {
-                getSupportFragmentManager().popBackStack("map", 0);
-                mIsOnMapView = true;
-                mBtnSwap.setTitle(R.string.swap_list);
-                mBtnSwap.setIcon(R.drawable.list);
-                // if an item on the list was clicked, generate markers and zoom to selected location
-                if (mClickedOnID != null) {
-                    if (!currentUser.isOrg) {
-                        mMapFragment.generateMarkersEvents();
-                    } else {
-                        Location currentLocation = mMapFragment.getCurrentLocation();
-                        mMapFragment.generateMarkersRestaurants(Double.toString(currentLocation.getLongitude()), Double.toString(currentLocation.getLatitude()));
-                    }
+        if ((mIsOnMapView || (query != null)) && (!mIsOnNotifications)) {
+            mListFragment = new ListFragment();
+            mListFragment.setAllEvents(mMapFragment.getAllEvents());
+            mListFragment.setRestaurantsJSON(mMapFragment.getRestaurantsNearbyJSON());
+            mListFragment.setIdToRestaurant(mMapFragment.getIdToRestaurant());
+            mListFragment.setIdToOrg(mMapFragment.getIdToOrg());
+            mListFragment.setLocation(mMapFragment.getCurrentLocation());
+            mListFragment.setQueryOrgId(mMapFragment.getNameToId().get(query));
+            mListFragment.setOrgNames(mMapFragment.getOrgNames());
+            mStack = "list";
+            if (!getSupportFragmentManager().popBackStackImmediate("list", 0)) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.flContainer, mListFragment)
+                        .addToBackStack(mStack)
+                        .commit();
+            }
+            mIsOnMapView = false;
+            mBtnSwap.setTitle(R.string.swap_map);
+            mBtnSwap.setIcon(R.drawable.map);
+        } else {
+            getSupportFragmentManager().popBackStack("map", 0);
+            mIsOnMapView = true;
+            if (mIsOnNotifications) {
+                mBottomNavigationView.getMenu().findItem(R.id.action_notify).setIcon(R.drawable.icons8_notification_50);
+                mBottomNavigationView.getMenu().findItem(R.id.action_map).setIcon(R.drawable.icons8_map_filled_50);
+                mBottomNavigationView.getMenu().findItem(R.id.action_profile).setIcon(R.drawable.like);
+                MenuItem map = mBottomNavigationView.getMenu().findItem(R.id.action_map);
+                map.setChecked(true);
+                mBtnSwap.setVisible(true);
+                mSearch.setVisible(!currentUser.isOrg);
+                mLogOut.setVisible(false);
+                mEditProfile.setVisible(false);
+                mIsOnNotifications = false;
+            }
+            mBtnSwap.setTitle(R.string.swap_list);
+            mBtnSwap.setIcon(R.drawable.list);
+            // if an item on the list was clicked, generate markers and zoom to selected location
+            if (mClickedOnID != null) {
+                if (!currentUser.isOrg) {
+                    mMapFragment.generateMarkersEvents();
+                } else {
+                    Location currentLocation = mMapFragment.getCurrentLocation();
+                    mMapFragment.generateMarkersRestaurants(Double.toString(currentLocation.getLongitude()), Double.toString(currentLocation.getLatitude()));
                 }
             }
         }
@@ -247,8 +256,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setUpNotificationWorker() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 18);
-        calendar.set(Calendar.MINUTE, 25);
+        calendar.set(Calendar.HOUR_OF_DAY, 9);
+        calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
         // if time already happened, adds one day to trigger notification
@@ -263,7 +272,7 @@ public class HomeActivity extends AppCompatActivity {
             mPendingIntent = PendingIntent.getBroadcast(HomeActivity.this, 0, triggerNotification, PendingIntent.FLAG_CANCEL_CURRENT);
             // start it only it wasn't running already
             alarmManageram.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                    AlarmManager.INTERVAL_FIFTEEN_MINUTES, mPendingIntent);
+                    AlarmManager.INTERVAL_HOUR, mPendingIntent);
         }
     }
 

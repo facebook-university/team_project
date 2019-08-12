@@ -128,6 +128,7 @@ public class LoginActivity extends AppCompatActivity {
                             createUserModel();
                         } else {
                             // If sign in fails, display a message to the user.
+                            setLoading(false);
                             Log.w("signIn", "signInWithEmail:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
@@ -143,6 +144,7 @@ public class LoginActivity extends AppCompatActivity {
                 mCurrentUserModel.setName(dataSnapshot.child("name").getValue().toString());
                 mCurrentUserModel.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
                 mCurrentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
+                mCurrentUserModel.setImageUrl(dataSnapshot.child("imageUrl").getValue().toString());
                 if (mCurrentUserModel.getIsOrg()) {
                     mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
                 }

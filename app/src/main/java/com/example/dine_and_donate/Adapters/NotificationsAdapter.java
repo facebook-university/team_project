@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -19,6 +20,7 @@ import com.example.dine_and_donate.Activities.HomeActivity;
 import com.example.dine_and_donate.Models.Notification;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,7 +37,7 @@ import java.util.Locale;
 public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.ViewHolder> {
 
     private List<Notification> mNotifications;
-    private static Context mContext;
+    private Context mContext;
     private DatabaseReference mRef;
     private DatabaseReference mEventsRef;
     private DatabaseReference mNotificationsRef;
@@ -52,24 +54,23 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     //for each row, inflate the layout and cache references into ViewHolder (pass them into ViewHolder class)
     //only invoked when new row needs to be created
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        mDatabase = FirebaseDatabase.getInstance();
+        mRef = mDatabase.getReference(); //need an instance of database reference
         mContext = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        mDatabase = FirebaseDatabase.getInstance();
-        mRef = mDatabase.getReference();
 
-        final View feedView = inflater.inflate(R.layout.item_notification, parent, false);
-        final NotificationsAdapter.ViewHolder viewHolder = new NotificationsAdapter.ViewHolder(feedView);
-        feedView.setOnClickListener(new View.OnClickListener() {
+        final View view = inflater.inflate(R.layout.item_notification, parent, false);
+        final NotificationsAdapter.ViewHolder viewHolder = new NotificationsAdapter.ViewHolder(view);
+        view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // todo: get location from event, pass to home activity
                 HomeActivity homeActivity = (HomeActivity) mContext;
-//                homeActivity.setClickedOnID(viewHolder.notification.getEventId());
-                //homeActivity.setExploreTab();
-                //homeActivity.setLoading(true);
+                homeActivity.setClickedOnID(viewHolder.notification.getYelpId());
+                homeActivity.setExploreTab(null);
+                homeActivity.setLoading(true);
             }
         });
-
         return viewHolder;
     }
 
@@ -79,7 +80,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         Notification notification = mNotifications.get(position);
         String eventId = notification.getEventId();
         String yelpId = notification.getYelpId();
-        holder.yelpId = yelpId;
+        holder.notification = notification;
         mNotificationsRef = mRef.child("events").child(yelpId).child(eventId);
         mNotificationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -135,8 +136,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         public TextView mStartDate;
         public TextView mPartner;
         public TextView mNotifiedAt;
+        public Notification notification;
         public androidx.constraintlayout.widget.ConstraintLayout mItem;
-        public String yelpId;
 
         //constructor takes in an inflated layout
         public ViewHolder(View itemView) {
