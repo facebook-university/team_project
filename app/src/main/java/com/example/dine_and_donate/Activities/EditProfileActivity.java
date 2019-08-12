@@ -9,12 +9,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.dine_and_donate.Models.User;
 import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.UploadUtil;
@@ -47,7 +52,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private Button mSaveBtn;
     private TextView mNumberTextView;
     private Button mChangeProfPic;
-    private CircleImageView mProfPic;
+    private ImageView mProfPic;
 
     private FirebaseDatabase mDatabase;
     private FirebaseUser mFbUser;
@@ -112,6 +117,10 @@ public class EditProfileActivity extends AppCompatActivity {
         });
         //retrieve User object
         mCurrentUser = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
+        Glide.with(this)
+                .load(mCurrentUser.getImageUrl())
+                .transform(new MultiTransformation<>(new CenterCrop(), new CircleCrop()))
+                .into(mProfPic);
         populateFields();
         setUpOnClickListeners();
     }
@@ -170,8 +179,8 @@ public class EditProfileActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 downloadUri[0] = task.getResult();
                                 String s = downloadUri[0].toString();
-                                mCurrentUser.setImageUrl(s);
                                 Log.d("url", mCurrentUser.getImageUrl());
+                                mCurrentUser.setImageUrl(s);
                                 mRefForUser.child("imageUrl").setValue(s);
                                 Intent intent = new Intent(EditProfileActivity.this, HomeActivity.class);
                                 intent.putExtra(User.class.getSimpleName(), Parcels.wrap(mCurrentUser));

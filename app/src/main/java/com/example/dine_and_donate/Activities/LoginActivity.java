@@ -143,6 +143,7 @@ public class LoginActivity extends AppCompatActivity {
                 mCurrentUserModel.setName(dataSnapshot.child("name").getValue().toString());
                 mCurrentUserModel.setOrg(Boolean.parseBoolean(dataSnapshot.child("isOrg").getValue().toString()));
                 mCurrentUserModel.setEmail(dataSnapshot.child("email").getValue().toString());
+                mCurrentUserModel.setImageUrl(dataSnapshot.child("imageUrl").getValue().toString());
                 if (mCurrentUserModel.getIsOrg()) {
                     mCurrentUserModel.setPhoneNumber(dataSnapshot.child("phoneNumber").getValue().toString());
                 }
@@ -190,4 +191,6 @@ public class LoginActivity extends AppCompatActivity {
         mSignup.setVisibility(visAll);
         mTvAsk.setVisibility(visAll);
     }
+
+
 }
