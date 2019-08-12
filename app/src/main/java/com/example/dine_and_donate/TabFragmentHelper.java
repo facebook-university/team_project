@@ -1,5 +1,7 @@
 package com.example.dine_and_donate;
 
+import android.util.Log;
+
 import com.example.dine_and_donate.Adapters.StaggeredRecyclerViewAdapter;
 import com.example.dine_and_donate.Models.Event;
 
@@ -17,20 +19,12 @@ public class TabFragmentHelper {
         mForOld = forOld;
     }
 
-    //add images and descriptions to respective arrayLists
-    public void initBitmapsEvents(String urls, String descriptions, long currMillis, long eventEndMillis) {
+    public void initBitmapsEvents(String urls, String descriptions) {
         Event newEvent = new Event();
         newEvent.locationString = descriptions;
         newEvent.imageUrl = urls;
         //for upcoming vouchers
         mEvents.add(0, newEvent);
-        for(int index = 0; index < mEvents.size(); index++) {
-            if(!mForOld && (currMillis > eventEndMillis)) {
-                mEvents.remove(index);
-            } else if(mForOld && (currMillis <= eventEndMillis)) {
-                mEvents.remove(index);
-            }
-        }
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
     }
 }

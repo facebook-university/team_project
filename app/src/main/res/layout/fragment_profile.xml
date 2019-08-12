@@ -92,16 +92,6 @@
                         android:layout_height="match_parent">
 
                         <ImageView
-                            android:id="@+id/org_prof_pic"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_marginTop="16dp"
-                            app:layout_constraintBottom_toBottomOf="@+id/forOrg"
-                            app:layout_constraintDimensionRatio="1:1"
-                            app:layout_constraintStart_toStartOf="@+id/forOrg"
-                            app:layout_constraintTop_toTopOf="@+id/forOrg" />
-
-                        <ImageView
                             android:id="@+id/blurred_org_pic"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
@@ -111,6 +101,17 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/background" />
+
+                        <ImageView
+                            android:id="@+id/org_prof_pic"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginLeft="16dp"
+                            app:layout_constraintBottom_toBottomOf="@+id/forOrg"
+                            app:layout_constraintDimensionRatio="1:1"
+                            app:layout_constraintStart_toStartOf="@+id/forOrg"
+                            app:layout_constraintTop_toTopOf="@+id/forOrg" />
 
                         <TextView
                             android:id="@+id/org_name"
@@ -123,7 +124,7 @@
                             android:layout_marginBottom="8dp"
                             android:text="TextView"
                             android:textColor="#000000"
-                            android:textSize="20sp"
+                            android:textSize="17sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/org_prof_pic"

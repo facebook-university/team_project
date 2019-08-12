@@ -70,7 +70,7 @@ public class OldVouchersFragment extends Fragment {
         mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRecyclerView.setAdapter(mStaggeredRecyclerViewAdapter);
         mTabFragmentHelper = new TabFragmentHelper(mEvents, mStaggeredRecyclerViewAdapter, true);
-        super.onViewCreated(mView, savedInstanceState);
+//        super.onViewCreated(mView, savedInstanceState);
         if (pastEvents.size() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
         } else {
@@ -91,7 +91,10 @@ public class OldVouchersFragment extends Fragment {
 
     public void loadVouchers() {
         mRef = FirebaseDatabase.getInstance().getReference();
+        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
         mRefForEvent = mRef.child("events");
+        mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
+        pastEvents = mCurrUser.getSavedEventsIDs();
         mRefForEvent.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -100,12 +103,17 @@ public class OldVouchersFragment extends Fragment {
                     //iterate through all events at that restaurant
                     for (DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
-                        if (pastEvents.containsKey(dsEvent.getKey())) {
-                            long dateMillis = Calendar.getInstance().getTimeInMillis();
+                        if (pastEvents.containsKey(dsEvent.getKey()) && !mAlreadyLoaded.contains(dsEvent.getKey())) {
+                            long todayMillis = Calendar.getInstance().getTimeInMillis();
+                            long eventEndMillis = Long.parseLong(dsEvent.child("endTime").getValue().toString());
                             //if event end date is older than today's date, it is a past event
-                            long otherMillis = Long.parseLong(dsEvent.child("endTime").getValue().toString());
-                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), dateMillis, otherMillis);
-                            mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
+                            if(todayMillis > eventEndMillis) {
+                                mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
+                                mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
+                                mAlreadyLoaded.add(dsEvent.getKey());
+                            }
+//                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), todayMillis, eventEndMillis);
+//                            mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
                         }
                     }
                 }

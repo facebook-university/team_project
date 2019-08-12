@@ -30,7 +30,6 @@
             android:layout_marginBottom="8dp"
             android:src="@drawable/like"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintCircleRadius="700dp"
             app:layout_constraintEnd_toStartOf="@+id/date_tv"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -39,7 +38,11 @@
             android:id="@+id/partnered_with_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginBottom="2dp"
             android:textColor="@color/black"
+            app:layout_constraintBottom_toTopOf="@+id/date_tv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/org_iv"
             app:layout_constraintTop_toTopOf="@+id/org_iv" />
@@ -50,6 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginBottom="4dp"
             android:textColor="#868686"
             android:textStyle="italic"
             app:layout_constraintBottom_toBottomOf="@+id/org_iv"

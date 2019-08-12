@@ -89,7 +89,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User org = mIdToOrg.get(dataSnapshot.child("orgId").getValue().toString());
-                String formattedInfo = "<b>" + org.name + "</b>" + " organized an event at " + "<b>" + getRestaurantName(dataSnapshot.child("locationString").getValue().toString()) + "</b>" + "!";
+                String restName = dataSnapshot.child("locationString").getValue().toString().split("\\r?\\n")[0];
+                String formattedInfo = "<b>" + org.name + "</b>" + " organized an event at " + "<b>" + restName + "</b>" + "!";
                 holder.mPartner.setText(Html.fromHtml(formattedInfo));
 
                 RequestOptions requestOptions = new RequestOptions()
@@ -119,14 +120,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         holder.mStartDate.setText(relativeDate);
     }
 
-    private String getRestaurantName(String entireLocation) {
-        int positionOfNewLine = entireLocation.indexOf("\n");
-        String restName = "";
-        if (positionOfNewLine >= 0) {
-            restName = entireLocation.substring(0, positionOfNewLine);
-        }
-        return restName;
-    }
 
     @Override
     //return size of list
@@ -139,7 +132,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         public ImageView mOrgPic;
         public TextView mStartDate;
         public TextView mPartner;
-        public TextView mNotifiedAt;
         public Notification notification;
         public androidx.constraintlayout.widget.ConstraintLayout mItem;
 
@@ -149,7 +141,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             mOrgPic = itemView.findViewById(R.id.org_iv);
             mStartDate = itemView.findViewById(R.id.date_tv);
             mPartner = itemView.findViewById(R.id.partnered_with_tv);
-            mNotifiedAt = itemView.findViewById(R.id.notified_at_tv);
         }
     }
 }

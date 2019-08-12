@@ -68,7 +68,7 @@ public class ProfileFragment extends Fragment {
         mLayoutForOrg = view.findViewById(R.id.forOrg);
         mTabLayout = view.findViewById(R.id.tabs_profile);
         mTabLayout.setupWithViewPager(mVoucherView);
-        setUpTopProfile(mCurrentUserModel.name);
+        setUpTopProfile();
         if (mCurrentUserModel.isOrg) {
             mProfPic = view.findViewById(R.id.org_prof_pic);
             mUserName = view.findViewById(R.id.org_name);
@@ -90,7 +90,7 @@ public class ProfileFragment extends Fragment {
     }
 
     //set up for top of profile page based on user type
-    private void setUpTopProfile(String name) {
+    private void setUpTopProfile() {
         //display orgView when user type is an organization
         if (mCurrentUserModel.isOrg) {
             mLayoutForOrg.setVisibility(View.VISIBLE);

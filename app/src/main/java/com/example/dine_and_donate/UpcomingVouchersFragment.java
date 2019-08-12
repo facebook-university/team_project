@@ -56,6 +56,7 @@ public class UpcomingVouchersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         HomeActivity homeActivity = (HomeActivity) getActivity();
         mCurrUser = homeActivity.currentUser;
+        //mEvents = new ArrayList<>();
         mSavedEventsIDs = mCurrUser.getSavedEventsIDs();
         mView = inflater.inflate(R.layout.tab_fragment, container, false);
         mRecyclerView = mView.findViewById(R.id.rv_vouchers);
@@ -100,12 +101,17 @@ public class UpcomingVouchersFragment extends Fragment {
                     //iterate through all events at that restaurant
                     for (DataSnapshot dsEvent : dsRestaurant.getChildren()) {
                         //that event is saved, should be added to arrayList
-                        if (mSavedEventsIDs.containsKey(dsEvent.getKey())) {
-                            long currMillis = Calendar.getInstance().getTimeInMillis();
+                        if (mSavedEventsIDs.containsKey(dsEvent.getKey()) && !mAlreadyLoaded.contains(dsEvent.getKey())) {
+                            long todayMillis = Calendar.getInstance().getTimeInMillis();
                             //if event end date is older than today's date, it is a past event
-                            long eventMillis = Long.parseLong(dsEvent.child("endTime").getValue().toString());
-                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), currMillis, eventMillis);
-                            mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
+                            long eventEndMillis = Long.parseLong(dsEvent.child("endTime").getValue().toString());
+                            if(todayMillis <= eventEndMillis) {
+                                mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString());
+                                mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
+                                mAlreadyLoaded.add(dsEvent.getKey());
+                            }
+//                            mTabFragmentHelper.initBitmapsEvents(dsEvent.child("imageUrl").getValue().toString(), dsEvent.child("locationString").getValue().toString(), currMillis, eventMillis);
+//                            mStaggeredRecyclerViewAdapter.notifyDataSetChanged();
                         }
                     }
                 }

@@ -8,10 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -23,6 +25,7 @@ import com.example.dine_and_donate.R;
 import com.example.dine_and_donate.Transitions.VoucherTransition;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 //bind the data to the view
 public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<StaggeredRecyclerViewAdapter.ViewHolder> {
@@ -53,7 +56,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
 
         //dummy image
         RequestOptions requestOptions = new RequestOptions()
-                .placeholder(R.drawable.ic_launcher_background);
+                .placeholder(R.drawable.voucher_background);
 
         //populate recycler view for tab fragment
         Glide.with(mContext)
@@ -61,6 +64,8 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
                 .centerCrop()
                 .apply(requestOptions)
                 .into(holder.image);
+
+        holder.image.isShown();
 
         holder.name.setText(event.locationString.split("\\r?\\n")[0]);
         holder.image.setOnClickListener(new View.OnClickListener() {
@@ -94,7 +99,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
 
     //describes an item view inside a recycler view
     class ViewHolder extends RecyclerView.ViewHolder {
-
+        CardView voucherView;
         Event event;
         ImageView image;
         TextView name;
@@ -104,6 +109,7 @@ public class StaggeredRecyclerViewAdapter extends RecyclerView.Adapter<Staggered
             super(itemView);
             this.image = itemView.findViewById(R.id.voucher_image);
             this.name = itemView.findViewById(R.id.name);
+            this.voucherView = itemView.findViewById(R.id.voucher_cv);
         }
     }
 }
