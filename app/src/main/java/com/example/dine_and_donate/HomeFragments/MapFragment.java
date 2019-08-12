@@ -273,7 +273,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                     if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
                                         clickMarkerRestaurant(marker);
                                         homeActivity.setClickedOnID(null);
-                                        homeActivity.setLoading(false);
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -329,12 +328,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                             }
                                         });
                                         try {
-                                            if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())
-                                                || homeActivity.getMarkerLatLng() != null) {
+                                            if (marker.getPosition().equals(homeActivity.getMarkerLatLng())) {
+                                                homeActivity.setClickedOnID(null);
+                                                homeActivity.setMarkerLatLngToNull();
+                                                clickMarkerEvent(marker);
+                                            } else if (restaurantJSON.getString("id").equals(homeActivity.getClickedOnID())) {
                                                 // simulates marker click
                                                 clickMarkerEvent(marker);
                                                 homeActivity.setClickedOnID(null);
-                                                homeActivity.setLoading(false);
                                             }
                                         } catch (JSONException e) {
                                             e.printStackTrace();
@@ -356,8 +357,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private boolean clickMarkerRestaurant(Marker marker) {
-        slideUpMenuCreate((JSONObject) marker.getTag());
         map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
+        slideUpMenuCreate((JSONObject) marker.getTag());
+        homeActivity.setLoading(false);
         slideViewIsUp = true;
         return true;
     }
@@ -366,14 +368,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         try {
             final JSONObject restaurantOfMarker = (JSONObject) marker.getTag();
             DataSnapshot eventsOfRestaurant = mAllEvents.child(restaurantOfMarker.getString("id"));
-
+            map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
             slideUpMenuSave(restaurantOfMarker, eventsOfRestaurant);
-            if (homeActivity.getMarkerLatLng() != null) {
-                homeActivity.setMarkerLatLngToNull();
-            } else {
-                map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()), 250, null);
-            }
-
+            homeActivity.setLoading(false);
             slideViewIsUp = true;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -751,6 +748,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mIdToOrg.put(id, dataSnapshot.child(id).getValue(User.class));
+                homeActivity.setIdToOrg(mIdToOrg);
                 String orgName = dataSnapshot.child(id).child("name").getValue().toString();
                 if (!mOrgNames.contains(orgName)) {
                     mOrgNames.add(orgName);
