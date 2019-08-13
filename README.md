@@ -62,5 +62,5 @@ Our app creates a platform to make it easier to to market and find Dine and Dona
 * View a charity's profile to read about their mission and where the money fundraised is going
 
 ## GIF Walkthrough 
-<img src="https://github.com/facebook-university/team_project/blob/master/dine_and_donate_walkthrough.gif" width=200>
+<img src="https://github.com/facebook-university/team_project/blob/master/dine_and_donate_walkthrough.gif" width=400>
 
