@@ -1,11 +1,7 @@
-Unit 8: Group Milestone - README Example
+Facebook University: Dine & Donate
 ===
+### Mia Johansson, Ryan Beck, Shreya Yellepeddy
 
-:::info
-**Below is an example** of what your **Group Project README** should include and how it should be structured for the **Unit 8 Group Milestone Submission**.
-:::
-
-# TUNIN
 
 ## Table of Contents
 1. [Overview](#Overview)
@@ -14,73 +10,57 @@ Unit 8: Group Milestone - README Example
 
 ## Overview
 ### Description
-Tracks what music an individual listens to, and pairs them with others based on that music. Could be potentially used as a dating app, or just meeting new friends with similar music tastes.
+Our app creates a platform to make it easier to to market and find Dine and Donate fundraisers (i.e. 10% of your bill at a restaurant will go towards a given charity/organization). Organizers of these events can post when and where they are having events. Users looking to find these events will be able to see when they are happening in their area.
+
 
 ### App Evaluation
-- **Category:** Social Networking / Music
-- **Mobile:** This app would be primarily developed for mobile but would perhaps be just as viable on a computer, such as tinder or other similar apps. Functionality wouldn't be limited to mobile devices, however mobile version could potentially have more features.
-- **Story:** Analyzes users music choices, and connects them to other users with similar choices. The user can then decide to message this person and befriend them if wanted.
-- **Market:** Any individual could choose to use this app, and to keep it a safe environment, people would be organized into age groups.
-- **Habit:** This app could be used as often or unoften as the user wanted depending on how deep their social life is, and what exactly they're looking for.
-- **Scope:** First we would start with pairing people based on music taste, then perhaps this could evolve into a music sharing application as well to broaden its usage. Large potential for use with spotify, apple music, or other music streaming applications.
+- **Category:** Fundraising / Networking / Business
+- **Mobile:** This app would be primarily developed for mobile but would perhaps be just as viable on a computer, such as Facebook or other similar apps. Functionality wouldn't be limited to mobile devices, however mobile version could potentially have more features.
+- **Story:** Make organizing dine & donate fundraisers between restaurants and charities easy, and allow these fundraisers to reach more diners.
+- **Market:** 
+    - User: 
+        - Any individual who is eating at a restaurant and wants to donate to a charity. 
+    - Restaurant owner:
+        - Restaurants who would like to market through fundraising events.
+    - Charity organizer:
+        - Make donations to their charity more accessible to users
+- **Habit:** 
+    - Charities will remind users to download the app/use it. 
+    - Upon ariving at events users will show their "voucher image" as apposed to the print-out flyers that these event organizers usually hand out. 
+    - Push notifications will be sent to users to show upcoming nearby events to support.
+- **Scope:** 
+    - First we would make it so that users can see where/when dine & donates near them are happening. They would be able to save the events they are interested in and easily access the vouchers for these events. 
+    - Eventually, we would make different profiles for charities and restaurants so users could follow them and get specific updates on their fundraisers. 
+    - Another future goal could be to have verified restaurants, for which we keep data on past events to incentivize organizations to hold fundraisers with them.
+    - Ultimately, we could automate the entire dine & donate process. We would be the third party between organizations and restaurants. We would set up these events for restaurants so that they would not have to worry about organizing the events, only accepting/denying the ones we have set up with local organizations.
+
+
 
 ## Product Spec
-### 1. User Stories (Required and Optional)
+### User Stories (Required and Optional)
 
 **Required Must-have Stories**
 
-* User logs in to access previous chats and preference settings
-* User picks what their favorite artist/genre/etc. (Think Spotify interface)
-* Matches have a chat window to get to know each other, with the ability to skip music and unmatch (Tinder Style).
-* Profile pages for each user
-* Settings (Accesibility, Notification, General, etc.)
+* Create account / login (2 account types)
+    * User
+    * Charity / Organization
+* Organizations can see the nearby restaurants in their area
+    * Enable them to create fundraising events at nearby restaurants
+* Users can see where and when dine & donate events are taking place on a map
+    * User can save an event and then be able to access the voucher to show at restaurant to ensure a portion of their meal cost is donated 
+
 
 **Optional Nice-to-have Stories**
 
-* Log of past songs/people with album art covers matching
-* Page of most played songs (i.e. songs that most users are connecting through)
-* Profile Add-On: Top music choices, etc.
-* Optional Shuffle Button (i.e. random encounter/random song)
-* Listening/Encounter Queue
+* Users can follow charities and restaurants
+    * Can see timeline for upcoming events
+        * Filter by date (one specific date, or within range of current date)
+        * Filter by following, nearby, or both
+    * Push notifications for upcoming events in the area and for charities/restaurants they're following
+    * Users can select which types of charities/restaurants their interested in (similar to Pinterest)
+* View a restaurant's profile to get information on type of food, average price, menu, hours, etc. 
+* View a charity's profile to read about their mission and where the money fundraised is going
 
-### 2. Screen Archetypes
+## GIF Walkthrough 
+<img src="https://github.com/facebook-university/team_project/blob/master/dine_and_donate_walkthrough.gif" width=200>
 
-* Login 
-* Register - User signs up or logs into their account
-   * Upon Download/Reopening of the application, the user is prompted to log in to gain access to their profile information to be properly matched with another person. 
-   * ...
-* Messaging Screen - Chat for users to communicate (direct 1-on-1)
-   * Upon selecting music choice users matched and message screen opens
-* Profile Screen 
-   * Allows user to upload a photo and fill in information that is interesting to them and others
-* Song Selection Screen.
-   * Allows user to be able to choose their desired song, artist, genre of preference and begin listening and interacting with others.
-* Settings Screen
-   * Lets people change language, and app notification settings.
-
-### 3. Navigation
-
-**Tab Navigation** (Tab to Screen)
-
-* Music selection
-* Profile
-* Settings
-
-Optional:
-* Music/Encounter Queue
-* Discover (Top Choices)
-
-**Flow Navigation** (Screen to Screen)
-* Forced Log-in -> Account creation if no log in is available
-* Music Selection (Or Queue if Optional) -> Jumps to Chat
-* Profile -> Text field to be modified. 
-* Settings -> Toggle settings
-
-## Wireframes
-<img src="https://i.imgur.com/9CrjH1K.jpg" width=800><br>
-
-### [BONUS] Digital Wireframes & Mockups
-<img src="https://i.imgur.com/lYHn37F.jpg" height=200>
-
-### [BONUS] Interactive Prototype
-<img src="https://i.imgur.com/AiKfE5g.gif" width=200>
